@@ -83,7 +83,7 @@ export default async function RootLayout({
       lang="en"
       className={`${GeistSans.variable} ${GeistMono.variable} ${buildWarsFont.variable}`}
     >
-      <body className="antialiased min-h-screen bg-background font-sans dot-grid-subtle flex flex-col">
+      <body className="antialiased min-h-dvh bg-background font-sans dot-grid-subtle flex flex-col">
         <AuthProvider initialUser={user} initialProfile={profile}>
           <AuthModalProvider>
             <Header />

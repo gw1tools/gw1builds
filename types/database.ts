@@ -87,6 +87,9 @@ export interface SkillBar {
   skills: number[]
 }
 
+/** Moderation status for builds */
+export type ModerationStatus = 'published' | 'delisted' | 'appealed'
+
 /**
  * A complete build with metadata
  * Can be single-bar (player) or multi-bar (team)
@@ -114,6 +117,10 @@ export interface Build {
   updated_at: string
   /** Soft delete timestamp, null if active */
   deleted_at: string | null
+  /** Moderation status: published (default), delisted, or appealed */
+  moderation_status?: ModerationStatus
+  /** Reason for delisting (if delisted) */
+  moderation_reason?: string | null
 }
 
 /**
@@ -256,4 +263,6 @@ export interface BuildListItem {
     username: string | null
     avatar_url: string | null
   } | null
+  /** Moderation status (only included for author's own builds in My Builds) */
+  moderation_status?: ModerationStatus
 }

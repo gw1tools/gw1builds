@@ -8,7 +8,7 @@
 
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Eye, Clock, Copy, Link2, Pencil, Check } from 'lucide-react'
+import { Eye, Clock, Copy, Link2, Pencil, Check, Flag } from 'lucide-react'
 import { useState, useMemo, useEffect } from 'react'
 import {
   trackBuildViewed,
@@ -16,6 +16,7 @@ import {
   trackBuildShared,
 } from '@/lib/analytics'
 import { cn } from '@/lib/utils'
+import { useAuthModal } from '@/components/auth/auth-modal'
 import { SkillMentionTooltip } from '@/components/ui/skill-mention-tooltip'
 import { SkillBar } from '@/components/ui/skill-bar'
 import { AttributeBar } from '@/components/ui/attribute-bar'
@@ -25,6 +26,7 @@ import { ProfessionIcon } from '@/components/ui/profession-icon'
 import { Tag, TagGroup } from '@/components/ui/tag'
 import { HeroBuildCard } from '@/components/build/hero-build-card'
 import { TeamOverview } from '@/components/build/team-overview'
+import { ReportModal } from '@/components/build/report-modal'
 import type { BuildWithAuthor } from '@/types/database'
 import type { Skill } from '@/lib/gw/skills'
 import type { ProfessionKey } from '@/types/gw1'
@@ -53,6 +55,18 @@ export function BuildPageClient({
   isAuthenticated,
 }: BuildPageClientProps) {
   const isSingleBuild = build.bars.length === 1
+  const [reportModalOpen, setReportModalOpen] = useState(false)
+  const isDelisted = build.moderation_status === 'delisted'
+  const { openModal } = useAuthModal()
+
+  const handleReportClick = () => {
+    if (!isAuthenticated) {
+      // Open auth modal - user can report after logging in
+      openModal()
+      return
+    }
+    setReportModalOpen(true)
+  }
 
   // Track build view on mount (only once per build)
   useEffect(() => {
@@ -69,6 +83,22 @@ export function BuildPageClient({
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8 pb-12">
+      {/* Delisted banner - only shown to author */}
+      {isOwner && isDelisted && (
+        <div className="mb-6 p-4 rounded-xl border border-accent-red/30 bg-accent-red/5">
+          <div className="flex items-start gap-3">
+            <Flag className="w-5 h-5 text-accent-red shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-accent-red">
+                This build has been delisted
+              </p>
+              <p className="text-sm text-text-secondary mt-1">
+                {build.moderation_reason || 'This build is no longer visible to other users due to community reports.'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Breadcrumb + Actions Row - consistent for all builds */}
       <nav className="flex items-center justify-between mb-6">
         <div className="text-sm text-text-muted font-mono">
@@ -176,11 +206,27 @@ export function BuildPageClient({
             </span>
           </div>
 
-          <Button variant="ghost" size="sm" noLift>
-            Report
-          </Button>
+          {/* Report button for all non-owners (triggers auth flow if not logged in) */}
+          {!isOwner && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleReportClick}
+              leftIcon={<Flag className="w-3.5 h-3.5" />}
+              noLift
+            >
+              Report
+            </Button>
+          )}
         </div>
       </footer>
+
+      {/* Report Modal */}
+      <ReportModal
+        buildId={build.id}
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+      />
     </main>
   )
 }
@@ -202,6 +248,7 @@ function PageActions({
   isAuthenticated: boolean
 }) {
   const [linkCopied, setLinkCopied] = useState(false)
+  const { openModal } = useAuthModal()
 
   const handleStarChange = async () => {
     const response = await fetch(`/api/builds/${buildId}/star`, {
@@ -229,8 +276,8 @@ function PageActions({
         count={starCount}
         isStarred={initialStarred}
         onStarChange={handleStarChange}
+        onUnauthenticatedClick={isAuthenticated ? undefined : openModal}
         size="sm"
-        disabled={!isAuthenticated}
       />
 
       <Button
