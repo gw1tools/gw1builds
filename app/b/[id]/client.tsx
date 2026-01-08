@@ -56,6 +56,7 @@ export function BuildPageClient({
 }: BuildPageClientProps) {
   const isSingleBuild = build.bars.length === 1
   const [reportModalOpen, setReportModalOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const isDelisted = build.moderation_status === 'delisted'
   const { openModal } = useAuthModal()
 
@@ -81,6 +82,15 @@ export function BuildPageClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [build.id])
 
+  // Track scroll for sticky header
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
     <main className="max-w-3xl mx-auto px-4 py-8 pb-12">
       {/* Delisted banner - only shown to author */}
@@ -99,28 +109,49 @@ export function BuildPageClient({
           </div>
         </div>
       )}
-      {/* Breadcrumb + Actions Row - consistent for all builds */}
-      <nav className="flex items-center justify-between mb-6">
-        <div className="text-sm text-text-muted font-mono">
-          <Link
-            href="/"
-            className="text-text-secondary hover:text-accent-gold transition-colors"
-          >
-            builds
-          </Link>
-          {' / '}
-          <span>{build.id}</span>
-        </div>
+      {/* Sticky Navigation Bar */}
+      <nav
+        className={cn(
+          'fixed top-[60px] left-0 right-0 z-30 transition-all duration-200',
+          isScrolled
+            ? 'bg-bg-primary/95 backdrop-blur-md border-b border-border shadow-lg'
+            : 'bg-transparent'
+        )}
+      >
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          {/* Breadcrumb with build name */}
+          <div className="text-sm text-text-muted font-mono flex items-center gap-2 min-w-0 flex-1">
+            <Link
+              href="/"
+              className="text-text-secondary hover:text-accent-gold transition-colors shrink-0"
+            >
+              builds
+            </Link>
+            <span className="shrink-0">/</span>
+            <span className="shrink-0">{build.id}</span>
+            {isScrolled && (
+              <>
+                <span className="shrink-0 text-text-muted/50">•</span>
+                <span className="truncate text-text-primary font-sans">
+                  {build.name}
+                </span>
+              </>
+            )}
+          </div>
 
-        {/* Actions always in breadcrumb row for consistency */}
-        <PageActions
-          buildId={build.id}
-          isOwner={isOwner}
-          initialStarred={initialStarred}
-          starCount={starCount}
-          isAuthenticated={isAuthenticated}
-        />
+          {/* Actions */}
+          <PageActions
+            buildId={build.id}
+            isOwner={isOwner}
+            initialStarred={initialStarred}
+            starCount={starCount}
+            isAuthenticated={isAuthenticated}
+          />
+        </div>
       </nav>
+
+      {/* Spacer to prevent content jump */}
+      <div className="h-12" />
 
       {/* Single Build View - unified card with title */}
       {isSingleBuild && (
