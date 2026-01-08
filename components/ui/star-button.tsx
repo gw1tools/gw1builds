@@ -13,6 +13,8 @@ export interface StarButtonProps {
   isStarred?: boolean
   /** Callback when star is clicked - must complete before another click is allowed */
   onStarChange?: (starred: boolean) => Promise<void> | void
+  /** Callback when unauthenticated user clicks (e.g., to open auth modal) */
+  onUnauthenticatedClick?: () => void
   /** Size variant */
   size?: 'sm' | 'md' | 'lg'
   /** Show count even when 0 */
@@ -64,6 +66,7 @@ export const StarButton = forwardRef<HTMLButtonElement, StarButtonProps>(
       count: initialCount,
       isStarred: initialIsStarred = false,
       onStarChange,
+      onUnauthenticatedClick,
       size = 'md',
       showZeroCount = false,
       disabled,
@@ -85,6 +88,12 @@ export const StarButton = forwardRef<HTMLButtonElement, StarButtonProps>(
 
     const handleClick = async () => {
       if (disabled || isLoading) return
+
+      // If unauthenticated callback provided, call it instead of starring
+      if (onUnauthenticatedClick) {
+        onUnauthenticatedClick()
+        return
+      }
 
       const newStarredState = !isStarred
 

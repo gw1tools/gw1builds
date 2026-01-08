@@ -344,7 +344,7 @@ export function NewBuildForm() {
   // Show loading while checking auth
   if (authLoading) {
     return (
-      <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center">
+      <div className="min-h-[calc(100dvh-3.5rem)] flex items-center justify-center">
         <ProfessionSpinner />
       </div>
     )
@@ -353,7 +353,7 @@ export function NewBuildForm() {
   // Don't render form if not authenticated
   if (!user) {
     return (
-      <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-4">
+      <div className="min-h-[calc(100dvh-3.5rem)] flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <p className="text-text-secondary">
             Please sign in to create a build
@@ -365,7 +365,7 @@ export function NewBuildForm() {
 
   return (
     <motion.div
-      className="min-h-[calc(100vh-3.5rem)] w-full max-w-4xl mx-auto px-4 py-6 sm:py-8"
+      className="min-h-[calc(100dvh-3.5rem)] w-full max-w-4xl mx-auto px-4 py-6 sm:py-8"
       variants={pageTransitionVariants}
       initial="initial"
       animate="animate"

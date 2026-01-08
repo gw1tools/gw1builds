@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { Github } from 'lucide-react'
 
 // Compute year once at module level to prevent hydration mismatch
 const CURRENT_YEAR = new Date().getFullYear()
@@ -33,12 +34,12 @@ const dotVariants = {
 }
 
 /**
- * Minimal site footer with GW1 flair
+ * Minimal site footer with GW1 flair - fixed at bottom
  */
 export function Footer() {
   return (
-    <footer className="mt-12 border-t border-border bg-bg-secondary">
-      <div className="container mx-auto px-4 py-5">
+    <footer className="border-t border-border bg-bg-secondary">
+      <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Left - Links */}
           <div className="flex items-center gap-2 text-xs text-text-muted">
@@ -55,6 +56,16 @@ export function Footer() {
             >
               Terms
             </Link>
+            <span>·</span>
+            <a
+              href="https://github.com/gw1tools/gw1builds"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-text-secondary transition-colors"
+              aria-label="View source on GitHub"
+            >
+              <Github className="w-3.5 h-3.5" />
+            </a>
           </div>
 
           {/* Right - Year + Profession dots */}

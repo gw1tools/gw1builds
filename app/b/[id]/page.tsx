@@ -43,7 +43,8 @@ export async function generateMetadata({
   const { id } = await params
   const build = await getBuildById(id)
 
-  if (!build) {
+  // Don't expose metadata for non-existent or delisted builds
+  if (!build || build.moderation_status === 'delisted') {
     return {
       title: 'Build not found',
     }
@@ -156,10 +157,17 @@ export default async function BuildPage({ params }: BuildPageProps) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Record view - fire and forget (don't block render)
-  recordBuildView(id, clientIP).catch(() => {})
-
   const isOwner = user?.id === build.author_id
+
+  // Access control: delisted builds only visible to owner
+  if (build.moderation_status === 'delisted' && !isOwner) {
+    notFound()
+  }
+
+  // Record view - fire and forget (don't block render, only for published builds)
+  if (build.moderation_status === 'published') {
+    recordBuildView(id, clientIP).catch(() => {})
+  }
 
   // Check if user has starred this build
   const initialStarred = user ? await hasUserStarredBuild(user.id, id) : false

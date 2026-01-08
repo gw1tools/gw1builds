@@ -6,6 +6,7 @@
  * - 3-20 characters
  * - Alphanumeric + underscore + hyphen only (A-Za-z0-9_-)
  * - No spaces
+ * - No profanity (checked server-side with leet-speak detection)
  * - Unique (case-insensitive) - checked server-side
  */
 
@@ -15,7 +16,7 @@ export const USERNAME_REGEX = /^[A-Za-z0-9_-]+$/
 
 /**
  * Validates username format (client-side check)
- * Does NOT check uniqueness - that requires a server call
+ * Does NOT check uniqueness or profanity - those require server calls
  */
 export function validateUsername(username: string): {
   valid: boolean
@@ -53,33 +54,96 @@ export function validateUsername(username: string): {
 
 /**
  * Reserved usernames that cannot be used
- * Includes common routes and system names
+ * Includes:
+ * - Route names (to prevent URL conflicts)
+ * - System/admin names
+ * - Impersonation vectors (official accounts)
+ * - Special values (null, undefined, etc.)
  */
 export const RESERVED_USERNAMES = new Set([
+  // System/admin names
   'admin',
   'administrator',
-  'api',
-  'auth',
-  'build',
-  'builds',
-  'gw1builds',
-  'help',
-  'login',
-  'logout',
-  'me',
   'mod',
   'moderator',
-  'new',
-  'null',
-  'profile',
   'root',
-  'settings',
-  'signup',
-  'support',
   'system',
-  'undefined',
+  'support',
+  'help',
+  'staff',
+  'team',
+  'official',
+  // Auth routes
+  'auth',
+  'login',
+  'logout',
+  'signup',
+  'signin',
+  'signout',
+  'register',
+  // App routes
+  'api',
+  'b',
+  'build',
+  'builds',
+  'new',
+  'edit',
+  'create',
+  'delete',
+  'search',
+  'browse',
+  'explore',
+  'feed',
+  // User routes
+  'me',
+  'my',
+  'profile',
+  'settings',
+  'account',
   'user',
   'users',
+  'u',
+  // Static pages
+  'about',
+  'privacy',
+  'terms',
+  'contact',
+  'faq',
+  'design-system',
+  // Brand/impersonation
+  'gw1builds',
+  'gw1',
+  'guildwars',
+  'arenanet',
+  'anet',
+  'ncsoft',
+  // Infrastructure
+  'www',
+  'mail',
+  'ftp',
+  'cdn',
+  'assets',
+  'static',
+  // Special values
+  'null',
+  'undefined',
+  'anonymous',
+  'unknown',
+  'deleted',
+  'removed',
+  'nobody',
+  'everyone',
+  'all',
+  // Common test names
+  'test',
+  'demo',
+  'example',
+  'sample',
+  // Variations
+  'admin1',
+  'admin2',
+  'moderator1',
+  'support1',
   'welcome',
 ])
 
