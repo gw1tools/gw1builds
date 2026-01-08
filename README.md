@@ -119,7 +119,7 @@ docs/PRD/     → Product requirement documents (some might be outdated, but I l
 
 ## Contributing
 
-**For now, let's keep it simple:** Directly share your feedback and [open an issue](https://github.com/gw1tools/gw1builds/issues) on GitHub. The more detailed your feedback, the higher the chance of it being addressed.
+Found a bug or have an idea? [Open an issue](https://github.com/gw1tools/gw1builds/issues) on GitHub. The more detail you provide, the easier it is to implement. Want to contribute code? Reach out via an issue first and we'll go from there.
 
 ---
 
@@ -139,7 +139,7 @@ A special thanks to:
 
 ## License
 
-[MIT](LICENSE) - Do what you want with it.
+[MIT](LICENSE) - Free to use, modify, and share.
 
 ---
 
