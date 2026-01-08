@@ -1,10 +1,7 @@
 'use client'
 
 /**
- * @fileoverview Authentication modal with sticky-note aesthetic
- *
- * Design: "FigJam meets Dark Mode" - playful sticky-note energy
- * with tape decorations, offset shadows, and Guild Wars gold accents.
+ * @fileoverview Authentication modal
  *
  * Two steps:
  * 1. Sign-in modal - triggered via openModal()
@@ -83,9 +80,13 @@ export function AuthModalProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <AuthModalContext.Provider value={{ isOpen, openModal, closeModal, redirectTo }}>
+    <AuthModalContext.Provider
+      value={{ isOpen, openModal, closeModal, redirectTo }}
+    >
       {children}
-      {isClient && <AuthModal open={isOpen} onClose={closeModal} redirectTo={redirectTo} />}
+      {isClient && (
+        <AuthModal open={isOpen} onClose={closeModal} redirectTo={redirectTo} />
+      )}
     </AuthModalContext.Provider>
   )
 }
@@ -102,7 +103,15 @@ export function useAuthModal() {
 // AUTH MODAL COMPONENT
 // ============================================================================
 
-function AuthModal({ open, onClose, redirectTo }: { open: boolean; onClose: () => void; redirectTo: string | null }) {
+function AuthModal({
+  open,
+  onClose,
+  redirectTo,
+}: {
+  open: boolean
+  onClose: () => void
+  redirectTo: string | null
+}) {
   const { user, profile, refreshProfile, signOut } = useAuth()
   const router = useRouter()
   const modalRef = useRef<HTMLDivElement>(null)
@@ -231,7 +240,7 @@ function AuthModal({ open, onClose, redirectTo }: { open: boolean; onClose: () =
             onClick={handleBackdropClick}
           />
 
-          {/* Modal Card - sticky note style with gold border */}
+          {/* Modal Card */}
           <motion.div
             ref={modalRef}
             role="dialog"
@@ -239,18 +248,13 @@ function AuthModal({ open, onClose, redirectTo }: { open: boolean; onClose: () =
             aria-labelledby="auth-modal-title"
             aria-describedby="auth-modal-description"
             className={cn(
-              'relative z-10 w-full max-w-sm',
+              'relative z-10 w-full max-w-md',
               'bg-bg-card',
-              'border-2 border-accent-gold',
-              'rounded-[var(--radius-lg)]',
+              'border border-border',
+              'rounded-xl',
               'max-h-[90vh] overflow-y-auto',
-              // Slight rotation for playful sticky-note feel
-              'rotate-[0.3deg]'
+              'shadow-xl'
             )}
-            style={{
-              boxShadow:
-                '6px 6px 0px 0px rgba(212, 175, 55, 0.4), 8px 8px 20px 0px rgba(0, 0, 0, 0.5)',
-            }}
             variants={reducedMotion ? undefined : modalContentVariants}
             initial={reducedMotion ? undefined : 'hidden'}
             animate={reducedMotion ? undefined : 'visible'}
@@ -324,11 +328,8 @@ function SignInStep() {
           id="auth-modal-title"
           className="text-lg font-bold text-text-primary mb-1"
         >
-          Sign in
+          Sign in to Contribute
         </h2>
-        <p id="auth-modal-description" className="text-sm text-text-secondary">
-          to create and share builds
-        </p>
       </motion.div>
 
       {/* Simple bullet points */}
@@ -345,6 +346,7 @@ function SignInStep() {
         }}
       >
         <Benefit>Create, edit and delete your builds anytime</Benefit>
+        <Benefit>Star builds to store them, report builds to flag them</Benefit>
         <Benefit>
           We don&apos;t store your email, we&apos;ll never spam you
         </Benefit>
@@ -412,6 +414,8 @@ function UsernameStep({
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const currentValueRef = useRef<string>('')
   const isMountedRef = useRef(true)
   const reducedMotion = useReducedMotion()
 
@@ -420,6 +424,8 @@ function UsernameStep({
     isMountedRef.current = true
     return () => {
       isMountedRef.current = false
+      // Cancel any in-flight request on unmount
+      abortControllerRef.current?.abort()
     }
   }, [])
 
@@ -427,22 +433,28 @@ function UsernameStep({
     const value = e.target.value
     setUsername(value)
     setIsAvailable(null)
+    currentValueRef.current = value
 
+    // Cancel any pending debounce and in-flight request
     if (debounceRef.current) clearTimeout(debounceRef.current)
+    abortControllerRef.current?.abort()
 
     if (!value.trim()) {
       setError(null)
+      setIsChecking(false)
       return
     }
 
     const validation = validateUsername(value)
     if (!validation.valid) {
       setError(validation.error || null)
+      setIsChecking(false)
       return
     }
 
     if (isReservedUsername(value)) {
       setError('This username is reserved')
+      setIsChecking(false)
       return
     }
 
@@ -452,24 +464,31 @@ function UsernameStep({
   }
 
   const checkAvailability = useCallback(async (value: string) => {
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController()
+
     try {
       const res = await fetch(
-        `/api/auth/username/check?username=${encodeURIComponent(value)}`
+        `/api/auth/username/check?username=${encodeURIComponent(value)}`,
+        { signal: abortControllerRef.current.signal }
       )
       const data = await res.json()
 
-      // Don't update state if component unmounted
-      if (!isMountedRef.current) return
+      // Don't update state if component unmounted or value changed
+      if (!isMountedRef.current || currentValueRef.current !== value) return
 
       setIsAvailable(data.available)
       if (!data.available) {
         setError(data.error || 'Username is already taken')
       }
-    } catch {
+    } catch (err) {
+      // Ignore abort errors (user typed again before request completed)
+      if (err instanceof Error && err.name === 'AbortError') return
       if (!isMountedRef.current) return
       setError('Failed to check availability')
     } finally {
-      if (isMountedRef.current) {
+      // Only clear loading if this is still the current value
+      if (isMountedRef.current && currentValueRef.current === value) {
         setIsChecking(false)
       }
     }
@@ -524,7 +543,7 @@ function UsernameStep({
     }
   }
 
-  const isValid = username.trim() && !error && !isChecking
+  const isValid = username.trim() && !error && !isChecking && isAvailable === true
 
   return (
     <div className="p-6 pt-8">

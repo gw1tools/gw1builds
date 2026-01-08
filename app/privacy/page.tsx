@@ -14,7 +14,7 @@ export const metadata: Metadata = {
  */
 export default function PrivacyPage() {
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] py-12 px-4">
+    <div className="min-h-[calc(100dvh-3.5rem)] py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <Link href="/" className="inline-block mb-8">
           <Button

@@ -14,6 +14,7 @@ import {
   validateUsername,
   isReservedUsername,
 } from '@/lib/validations/username'
+import { containsProfanity } from '@/lib/validations/profanity'
 import { removeControlChars } from '@/lib/security'
 
 export async function GET(request: Request) {
@@ -58,6 +59,14 @@ export async function GET(request: Request) {
       return NextResponse.json({
         available: false,
         error: 'This username is reserved',
+      })
+    }
+
+    // Check profanity (with leet-speak detection)
+    if (containsProfanity(trimmedUsername)) {
+      return NextResponse.json({
+        available: false,
+        error: 'This username is not allowed',
       })
     }
 

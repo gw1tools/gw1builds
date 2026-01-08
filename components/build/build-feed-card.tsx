@@ -10,9 +10,10 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Star, Eye, Users } from 'lucide-react'
+import { Star, Eye, Users, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ProfessionBadge } from '@/components/ui/profession-badge'
+import { Badge } from '@/components/ui/badge'
 import { Tag, TagGroup } from '@/components/ui/tag'
 import { getSkillIconUrlById } from '@/lib/gw/icons'
 import type { BuildListItem } from '@/types/database'
@@ -143,6 +144,7 @@ export function BuildFeedCard({
 }: BuildFeedCardProps) {
   const isTeamBuild = build.bars.length > 1
   const heroCount = build.bars.length
+  const isDelisted = build.moderation_status === 'delisted'
 
   // Get first bar for profession display
   const firstBar = build.bars[0]
@@ -154,14 +156,19 @@ export function BuildFeedCard({
 
   const cardContent = (
     <>
-      {/* Header: Name */}
-      <div className="mb-2">
+      {/* Header: Name + Delisted Badge */}
+      <div className="mb-2 flex items-start justify-between gap-2">
         <h3 className={cn(
           'font-semibold text-text-primary leading-tight line-clamp-1',
           size === 'lg' ? 'text-lg' : 'text-sm'
         )}>
           {build.name}
         </h3>
+        {isDelisted && (
+          <Badge variant="danger" size="sm" icon={<AlertTriangle className="w-3 h-3" />}>
+            Delisted
+          </Badge>
+        )}
       </div>
 
       {/* Badge row - Profession or Team indicator */}

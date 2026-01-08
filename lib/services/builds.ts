@@ -22,12 +22,16 @@ import type {
   BuildWithAuthor,
   BuildVersionInsert,
 } from '@/types/database'
-import { BUILD_ID_LENGTH, MAX_BARS, MIN_BARS } from '@/lib/constants'
+import { BUILD_ID_LENGTH, MIN_BARS } from '@/lib/constants'
 import {
   validateBuildInput,
   sanitizeBuildInput,
   validateBars,
 } from '@/lib/validation'
+import {
+  containsProfanity,
+  extractTextFromTiptap,
+} from '@/lib/validations/profanity'
 
 // ============================================================================
 // ERROR TYPES
@@ -149,6 +153,7 @@ export async function getPopularBuilds(limit = 20): Promise<BuildListItem[]> {
     `
     )
     .is('deleted_at', null)
+    .eq('moderation_status', 'published')
     .order('star_count', { ascending: false })
     .limit(safeLimit)
 
@@ -185,6 +190,7 @@ export async function getRecentBuilds(limit = 20): Promise<BuildListItem[]> {
     `
     )
     .is('deleted_at', null)
+    .eq('moderation_status', 'published')
     .order('created_at', { ascending: false })
     .limit(safeLimit)
 
@@ -201,10 +207,10 @@ export async function getRecentBuilds(limit = 20): Promise<BuildListItem[]> {
 }
 
 /**
- * Fetches all builds by a specific user
+ * Fetches all builds by a specific user (including delisted - author can see their own)
  *
  * @param userId - UUID of the user
- * @returns Array of builds for list view
+ * @returns Array of builds for list view (includes moderation_status for delisted badge)
  */
 export async function getUserBuilds(userId: string): Promise<BuildListItem[]> {
   // Guard: Validate UUID format (basic check)
@@ -219,7 +225,7 @@ export async function getUserBuilds(userId: string): Promise<BuildListItem[]> {
     .from('builds')
     .select(
       `
-      id, name, tags, bars, star_count, view_count, created_at,
+      id, name, tags, bars, star_count, view_count, created_at, moderation_status,
       author:users!builds_author_id_fkey(username, avatar_url)
     `
     )
@@ -240,7 +246,7 @@ export async function getUserBuilds(userId: string): Promise<BuildListItem[]> {
 }
 
 /**
- * Fetches builds starred by a specific user
+ * Fetches builds starred by a specific user (excludes delisted builds)
  *
  * @param userId - UUID of the user
  * @returns Array of builds for list view
@@ -264,7 +270,7 @@ export async function getUserStarredBuilds(
       `
       created_at,
       builds (
-        id, name, tags, bars, star_count, view_count, created_at, deleted_at,
+        id, name, tags, bars, star_count, view_count, created_at, deleted_at, moderation_status,
         author:users!builds_author_id_fkey(username, avatar_url)
       )
     `
@@ -280,12 +286,13 @@ export async function getUserStarredBuilds(
     return []
   }
 
-  // Flatten the nested structure, transform author, and filter out deleted
+  // Flatten the nested structure, transform author, and filter out deleted/delisted
   const results: BuildListItem[] = []
   for (const row of data || []) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const build = row.builds as any
-    if (!build || build.deleted_at) continue
+    // Filter out deleted and delisted builds (users shouldn't see other people's delisted builds)
+    if (!build || build.deleted_at || build.moderation_status !== 'published') continue
 
     const authorData = build.author
     results.push({
@@ -371,6 +378,21 @@ export async function createBuild(build: BuildInsert): Promise<Build> {
     notes: build.notes,
     tags: build.tags,
   })
+
+  // Check for profanity in name, bar names, and notes
+  if (containsProfanity(sanitized.name)) {
+    throw new ValidationError('Build name contains inappropriate content')
+  }
+  for (const bar of sanitized.bars) {
+    const barName = bar.name as string
+    if (barName && containsProfanity(barName)) {
+      throw new ValidationError('Skill bar name contains inappropriate content')
+    }
+  }
+  const notesText = extractTextFromTiptap(sanitized.notes)
+  if (notesText && containsProfanity(notesText)) {
+    throw new ValidationError('Build notes contain inappropriate content')
+  }
 
   const supabase = await createClient()
   const id = nanoid(BUILD_ID_LENGTH)
@@ -466,6 +488,25 @@ export async function updateBuild(
     sanitizedUpdates.tags = updates.tags.map(t =>
       t.replace(/[\x00-\x1F\x7F]/g, '').trim()
     )
+  }
+
+  // Check for profanity in name, bar names, and notes
+  if (sanitizedUpdates.name && containsProfanity(sanitizedUpdates.name)) {
+    throw new ValidationError('Build name contains inappropriate content')
+  }
+  if (sanitizedUpdates.bars) {
+    for (const bar of sanitizedUpdates.bars) {
+      const barName = bar.name as string
+      if (barName && containsProfanity(barName)) {
+        throw new ValidationError('Skill bar name contains inappropriate content')
+      }
+    }
+  }
+  if (sanitizedUpdates.notes) {
+    const updateNotesText = extractTextFromTiptap(sanitizedUpdates.notes)
+    if (updateNotesText && containsProfanity(updateNotesText)) {
+      throw new ValidationError('Build notes contain inappropriate content')
+    }
   }
 
   const supabase = await createClient()

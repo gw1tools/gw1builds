@@ -59,6 +59,7 @@ export async function getBuilds(
     `
     )
     .is('deleted_at', null)
+    .eq('moderation_status', 'published')
     .range(offset, offset + limit - 1)
 
   if (type === 'popular') {

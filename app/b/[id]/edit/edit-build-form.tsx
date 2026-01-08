@@ -300,7 +300,7 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
   // Show loading while fetching
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center">
+      <div className="min-h-[calc(100dvh-3.5rem)] flex items-center justify-center">
         <ProfessionSpinner />
       </div>
     )
@@ -309,7 +309,7 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
   // Don't render if not authenticated
   if (!user) {
     return (
-      <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-4">
+      <div className="min-h-[calc(100dvh-3.5rem)] flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <p className="text-text-secondary">
             Please sign in to edit this build
@@ -322,7 +322,7 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
   // Show error if failed to load
   if (error && !originalData) {
     return (
-      <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-4">
+      <div className="min-h-[calc(100dvh-3.5rem)] flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <p className="text-accent-red mb-4">{error}</p>
           <Button onClick={() => router.push(`/b/${buildId}`)}>
@@ -335,7 +335,7 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
 
   return (
     <motion.div
-      className="min-h-[calc(100vh-3.5rem)] w-full max-w-4xl mx-auto px-4 py-6 sm:py-8"
+      className="min-h-[calc(100dvh-3.5rem)] w-full max-w-4xl mx-auto px-4 py-6 sm:py-8"
       variants={pageTransitionVariants}
       initial="initial"
       animate="animate"
