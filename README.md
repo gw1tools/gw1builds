@@ -128,12 +128,12 @@ docs/PRD/     → Product requirement documents (some might be outdated, but I l
 A special thanks to:
 
 - **[ArenaNet](https://www.arena.net)** - For creating Guild Wars and so many wonderful memories. Reforged has been such a surprise and an inspiration to create this project.
-- **[Guild Wars Wiki](https://wiki.guildwars.com)** - The definitive resource for all things GW1
+- **[Guild Wars Wiki](https://wiki.guildwars.com)** - The definitive resource for all things GW1.
 - **[PvX Wiki](https://gwpvx.fandom.com)** - For years of build documentation and community knowledge. We hope to build a complementary tool for easier build sharing.
 - **[TeamBuilder](http://www.gwteambuilder.de/en/)** - For creating the original build sharing tool and all the amazing memories playing HA late at night.
-- **[paw·ned²](https://memorial.redeemer.biz/pawned2/)** - For continuing the TeamBuilder legacy and for the profession icon font
-- **[build-wars](https://github.com/build-wars)** - For the template decoder and skill data
-- **[Claude Code](https://claude.ai)** - AI-assisted development companion
+- **[paw·ned²](https://memorial.redeemer.biz/pawned2/)** - For continuing the TeamBuilder legacy and for the profession icon font.
+- **[build-wars](https://github.com/build-wars)** - For the template decoder and skill data.
+- **[Claude Code](https://claude.ai)** - For making this project possible. Without AI-assisted development, we wouldn't have had the time or resources to build this.
 
 ---
 
