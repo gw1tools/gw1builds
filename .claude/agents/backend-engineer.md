@@ -31,7 +31,7 @@ description: |
   - Authentication or authorization logic
   - Performance optimizations for server-side operations
   - Security-sensitive operations (user data, permissions)
-model: sonnet
+model: opus
 color: red
 ---
 
@@ -65,6 +65,8 @@ You build robust, secure backend systems for GW1 Builds following these principl
 ## Supabase Project IDs
 
 **ALWAYS use the development branch by default unless explicitly asked for production.**
+
+**For contributors:** If you fork this repo, replace these with your own Supabase project IDs.
 
 | Environment | Project ID | Branch |
 |-------------|------------|--------|
