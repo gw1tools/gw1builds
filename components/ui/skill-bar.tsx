@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useMemo } from 'react'
+import { forwardRef, useEffect, useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { SkillSlot, type SkillSlotProps } from './skill-slot'
 
@@ -29,6 +29,17 @@ export interface SkillBarProps {
  */
 export const SkillBar = forwardRef<HTMLDivElement, SkillBarProps>(
   ({ className, skills, size = 'md', editable = false, onSkillClick }, ref) => {
+    const [isMobile, setIsMobile] = useState(false)
+
+    useEffect(() => {
+      const update = () => setIsMobile(window.innerWidth < 640) // sm breakpoint
+      update()
+      window.addEventListener('resize', update)
+      return () => window.removeEventListener('resize', update)
+    }, [])
+
+    const effectiveSize = isMobile ? 'sm' : size
+
     // Ensure we always have 8 slots
     const normalizedSkills = useMemo(() => {
       const result = [...skills]
@@ -46,8 +57,8 @@ export const SkillBar = forwardRef<HTMLDivElement, SkillBarProps>(
         ref={ref}
         className={cn(
           // 4-column grid on mobile, flex wrap on desktop (allows graceful resize)
-          'grid grid-cols-4 gap-2',
-          'sm:flex sm:flex-wrap sm:items-center',
+          'grid grid-cols-4 gap-1',
+          'sm:flex sm:flex-wrap sm:items-center sm:gap-2',
           // Padding to prevent hover press from being clipped
           'pb-2 -mb-2',
           className
@@ -59,7 +70,7 @@ export const SkillBar = forwardRef<HTMLDivElement, SkillBarProps>(
           <SkillSlot
             key={index}
             skill={skill}
-            size={size}
+            size={effectiveSize}
             position={index + 1}
             empty={!skill}
             onSlotClick={
