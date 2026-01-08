@@ -227,6 +227,8 @@ textarea:focus {
 .prose {
   color: var(--color-text-secondary);
   line-height: 1.7;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Ensure all prose elements inherit proper color */
