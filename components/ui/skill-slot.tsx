@@ -1,0 +1,508 @@
+'use client'
+
+import { forwardRef, useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
+import {
+  useFloating,
+  offset,
+  flip,
+  shift,
+  useHover,
+  useFocus,
+  useDismiss,
+  useInteractions,
+  arrow,
+  FloatingArrow,
+  autoUpdate,
+  FloatingPortal,
+  useClick,
+} from '@floating-ui/react'
+import { cn } from '@/lib/utils'
+import { getSkillIconUrlById } from '@/lib/gw/icons'
+import { getSkillWikiUrl } from '@/lib/gw/wiki'
+
+const slotSizes = {
+  sm: 'w-11 h-11',
+  md: 'w-14 h-14',
+  lg: 'w-16 h-16',
+}
+
+export interface SkillSlotProps {
+  /** Skill data - null/undefined for empty slot */
+  skill?: {
+    id: string | number
+    name: string
+    description?: string
+    profession?: string
+    attribute?: string
+    energy?: number
+    activation?: number
+    recharge?: number
+    elite?: boolean
+    icon?: string
+    adrenaline?: number
+    sacrifice?: number
+    upkeep?: number
+    overcast?: number
+  } | null
+  size?: keyof typeof slotSizes
+  /** Slot position (1-8) for accessibility */
+  position?: number
+  /** Disable interactions */
+  disabled?: boolean
+  /** Show as empty placeholder */
+  empty?: boolean
+  /** Click handler */
+  onSlotClick?: () => void
+  /** Additional class names */
+  className?: string
+}
+
+/**
+ * Single skill slot with Floating UI tooltip
+ *
+ * Features the signature sticky shadow + gold glow for elite skills.
+ * Elite status is determined by skill.elite data, not by position.
+ * Uses Floating UI for smart tooltip positioning (avoids screen edges).
+ *
+ * @example
+ * <SkillSlot skill={energySurge} /> // elite if skill.elite is true
+ * <SkillSlot empty />
+ * <SkillSlot skill={skill} size="lg" onSlotClick={handleClick} />
+ */
+export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
+  (
+    {
+      className,
+      skill,
+      size = 'md',
+      position,
+      disabled = false,
+      empty = false,
+      onSlotClick,
+    },
+    forwardedRef
+  ) => {
+    const [isOpen, setIsOpen] = useState(false)
+    const [imgError, setImgError] = useState(false)
+    const [canHover, setCanHover] = useState(false) // Default false to avoid hydration mismatch
+    const arrowRef = useRef(null)
+    const isEmpty = empty || !skill
+    // Elite is determined ONLY by skill data, not position
+    const elite = skill?.elite === true
+
+    // Detect if device supports hover (desktop) vs touch-only (mobile)
+    useEffect(() => {
+      setCanHover(window.matchMedia('(hover: hover)').matches)
+    }, [])
+
+    // Get icon URL from skill ID (local files in /public/skills/)
+    const skillId =
+      typeof skill?.id === 'number' ? skill.id : parseInt(String(skill?.id), 10)
+    const iconUrl = skillId > 0 ? getSkillIconUrlById(skillId) : null
+
+    // Floating UI setup for smart tooltip positioning
+    const { refs, floatingStyles, context, isPositioned } = useFloating({
+      open: isOpen,
+      onOpenChange: setIsOpen,
+      placement: 'top',
+      strategy: 'fixed',
+      middleware: [
+        offset(12),
+        flip({
+          fallbackPlacements: ['bottom'],
+        }),
+        shift({ padding: 12 }),
+        // eslint-disable-next-line react-hooks/refs -- Floating UI pattern passes ref object, not .current
+        arrow({ element: arrowRef }),
+      ],
+      whileElementsMounted: autoUpdate,
+    })
+
+    // Hover for desktop, click for mobile/touch
+    const hover = useHover(context, {
+      delay: { open: 80, close: 50 },
+    })
+    const click = useClick(context, {
+      ignoreMouse: true,
+    })
+    const focus = useFocus(context)
+    const dismiss = useDismiss(context, {
+      ancestorScroll: true,
+    })
+    const { getReferenceProps, getFloatingProps } = useInteractions([
+      hover,
+      click,
+      focus,
+      dismiss,
+    ])
+
+    // Generate skill abbreviation from name
+    const getSkillAbbr = (name: string) => {
+      const words = name.split(' ')
+      if (words.length === 1) return name.slice(0, 3).toUpperCase()
+      return words
+        .slice(0, 2)
+        .map(w => w[0])
+        .join('')
+        .toUpperCase()
+    }
+
+    // Determine if this should be a link (no custom handler, has skill, and device supports hover)
+    // On touch devices, we show the wiki link inside the tooltip instead
+    const isLink = canHover && !onSlotClick && !isEmpty && skill?.name
+    const wikiUrl = skill?.name ? getSkillWikiUrl(skill.name) : undefined
+
+    // Shared styles for the slot
+    const slotClassName = cn(
+      slotSizes[size],
+      'relative flex items-center justify-center',
+      'cursor-pointer overflow-hidden',
+      'transition-transform duration-75 ease-out',
+      'hover:translate-y-0.5',
+      elite ? 'shadow-sticky-gold' : 'shadow-sticky',
+      isEmpty && 'border-2 border-black',
+      isEmpty ? 'bg-black/60' : 'bg-bg-card',
+      disabled && 'opacity-50 cursor-not-allowed hover:translate-y-0',
+      className
+    )
+
+    // Shared content
+    const slotContent = isEmpty ? (
+      <EmptySlotGhost />
+    ) : iconUrl && !imgError ? (
+      <Image
+        src={iconUrl}
+        alt={skill?.name || 'Skill'}
+        fill
+        sizes={size === 'sm' ? '44px' : size === 'lg' ? '64px' : '56px'}
+        className="object-cover"
+        onError={() => setImgError(true)}
+        unoptimized
+      />
+    ) : (
+      <span
+        className={cn(
+          'text-[10px] font-bold leading-tight text-center px-0.5',
+          elite ? 'text-accent-gold' : 'text-text-secondary'
+        )}
+      >
+        {getSkillAbbr(skill?.name || '')}
+      </span>
+    )
+
+    return (
+      <>
+        {/* Wrapper for Floating UI positioning */}
+        <div
+          ref={refs.setReference}
+          className="flex-shrink-0"
+          {...getReferenceProps()}
+        >
+          {isLink ? (
+            // Proper anchor tag for native link behavior (URL preview, right-click, cmd+click)
+            <a
+              ref={forwardedRef as React.Ref<HTMLAnchorElement>}
+              href={wikiUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${skill?.name}${elite ? ' (Elite)' : ''} - View on GW1 Wiki`}
+              className={cn(slotClassName, 'block')}
+            >
+              {slotContent}
+            </a>
+          ) : (
+            // Div for empty slots or when custom handler is provided
+            <div
+              ref={forwardedRef}
+              role={isEmpty ? 'img' : 'button'}
+              aria-label={
+                isEmpty
+                  ? `Empty skill slot${position ? ` ${position}` : ''}`
+                  : `${skill?.name}${elite ? ' (Elite)' : ''}`
+              }
+              tabIndex={disabled ? -1 : 0}
+              onClick={disabled ? undefined : onSlotClick}
+              className={slotClassName}
+            >
+              {slotContent}
+            </div>
+          )}
+        </div>
+
+        {/* Tooltip with Floating UI portal */}
+        <FloatingPortal>
+          {isOpen && (
+            // eslint-disable-next-line react-hooks/refs -- callback ref, not .current access
+            <div
+              ref={refs.setFloating}
+              style={floatingStyles}
+              className={cn(
+                'z-50 transition-opacity duration-75',
+                // Allow pointer events on touch devices so wiki link is clickable
+                canHover ? 'pointer-events-none' : 'pointer-events-auto',
+                isPositioned ? 'opacity-100' : 'opacity-0'
+              )}
+              {...getFloatingProps()}
+            >
+              {isEmpty ? (
+                <EmptySlotTooltip position={position} />
+              ) : (
+                <SkillTooltipContent
+                  skill={skill!}
+                  elite={elite}
+                  wikiUrl={wikiUrl}
+                  showWikiLink={!canHover}
+                />
+              )}
+              <FloatingArrow
+                ref={arrowRef}
+                context={context}
+                fill="var(--color-bg-primary)"
+                stroke="var(--color-border)"
+                strokeWidth={1}
+              />
+            </div>
+          )}
+        </FloatingPortal>
+      </>
+    )
+  }
+)
+
+SkillSlot.displayName = 'SkillSlot'
+
+/**
+ * Ghost placeholder for empty skill slots
+ */
+function EmptySlotGhost() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center">
+      <svg
+        viewBox="0 0 24 24"
+        className="w-6 h-6 text-text-muted/25"
+        fill="currentColor"
+      >
+        <path d="M12 2L2 12l10 10 10-10L12 2zm0 3.5L18.5 12 12 18.5 5.5 12 12 5.5z" />
+      </svg>
+    </div>
+  )
+}
+
+/**
+ * Tooltip for empty skill slots
+ */
+function EmptySlotTooltip({ position }: { position?: number }) {
+  return (
+    <div className="bg-bg-primary border border-border rounded-lg p-3 shadow-xl min-w-[180px] max-w-[240px]">
+      <div className="font-medium text-sm text-text-secondary mb-1">
+        Empty Slot{position ? ` #${position}` : ''}
+      </div>
+      <div className="text-xs text-text-muted leading-relaxed">
+        This slot is open for your own skill choice. Experiment with skills that
+        complement the build!
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Skill tooltip content
+ */
+interface SkillTooltipContentProps {
+  skill: NonNullable<SkillSlotProps['skill']>
+  elite?: boolean
+  /** Wiki URL for the skill */
+  wikiUrl?: string
+  /** Show wiki link inside tooltip (for touch devices) */
+  showWikiLink?: boolean
+}
+
+function SkillTooltipContent({
+  skill,
+  elite,
+  wikiUrl,
+  showWikiLink,
+}: SkillTooltipContentProps) {
+  const hasBasicCosts =
+    (skill.energy !== undefined && skill.energy >= 0) ||
+    (skill.adrenaline !== undefined && skill.adrenaline > 0) ||
+    (skill.activation !== undefined && skill.activation > 0) ||
+    (skill.recharge !== undefined && skill.recharge > 0)
+
+  const hasAdditionalCosts =
+    (skill.sacrifice !== undefined && skill.sacrifice > 0) ||
+    (skill.upkeep !== undefined && skill.upkeep !== 0) ||
+    (skill.overcast !== undefined && skill.overcast > 0)
+
+  // Filter out "No Attribute" from display
+  const displayAttribute =
+    skill.attribute && skill.attribute !== 'No Attribute'
+      ? skill.attribute
+      : null
+  // Filter out "None" profession (used for universal PvE skills)
+  const displayProfession =
+    skill.profession && skill.profession !== 'None' ? skill.profession : null
+
+  return (
+    <div className="bg-bg-primary border border-border rounded-lg p-3.5 shadow-xl min-w-[220px] max-w-[300px]">
+      {/* Name */}
+      <div
+        className={cn(
+          'font-semibold text-base mb-1',
+          elite ? 'text-accent-gold' : 'text-text-primary'
+        )}
+      >
+        {skill.name}
+        {elite && (
+          <span className="ml-1.5 text-xs font-medium opacity-80">[Elite]</span>
+        )}
+      </div>
+
+      {/* Profession/Attribute */}
+      {(displayProfession || displayAttribute) && (
+        <div className="text-xs text-text-muted uppercase tracking-wide mb-2">
+          {displayProfession}
+          {displayProfession && displayAttribute && ' • '}
+          {displayAttribute}
+        </div>
+      )}
+
+      {/* Description */}
+      {skill.description && (
+        <div className="text-sm text-text-secondary leading-relaxed mb-2">
+          {skill.description}
+        </div>
+      )}
+
+      {/* Stats */}
+      {(hasBasicCosts || hasAdditionalCosts) && (
+        <div className="border-t border-border pt-2 mt-2 space-y-1.5">
+          {/* Basic costs row */}
+          {hasBasicCosts && (
+            <div className="flex gap-3 text-xs text-text-secondary">
+              {/* Energy OR Adrenaline (mutually exclusive) */}
+              {skill.adrenaline !== undefined && skill.adrenaline > 0 ? (
+                <span className="flex items-center gap-1">
+                  <Image
+                    src="/icons/tango-adrenaline.png"
+                    alt=""
+                    width={16}
+                    height={16}
+                    className="shrink-0"
+                    unoptimized
+                  />
+                  {skill.adrenaline}
+                </span>
+              ) : skill.energy !== undefined && skill.energy >= 0 ? (
+                <span className="flex items-center gap-1">
+                  <Image
+                    src="/icons/tango-energy.png"
+                    alt=""
+                    width={16}
+                    height={16}
+                    className="shrink-0"
+                    unoptimized
+                  />
+                  {skill.energy}
+                </span>
+              ) : null}
+
+              {/* Activation */}
+              {skill.activation !== undefined && skill.activation > 0 && (
+                <span className="flex items-center gap-1">
+                  <Image
+                    src="/icons/tango-activation.png"
+                    alt=""
+                    width={16}
+                    height={16}
+                    className="shrink-0"
+                    unoptimized
+                  />
+                  {skill.activation}s
+                </span>
+              )}
+
+              {/* Recharge */}
+              {skill.recharge !== undefined && skill.recharge > 0 && (
+                <span className="flex items-center gap-1">
+                  <Image
+                    src="/icons/tango-recharge.png"
+                    alt=""
+                    width={16}
+                    height={16}
+                    className="shrink-0"
+                    unoptimized
+                  />
+                  {skill.recharge}s
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Additional costs row */}
+          {hasAdditionalCosts && (
+            <div className="flex gap-3 text-xs text-text-secondary">
+              {/* Sacrifice */}
+              {skill.sacrifice !== undefined && skill.sacrifice > 0 && (
+                <span className="flex items-center gap-1">
+                  <Image
+                    src="/icons/tango-sacrifice.png"
+                    alt=""
+                    width={16}
+                    height={16}
+                    className="shrink-0"
+                    unoptimized
+                  />
+                  {skill.sacrifice}%
+                </span>
+              )}
+
+              {/* Upkeep */}
+              {skill.upkeep !== undefined && skill.upkeep !== 0 && (
+                <span className="flex items-center gap-1">
+                  <Image
+                    src="/icons/tango-upkeep.png"
+                    alt=""
+                    width={16}
+                    height={16}
+                    className="shrink-0"
+                    unoptimized
+                  />
+                  {skill.upkeep}
+                </span>
+              )}
+
+              {/* Overcast */}
+              {skill.overcast !== undefined && skill.overcast > 0 && (
+                <span className="flex items-center gap-1">
+                  <Image
+                    src="/icons/tango-overcast.png"
+                    alt=""
+                    width={16}
+                    height={16}
+                    className="shrink-0"
+                    unoptimized
+                  />
+                  {skill.overcast}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Wiki link for touch devices */}
+      {showWikiLink && wikiUrl && (
+        <a
+          href={wikiUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block text-xs text-accent-blue hover:text-accent-blue/80 mt-2 pt-2 border-t border-border"
+        >
+          Read more →
+        </a>
+      )}
+    </div>
+  )
+}

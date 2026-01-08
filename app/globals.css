@@ -1,0 +1,620 @@
+@import 'tailwindcss';
+
+@theme inline {
+  --font-buildwars: var(--font-buildwars);
+}
+
+@theme {
+  /* ============================================
+     GW1 BUILDS - DESIGN SYSTEM TOKENS
+     "Sticky-note on dark board" aesthetic
+     ============================================ */
+
+  /* Background colors - warm charcoal palette */
+  --color-bg-primary: #18181b;
+  --color-bg-secondary: #1f1f23;
+  --color-bg-card: #242428;
+  --color-bg-elevated: #2a2a2f;
+  --color-bg-hover: #32323a;
+
+  /* Text colors - warm whites */
+  --color-text-primary: #fafaf9;
+  --color-text-secondary: #a8a8a8;
+  --color-text-muted: #6b6b70;
+
+  /* Border colors */
+  --color-border: #3a3a42;
+  --color-border-hover: #4a4a55;
+
+  /* Guild Wars Gold - the star accent */
+  --color-accent-gold: #e8b849;
+  --color-accent-gold-bright: #f4d06f;
+  --color-accent-gold-dim: #c9a03d;
+
+  /* Supporting accents */
+  --color-accent-blue: #5b9bd5;
+  --color-accent-red: #e05555;
+  --color-accent-green: #4caf50;
+  --color-accent-purple: #a78bda;
+
+  /* Profession colors - Official GW Wiki background colors */
+  --color-warrior: #ff8;
+  --color-ranger: #cf9;
+  --color-monk: #acf;
+  --color-necromancer: #9fc;
+  --color-mesmer: #daf;
+  --color-elementalist: #fbb;
+  --color-assassin: #fce;
+  --color-ritualist: #bff;
+  --color-paragon: #fc9;
+  --color-dervish: #ddf;
+
+  /* Sticky note colors - for tags and highlights */
+  --color-sticky-yellow: #fde68a;
+  --color-sticky-pink: #fda4af;
+  --color-sticky-blue: #93c5fd;
+  --color-sticky-green: #86efac;
+  --color-sticky-purple: #c4b5fd;
+  --color-sticky-orange: #fdba74;
+
+  /* NOTE: Custom spacing removed - was conflicting with Tailwind v4's
+     built-in spacing scale (e.g., max-w-2xl was using 3rem instead of 672px).
+     Use Tailwind's default spacing utilities instead. */
+
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-full: 9999px;
+
+  /* Shadows - lighter, airier sticky-note effect */
+  --shadow-sticky: 3px 3px 0 rgba(0, 0, 0, 0.3);
+  --shadow-sticky-hover: 5px 5px 0 rgba(0, 0, 0, 0.25);
+  --shadow-sticky-active: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  --shadow-gold-glow: 0 0 16px rgba(232, 184, 73, 0.3);
+  --shadow-gold-glow-intense: 0 0 24px rgba(232, 184, 73, 0.5);
+
+  /* Animation timing - crisp and snappy */
+  --duration-instant: 80ms;
+  --duration-fast: 120ms;
+  --duration-normal: 150ms;
+  --duration-slow: 250ms;
+
+  /* Easing curves */
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-feature-settings:
+    'ss01' on,
+    'cv01' on;
+  /* Prevent iOS overscroll bounce that can cause scroll position jumps */
+  overscroll-behavior-y: none;
+}
+
+/* Selection styling - gold highlight */
+::selection {
+  background-color: var(--color-accent-gold);
+  color: var(--color-bg-primary);
+}
+
+/* Focus ring - gold outline (not for inputs, they use border) */
+:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+input:focus,
+textarea:focus {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+/* ============================================
+   DOT GRID BACKGROUND
+   Subtle FigJam-style pattern
+   ============================================ */
+
+.dot-grid {
+  background-image: radial-gradient(
+    circle,
+    var(--color-bg-elevated) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+  background-position: 0 0;
+}
+
+.dot-grid-subtle::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.11) 1.35px,
+    transparent 1.35px
+  );
+  background-size: 22px 22px;
+}
+
+/* ============================================
+   STICKY SHADOW UTILITIES
+   ============================================ */
+
+.shadow-sticky {
+  box-shadow: var(--shadow-sticky);
+}
+
+.shadow-sticky-hover {
+  box-shadow: var(--shadow-sticky-hover);
+}
+
+.shadow-sticky-active {
+  box-shadow: var(--shadow-sticky-active);
+}
+
+.shadow-gold-glow {
+  box-shadow: var(--shadow-gold-glow);
+}
+
+.shadow-gold-glow-intense {
+  box-shadow: var(--shadow-gold-glow-intense);
+}
+
+/* Combined shadow + glow for elite items */
+.shadow-sticky-gold {
+  box-shadow: var(--shadow-sticky), var(--shadow-gold-glow);
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) var(--color-bg-secondary);
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================
+   TYPOGRAPHY - TIPTAP / PROSE
+   ============================================ */
+
+.prose {
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+/* Ensure all prose elements inherit proper color */
+.prose * {
+  color: inherit;
+}
+
+/* Reset specific element colors */
+.prose p,
+.prose li,
+.prose blockquote {
+  color: var(--color-text-secondary);
+}
+
+.prose p {
+  margin-bottom: 0.75rem;
+}
+
+.prose h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.prose h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.prose strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.prose code {
+  font-family: var(--font-geist-mono);
+  font-size: 0.875rem;
+  background-color: var(--color-bg-secondary);
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  color: var(--color-accent-gold);
+}
+
+.prose ul {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+  list-style-type: disc;
+}
+
+.prose ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+  list-style-type: decimal;
+}
+
+.prose li {
+  margin-bottom: 0.25rem;
+  display: list-item;
+}
+
+.prose li::marker {
+  color: var(--color-text-muted);
+}
+
+/* Nested lists */
+.prose ul ul,
+.prose ol ul {
+  list-style-type: circle;
+  margin: 0.25rem 0;
+}
+
+.prose ul ol,
+.prose ol ol {
+  list-style-type: lower-alpha;
+  margin: 0.25rem 0;
+}
+
+/* Blockquotes */
+.prose blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--color-accent-gold);
+  background-color: var(--color-bg-card);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.prose blockquote p {
+  margin-bottom: 0;
+}
+
+.prose blockquote p:not(:last-child) {
+  margin-bottom: 0.5rem;
+}
+
+/* Horizontal rules */
+.prose hr {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.prose a {
+  color: var(--color-accent-blue);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.prose a:hover {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+}
+
+/* Skill mentions should NOT use prose link styles */
+.prose a.skill-mention,
+.prose a.skill-mention:link,
+.prose a.skill-mention:visited {
+  color: var(--color-accent-purple);
+  text-decoration: none;
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-purple) 20%,
+    transparent
+  );
+}
+
+.prose a.skill-mention:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-purple) 30%,
+    transparent
+  );
+  color: color-mix(in srgb, var(--color-accent-purple) 70%, white);
+  text-decoration: none;
+}
+
+.prose a.skill-mention.skill-mention-elite,
+.prose a.skill-mention.skill-mention-elite:link,
+.prose a.skill-mention.skill-mention-elite:visited {
+  color: var(--color-accent-gold);
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-gold) 20%,
+    transparent
+  );
+}
+
+.prose a.skill-mention.skill-mention-elite:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-gold) 30%,
+    transparent
+  );
+  color: color-mix(in srgb, var(--color-accent-gold) 70%, white);
+  text-decoration: none;
+}
+
+/* ProseMirror / TipTap editor overrides */
+.ProseMirror {
+  color: var(--color-text-secondary);
+}
+
+.ProseMirror-focused {
+  outline: none !important;
+}
+
+.ProseMirror:focus {
+  outline: none !important;
+}
+
+/* Ensure all ProseMirror content has correct text color */
+.ProseMirror > * {
+  color: var(--color-text-secondary);
+}
+
+.ProseMirror h1,
+.ProseMirror h2 {
+  color: var(--color-text-primary);
+}
+
+/* Fix horizontal rule in editor - prevent color inheritance issues */
+.ProseMirror hr {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid var(--color-border);
+  background: transparent;
+  color: inherit;
+}
+
+/* Ensure paragraphs after hr maintain correct color */
+.ProseMirror hr + p,
+.ProseMirror hr + h1,
+.ProseMirror hr + h2,
+.ProseMirror hr + ul,
+.ProseMirror hr + ol,
+.ProseMirror hr + blockquote {
+  color: var(--color-text-secondary);
+}
+
+.ProseMirror hr + h1,
+.ProseMirror hr + h2 {
+  color: var(--color-text-primary);
+}
+
+/* TipTap uses a specific node view for hr - ensure it doesn't affect surrounding text */
+.ProseMirror [data-type='horizontalRule'],
+.ProseMirror .ProseMirror-separator {
+  color: transparent;
+  background: transparent;
+}
+
+/* Skill mention styling */
+.skill-mention {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-purple) 20%,
+    transparent
+  );
+  color: var(--color-accent-purple);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out);
+  /* Override default link styling when used as anchor */
+  text-decoration: none;
+}
+
+.skill-mention:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-purple) 30%,
+    transparent
+  );
+  /* Brighter color on hover, no underline */
+  color: color-mix(in srgb, var(--color-accent-purple) 70%, white);
+  text-decoration: none;
+}
+
+.skill-mention:visited {
+  color: var(--color-accent-purple);
+}
+
+.skill-mention-elite {
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-gold) 20%,
+    transparent
+  );
+  color: var(--color-accent-gold);
+}
+
+.skill-mention-elite:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-gold) 30%,
+    transparent
+  );
+  /* Brighter color on hover, no underline */
+  color: color-mix(in srgb, var(--color-accent-gold) 70%, white);
+  text-decoration: none;
+}
+
+.skill-mention-elite:visited {
+  color: var(--color-accent-gold);
+}
+
+/* ============================================
+   ANIMATION UTILITIES
+   ============================================ */
+
+/* Hover lift transform - refined for crisp feel */
+.hover-lift {
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.hover-lift:hover {
+  transform: translate(-1.5px, -1.5px);
+}
+
+.hover-lift:active {
+  transform: translate(0.5px, 0.5px);
+}
+
+/* Pulse animation for loading states */
+@keyframes pulse-subtle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Shimmer animation for skeletons */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-card) 0%,
+    var(--color-bg-elevated) 50%,
+    var(--color-bg-card) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+/* Gold glow pulse for elite/special items */
+@keyframes gold-pulse {
+  0%,
+  100% {
+    box-shadow: var(--shadow-gold-glow);
+  }
+  50% {
+    box-shadow: var(--shadow-gold-glow-intense);
+  }
+}
+
+.animate-gold-pulse {
+  animation: gold-pulse 2s ease-in-out infinite;
+}
+
+/* Gentle floating animation for ornamental elements */
+@keyframes float {
+  0%,
+  100% {
+    transform: rotate(45deg) translateY(0);
+  }
+  50% {
+    transform: rotate(45deg) translateY(-2px);
+  }
+}
+
+/* Profession spinner rotation */
+@keyframes profession-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-profession-spin {
+  animation: profession-spin 2s linear infinite;
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .hover-lift:hover,
+  .hover-lift:active {
+    transform: none;
+  }
+}

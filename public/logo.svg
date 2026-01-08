@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- GW1 Builds Logo - Profession Spinner -->
+  <!-- 10 profession dots evenly spaced on circle -->
+  <!-- Center: (50,50), Radius: 41.7, Dot radius: 8.3 -->
+  <!-- Positions: 36° apart starting from top (-90°), clockwise -->
+
+  <!-- Warrior (0°, top) -->
+  <circle cx="50" cy="8.3" r="8.3" fill="#ffff88"/>
+
+  <!-- Paragon (36°) -->
+  <circle cx="74.5" cy="16.3" r="8.3" fill="#ffcc99"/>
+
+  <!-- Elementalist (72°) -->
+  <circle cx="89.7" cy="37.1" r="8.3" fill="#ffbbbb"/>
+
+  <!-- Assassin (108°) -->
+  <circle cx="89.7" cy="62.9" r="8.3" fill="#ffccee"/>
+
+  <!-- Mesmer (144°) -->
+  <circle cx="74.5" cy="83.7" r="8.3" fill="#ddaaff"/>
+
+  <!-- Dervish (180°, bottom) -->
+  <circle cx="50" cy="91.7" r="8.3" fill="#ddddff"/>
+
+  <!-- Monk (216°) -->
+  <circle cx="25.5" cy="83.7" r="8.3" fill="#aaccff"/>
+
+  <!-- Ritualist (252°) -->
+  <circle cx="10.3" cy="62.9" r="8.3" fill="#bbffff"/>
+
+  <!-- Necromancer (288°) -->
+  <circle cx="10.3" cy="37.1" r="8.3" fill="#99ffcc"/>
+
+  <!-- Ranger (324°) -->
+  <circle cx="25.5" cy="16.3" r="8.3" fill="#ccff99"/>
+</svg>
