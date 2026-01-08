@@ -35,6 +35,8 @@ const BLOCKED_TERMS = new Set([
   'tranny', 'trannies',
   // Other severe terms
   'retard', 'retards', 'retarded',
+  // Nazi/hate symbols
+  'hitler', 'nazi', 'nazis', 'reich', 'heil',
 ])
 
 /**
