@@ -74,8 +74,8 @@ Create your build in-game, paste the template code, add some notes, and share it
 
 ```bash
 # Clone the repository
-git clone https://github.com/MAkzent/gw1-builds.git
-cd gw1-builds
+git clone https://github.com/gw1tools/gw1builds.git
+cd gw1builds
 
 # Install dependencies
 npm install
@@ -119,7 +119,7 @@ docs/PRD/     → Product requirement documents (some might be outdated, but I l
 
 ## Contributing
 
-**For now, let's keep it simple:** Directly share your feedback and [open an issue](https://github.com/MAkzent/gw1-builds/issues) on GitHub. The more detailed your feedback, the higher the chance of it being addressed.
+**For now, let's keep it simple:** Directly share your feedback and [open an issue](https://github.com/gw1tools/gw1builds/issues) on GitHub. The more detailed your feedback, the higher the chance of it being addressed.
 
 ---
 
