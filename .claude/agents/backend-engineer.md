@@ -31,7 +31,7 @@ description: |
   - Authentication or authorization logic
   - Performance optimizations for server-side operations
   - Security-sensitive operations (user data, permissions)
-model: sonnet
+model: opus
 color: red
 ---
 
