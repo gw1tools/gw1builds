@@ -66,6 +66,8 @@ You build robust, secure backend systems for GW1 Builds following these principl
 
 **ALWAYS use the development branch by default unless explicitly asked for production.**
 
+**For contributors:** If you fork this repo, replace these with your own Supabase project IDs.
+
 | Environment | Project ID | Branch |
 |-------------|------------|--------|
 | **Development** | `aqjfurwosiiicfxqmbjd` | develop |

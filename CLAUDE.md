@@ -302,7 +302,7 @@ npm run build
 
 ### Supabase Project IDs
 
-**ALWAYS use the development branch by default unless explicitly asked for production.**
+**For contributors:** If you fork this repo, replace these with your own Supabase project IDs.
 
 | Environment | Project ID | Branch |
 |-------------|------------|--------|
@@ -310,8 +310,6 @@ npm run build
 | Production | `iaqbfleijvzdffahhqtc` | main |
 
 When using Supabase MCP tools, use the development project ID (`aqjfurwosiiicfxqmbjd`) unless the user specifically mentions production.
-
-**Note for contributors:** These are development project IDs for reference. Production credentials are never committed to the repository.
 
 ### Future Supabase Integration
 - **Row Level Security (RLS):** Enable for all tables
