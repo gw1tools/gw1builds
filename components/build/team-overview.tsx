@@ -164,9 +164,9 @@ export function TeamOverview({
           </div>
         </div>
 
-        {/* Builds grid - horizontally scrollable on mobile */}
-        <div className="overflow-x-auto">
-          <div className="divide-y divide-border min-w-fit">
+        {/* Builds grid */}
+        <div>
+          <div className="divide-y divide-border w-full">
             {bars.map((bar, index) => (
               <TeamOverviewRow
                 key={index}
@@ -208,24 +208,24 @@ function TeamOverviewRow({
       : null
 
   return (
-    <div className="flex items-center gap-4 px-4 py-1">
-      {/* Profession icons - bigger */}
-      <div className="flex items-center gap-1 shrink-0">
+    <div className="flex items-center gap-4 px-2 py-1">
+      {/* Profession icons */}
+      <div className="flex items-start gap-1 shrink-0 scale-[0.7] sm:scale-90 md:scale-100">
         <ProfessionIcon profession={primaryProf} size="md" />
         {secondaryProf && (
           <ProfessionIcon profession={secondaryProf} size="md" className="opacity-60" />
         )}
       </div>
 
-      {/* Build name - more space */}
-      <div className="shrink-0 w-[120px] sm:w-[200px]">
+      {/* Build name */}
+      <div className="flex-1 min-w-13">
         <span className="text-sm font-medium text-text-primary block truncate">
           {bar.name}
         </span>
       </div>
 
-      {/* Skill icons - pushed right */}
-      <div className="flex items-center gap-0.5 ml-auto shrink-0">
+      {/* Skill icons */}
+      <div className="flex items-center ml-auto shrink-0 scale-[0.4] sm:scale-90 md:scale-100 sm:gap-1">
         {bar.skills.map((skillId, idx) => {
           const skill = skillId > 0 ? skillMap[skillId] : null
           return (
