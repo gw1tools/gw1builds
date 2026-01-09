@@ -18,6 +18,7 @@ import {
   MAX_TAG_LENGTH,
   SKILLS_PER_BAR,
 } from './constants'
+import { extractTextFromTiptap } from './validations/profanity'
 
 // ============================================================================
 // SANITIZATION
@@ -201,9 +202,9 @@ export function validateNotes(notes: unknown): ValidationResult {
     return { valid: false, error: 'Notes must be an object' }
   }
 
-  // Check serialized size
-  const serialized = JSON.stringify(notes)
-  if (serialized.length > MAX_NOTES_LENGTH) {
+  // Check actual text content length (not JSON structure)
+  const textContent = extractTextFromTiptap(notes)
+  if (textContent.length > MAX_NOTES_LENGTH) {
     return {
       valid: false,
       error: `Notes are too long (max ${MAX_NOTES_LENGTH} characters)`,
