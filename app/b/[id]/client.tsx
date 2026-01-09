@@ -617,7 +617,7 @@ function renderInlineContent(
 }
 
 /**
- * Renders list items with full inline content support
+ * Renders list items with full inline content support, including nested lists
  */
 function renderListItems(
   content: BuildWithAuthor['notes']['content'] | undefined
@@ -626,9 +626,21 @@ function renderListItems(
 
   return content.map((item, itemIndex) => (
     <li key={itemIndex}>
-      {item.content?.map((para, paraIndex) => (
-        <span key={paraIndex}>{renderInlineContent(para.content)}</span>
-      ))}
+      {item.content?.map((child, childIndex) => {
+        // Handle paragraphs
+        if (child.type === 'paragraph') {
+          return <span key={childIndex}>{renderInlineContent(child.content)}</span>
+        }
+        // Handle nested bullet lists - RECURSIVELY
+        if (child.type === 'bulletList') {
+          return <ul key={childIndex}>{renderListItems(child.content)}</ul>
+        }
+        // Handle nested ordered lists - RECURSIVELY
+        if (child.type === 'orderedList') {
+          return <ol key={childIndex}>{renderListItems(child.content)}</ol>
+        }
+        return null
+      })}
     </li>
   ))
 }
