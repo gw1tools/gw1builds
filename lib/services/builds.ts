@@ -22,9 +22,10 @@ import type {
   BuildWithAuthor,
   BuildVersionInsert,
 } from '@/types/database'
-import { BUILD_ID_LENGTH, MIN_BARS } from '@/lib/constants'
+import { BUILD_ID_LENGTH } from '@/lib/constants'
 import {
   validateBuildInput,
+  validateBuildName,
   sanitizeBuildInput,
   validateBars,
 } from '@/lib/validation'
@@ -70,6 +71,29 @@ export class ValidationError extends BuildServiceError {
     super(message, 'VALIDATION_ERROR')
     this.name = 'ValidationError'
   }
+}
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+/** Author object shape from Supabase */
+type AuthorData = { username: string | null; avatar_url: string | null }
+
+/** Transform row with author array to row with single author */
+type WithNormalizedAuthor<T> = Omit<T, 'author'> & { author: AuthorData | null }
+
+/**
+ * Transforms Supabase author join result from array to single object
+ * Supabase returns arrays for joined tables, but we want a single author
+ */
+function normalizeAuthor<T extends { author: AuthorData[] | null }>(
+  row: T
+): WithNormalizedAuthor<T> {
+  return {
+    ...row,
+    author: row.author?.[0] ?? null,
+  } as WithNormalizedAuthor<T>
 }
 
 // ============================================================================
@@ -162,11 +186,7 @@ export async function getPopularBuilds(limit = 20): Promise<BuildListItem[]> {
     return []
   }
 
-  // Transform author from array to single object (Supabase returns array for joins)
-  return (data || []).map(row => ({
-    ...row,
-    author: Array.isArray(row.author) ? row.author[0] || null : row.author,
-  })) as BuildListItem[]
+  return (data || []).map(normalizeAuthor) as BuildListItem[]
 }
 
 /**
@@ -199,11 +219,38 @@ export async function getRecentBuilds(limit = 20): Promise<BuildListItem[]> {
     return []
   }
 
-  // Transform author from array to single object
-  return (data || []).map(row => ({
-    ...row,
-    author: Array.isArray(row.author) ? row.author[0] || null : row.author,
-  })) as BuildListItem[]
+  return (data || []).map(normalizeAuthor) as BuildListItem[]
+}
+
+/**
+ * Fetches ALL published builds for client-side search indexing
+ *
+ * No pagination - loads all builds at once for search.
+ * Filters: deleted_at IS NULL, moderation_status = 'published'
+ *
+ * @returns Array of all published builds for search
+ */
+export async function getAllPublishedBuildsForSearch(): Promise<BuildListItem[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('builds')
+    .select(
+      `
+      id, name, tags, bars, star_count, view_count, created_at,
+      author:users!builds_author_id_fkey(username, avatar_url)
+    `
+    )
+    .is('deleted_at', null)
+    .eq('moderation_status', 'published')
+    .order('star_count', { ascending: false })
+
+  if (error) {
+    console.error('[getAllPublishedBuildsForSearch] Database error:', error)
+    return []
+  }
+
+  return (data || []).map(normalizeAuthor) as BuildListItem[]
 }
 
 /**
@@ -238,11 +285,7 @@ export async function getUserBuilds(userId: string): Promise<BuildListItem[]> {
     return []
   }
 
-  // Transform author from array to single object
-  return (data || []).map(row => ({
-    ...row,
-    author: Array.isArray(row.author) ? row.author[0] || null : row.author,
-  })) as BuildListItem[]
+  return (data || []).map(normalizeAuthor) as BuildListItem[]
 }
 
 /**
@@ -444,19 +487,11 @@ export async function updateBuild(
     throw new ValidationError('No updates provided')
   }
 
-  // Validate fields being updated
+  // Validate individual fields being updated
   if (updates.name !== undefined) {
-    const validation = validateBuildInput({
-      name: updates.name,
-      bars: updates.bars || [],
-      notes: updates.notes,
-      tags: updates.tags,
-    })
-    // Only check name validation if bars aren't being updated
-    if (!updates.bars && updates.name.length < MIN_BARS) {
-      // Skip bars validation
-    } else if (!validation.valid) {
-      throw new ValidationError(validation.error || 'Invalid update data')
+    const nameValidation = validateBuildName(updates.name)
+    if (!nameValidation.valid) {
+      throw new ValidationError(nameValidation.error || 'Invalid name')
     }
   }
 

@@ -44,6 +44,13 @@ export function Footer() {
           {/* Left - Links */}
           <div className="flex items-center gap-2 text-xs text-text-muted">
             <Link
+              href="/changes"
+              className="hover:text-text-secondary transition-colors"
+            >
+              Changes
+            </Link>
+            <span>·</span>
+            <Link
               href="/privacy"
               className="hover:text-text-secondary transition-colors"
             >

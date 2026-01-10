@@ -293,6 +293,39 @@ npm run build
   - `docs: update CLAUDE.md with new conventions`
 - **PR reviews:** Required before merging to main
 
+### Release Process
+
+**CRITICAL: Run `/release` before merging any PR to `main`.**
+
+The `main` branch has a GitHub Action that blocks merges unless `CHANGELOG.md` was updated. This ensures every release has documented changes.
+
+**Workflow:**
+1. Finish your work on `develop` branch
+2. Run `/release` in Claude Code
+3. Claude will:
+   - Analyze commits since last tag
+   - Determine version bump (major/minor/patch)
+   - Generate human-readable release notes
+   - Update `CHANGELOG.md` and `package.json`
+   - Create git tag and GitHub Release
+4. Review and approve the changes
+5. Push to the branch
+6. Create PR to `main`
+7. GitHub Action verifies CHANGELOG was updated
+8. Merge
+
+**Version Bump Rules:**
+- `feat:` commits → MINOR bump (1.0.0 → 1.1.0)
+- `fix:` commits → PATCH bump (1.0.0 → 1.0.1)
+- `BREAKING CHANGE:` → MAJOR bump (1.0.0 → 2.0.0)
+- Only `chore:`/`docs:` → Ask if release needed
+
+**Release Notes Style:**
+- Write for gamers, not developers
+- Transform commit messages into readable summaries
+- Aggregate minor fixes into "Plus X improvements"
+- See `CHANGELOG.md` for examples
+
 ## Security & Privacy
 
 ### Sensitive Files
@@ -470,6 +503,6 @@ Keep these synchronized:
 
 ---
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 **Maintainer:** GW1 Builds Team
 **Last Review:** January 2026
