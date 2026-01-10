@@ -280,6 +280,7 @@ export const PVE_CONTEXT = {
     'farming',
     'speed-clear',
     'running',
+    'dungeon',
   ] as const,
   /** Elite areas - optional specificity
    * @see https://wiki.guildwars.com/wiki/Elite_mission
@@ -299,6 +300,7 @@ export const PVP_FORMATS = ['gvg', 'ha', 'ra', 'ab', 'fa', 'jq', 'ca'] as const
  */
 export const CHARACTERISTICS = [
   'meta',
+  'alternative',
   'beginner',
   'budget',
   'niche',
@@ -327,6 +329,7 @@ export const TAG_LABELS: Record<string, string> = {
   farming: 'Farming',
   'speed-clear': 'Speed Clear',
   running: 'Running',
+  dungeon: 'Dungeon',
   // Elite areas
   uw: 'UW',
   fow: 'FoW',
@@ -345,6 +348,7 @@ export const TAG_LABELS: Record<string, string> = {
   ca: 'CA',
   // Characteristics
   meta: 'Meta',
+  alternative: 'Alternative',
   beginner: 'Beginner',
   budget: 'Budget',
   niche: 'Niche',
@@ -387,6 +391,7 @@ export const TAG_TOOLTIPS: Record<string, string> = {
  */
 export const ALL_TAGS = [
   ...GAME_MODES,
+  ...BUILD_TYPES,
   ...PVE_CONTEXT.activities,
   ...PVE_CONTEXT.eliteAreas,
   ...PVP_FORMATS,
@@ -472,6 +477,9 @@ export const MAX_TAGS_PER_BUILD = 50
 
 /** Maximum length for custom tags */
 export const MAX_TAG_LENGTH = 30
+
+/** Maximum number of tags to display in card UI */
+export const MAX_DISPLAYED_TAGS = 5
 
 // ============================================================================
 // DRAFT DETECTION THRESHOLDS

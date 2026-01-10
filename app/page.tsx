@@ -1,5 +1,5 @@
 /**
- * @fileoverview Homepage - Simple, lightweight build sharing
+ * @fileoverview Homepage - Build workbench for the GW1 community
  * @module app/page
  */
 
@@ -7,7 +7,9 @@ import { Plus } from 'lucide-react'
 import { Container } from '@/components/layout/container'
 import { Button } from '@/components/ui'
 import { BuildFeed } from '@/components/build/build-feed'
+import { BuildSearchTrigger } from '@/components/build/build-search-trigger'
 import { getBuilds } from '@/lib/supabase/queries'
+import { loadBuildsForSearch } from '@/lib/actions/search'
 
 export default async function HomePage() {
   // Fetch popular builds for initial load
@@ -16,23 +18,34 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative py-16 sm:py-24">
+      <section className="relative pt-12 sm:pt-20 pb-8 sm:pb-18">
         <Container size="md" className="text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-text-primary mb-4">
+          <h1 className="text-4xl sm:text-5xl font-bold text-text-primary mb-3">
             <span className="text-accent-gold">GW1</span> Builds
           </h1>
-          <p className="text-text-muted text-lg mb-14">
+          <p className="text-text-muted text-lg mb-18">
             A <span className="text-accent-gold italic">lightweight</span> build
             sharing tool for the Reforged era
           </p>
-          <Button
-            href="/new"
-            variant="primary"
-            size="lg"
-            leftIcon={<Plus className="w-5 h-5" />}
-          >
-            Create Build
-          </Button>
+
+          {/* Search + Create */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 max-w-lg mx-auto">
+            <div className="flex-1 min-w-0">
+              <BuildSearchTrigger
+                loadBuilds={loadBuildsForSearch}
+                placeholder="Search builds..."
+              />
+            </div>
+            <Button
+              href="/new"
+              variant="primary"
+              size="lg"
+              leftIcon={<Plus className="w-5 h-5" />}
+              className="flex-shrink-0"
+            >
+              Create
+            </Button>
+          </div>
         </Container>
       </section>
 
