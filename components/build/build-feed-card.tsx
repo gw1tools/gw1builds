@@ -260,10 +260,10 @@ export const BuildFeedCard = memo(function BuildFeedCard({
 
       {/* Footer: Tags (left) + Stats/Attribution (right) */}
       <div className="flex items-center justify-between gap-2">
-        {/* Tags - bottom left (highlighted tags shown first) */}
+        {/* Tags - bottom left (highlighted tags shown first, horizontally scrollable on mobile) */}
         {!hideTags && sortedTags.length > 0 ? (
-          <div className="flex items-center gap-1.5 shrink-0 min-w-0 overflow-hidden">
-            <TagGroup className="shrink-0">
+          <div className="flex items-center gap-1.5 min-w-0 overflow-x-auto scrollbar-none -mx-1 px-1">
+            <TagGroup className="flex-nowrap shrink-0">
               {displayedTags.map(tag => (
                 <Tag key={tag} label={tag} size="sm" />
               ))}

@@ -8,12 +8,20 @@ import { Container } from '@/components/layout/container'
 import { Button } from '@/components/ui'
 import { BuildFeed } from '@/components/build/build-feed'
 import { BuildSearchTrigger } from '@/components/build/build-search-trigger'
-import { getBuilds } from '@/lib/supabase/queries'
+import { getBuilds, type BuildSortType } from '@/lib/supabase/queries'
 import { loadBuildsForSearch } from '@/lib/actions/search'
 
-export default async function HomePage() {
-  // Fetch popular builds for initial load
-  const { builds, nextOffset } = await getBuilds({ type: 'popular', limit: 6 })
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>
+}) {
+  // Read and validate tab parameter
+  const { tab } = await searchParams
+  const initialTab: BuildSortType = tab === 'recent' ? 'recent' : 'popular'
+
+  // Fetch builds for the selected tab
+  const { builds, nextOffset } = await getBuilds({ type: initialTab, limit: 6 })
 
   return (
     <>
@@ -28,8 +36,8 @@ export default async function HomePage() {
             sharing tool for the Reforged era
           </p>
 
-          {/* Search + Create */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 max-w-lg mx-auto">
+          {/* Search + Create - always in one row */}
+          <div className="flex flex-row items-center justify-center gap-2 sm:gap-3 max-w-lg mx-auto">
             <div className="flex-1 min-w-0">
               <BuildSearchTrigger
                 loadBuilds={loadBuildsForSearch}
@@ -40,8 +48,8 @@ export default async function HomePage() {
               href="/new"
               variant="primary"
               size="lg"
-              leftIcon={<Plus className="w-5 h-5" />}
-              className="flex-shrink-0"
+              leftIcon={<Plus className="w-4 h-4 sm:w-5 sm:h-5" />}
+              className="flex-shrink-0 whitespace-nowrap"
             >
               Create
             </Button>
@@ -54,7 +62,7 @@ export default async function HomePage() {
         <Container size="md">
           <BuildFeed
             initialBuilds={builds}
-            initialTab="popular"
+            initialTab={initialTab}
             initialNextOffset={nextOffset}
           />
         </Container>

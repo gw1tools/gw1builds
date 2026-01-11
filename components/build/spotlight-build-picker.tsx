@@ -21,6 +21,7 @@ import { Search, X } from 'lucide-react'
 import Fuse from 'fuse.js'
 
 import { cn } from '@/lib/utils'
+import { useSearchAnalytics } from '@/hooks'
 import { searchSkills, getSkillByName, type Skill } from '@/lib/gw/skills'
 import { getSkillIconUrlById } from '@/lib/gw/icons'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
@@ -54,6 +55,12 @@ export interface SpotlightBuildPickerProps {
   onSelect?: (build: SearchableBuild) => void
   /** Server action to load builds */
   loadBuilds: () => Promise<{ database: BuildListItem[]; pvx: SearchableBuild[] }>
+  /** Initial query from URL hash */
+  initialQuery?: string
+  /** Initial filters from URL hash */
+  initialFilters?: BuildFilter[]
+  /** Called before navigating to an internal build (to save state to URL) */
+  onBeforeNavigate?: (query: string, filters: BuildFilter[]) => void
 }
 
 // ============================================================================
@@ -65,8 +72,11 @@ export function SpotlightBuildPicker({
   onClose,
   onSelect,
   loadBuilds,
+  initialQuery = '',
+  initialFilters = [],
+  onBeforeNavigate,
 }: SpotlightBuildPickerProps) {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(initialQuery)
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [activeFilters, setActiveFilters] = useState<BuildFilter[]>([])
   const [filterMode, setFilterMode] = useState<FilterMode>('and')
@@ -81,6 +91,14 @@ export function SpotlightBuildPicker({
   const selectedItemRef = useRef<HTMLElement | null>(null)
   const router = useRouter()
 
+  // Search analytics tracking
+  const {
+    onSearchChange: trackSearchChange,
+    onBuildClick: trackBuildClick,
+    onSearchClose: trackSearchClose,
+    onSearchClear: trackSearchClear,
+  } = useSearchAnalytics()
+
   // Debounce query for search (200ms)
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query), 200)
@@ -94,13 +112,21 @@ export function SpotlightBuildPicker({
     // Store current scroll position
     const scrollY = window.scrollY
 
-    // Prevent background scrolling with CSS only (more iOS-friendly)
-    document.documentElement.style.overflow = 'hidden'
+    // Prevent background scrolling - iOS needs position:fixed approach
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.left = '0'
+    document.body.style.right = '0'
     document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
 
     return () => {
-      document.documentElement.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.left = ''
+      document.body.style.right = ''
       document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
       // Restore scroll position
       window.scrollTo(0, scrollY)
     }
@@ -140,16 +166,22 @@ export function SpotlightBuildPicker({
     return () => { cancelled = true }
   }, [loadBuilds])
 
-  // Reset state when modal opens - standard modal reset pattern
+  // Track previous open state to detect transitions
+  const wasOpenRef = useRef(false)
+
+  // Initialize state when modal opens (not on subsequent prop changes while open)
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    if (isOpen) {
-      setQuery('')
-      setActiveFilters([])
+    const justOpened = isOpen && !wasOpenRef.current
+    wasOpenRef.current = isOpen
+
+    if (justOpened) {
+      setQuery(initialQuery)
+      setActiveFilters(initialFilters)
       setSelectedIndex(0)
       requestAnimationFrame(() => inputRef.current?.focus())
     }
-  }, [isOpen])
+  }, [isOpen, initialQuery, initialFilters])
 
   // Reset selected index and scroll when results change
   useEffect(() => {
@@ -175,6 +207,13 @@ export function SpotlightBuildPicker({
     const filters = activeFilters.length > 0 ? activeFilters : undefined
     return searchBuilds(searchIndex, allBuilds, debouncedQuery, filters, filterMode)
   }, [searchIndex, allBuilds, debouncedQuery, activeFilters, filterMode, isOpen])
+
+  // Track search changes for analytics (debounced via hook)
+  useEffect(() => {
+    if (isOpen && debouncedQuery.trim()) {
+      trackSearchChange(debouncedQuery, searchResults.totalCount)
+    }
+  }, [isOpen, debouncedQuery, searchResults.totalCount, trackSearchChange])
 
   // Skill autocomplete suggestions
   const [skillSuggestions, setSkillSuggestions] = useState<Skill[]>([])
@@ -270,14 +309,30 @@ export function SpotlightBuildPicker({
     setQuery('')
   }, [])
 
+  // Handle clearing the search input (tracks abandon if needed)
+  const handleClearSearch = useCallback(() => {
+    trackSearchClear()
+    setQuery('')
+  }, [trackSearchClear])
+
   // Add a skill filter
   const addSkillFilter = useCallback((skill: { name: string; id: number }) => {
     setActiveFilters(f => [...f, { type: 'skill', value: skill.name, skillId: skill.id }])
     setQuery('')
   }, [])
 
+  // Handle modal close with analytics
+  const handleClose = useCallback(() => {
+    trackSearchClose()
+    onClose()
+  }, [onClose, trackSearchClose])
+
   // Handle build selection
-  const handleBuildSelect = useCallback((build: SearchableBuild) => {
+  const handleBuildSelect = useCallback((build: SearchableBuild, positionInResults: number) => {
+    // Track click for analytics (1-based position)
+    trackBuildClick(build.id, positionInResults + 1)
+
+    // Close without abandon tracking (we tracked the click)
     onClose()
 
     if (onSelect) {
@@ -287,11 +342,14 @@ export function SpotlightBuildPicker({
 
     // Default behavior: navigate to build page
     if (build.externalUrl) {
+      // External links open in new tab, no need to save state
       window.open(build.externalUrl, '_blank', 'noopener,noreferrer')
     } else {
+      // Save search state to URL before navigating (so back button restores it)
+      onBeforeNavigate?.(query, activeFilters)
       router.push(`/b/${build.id}`)
     }
-  }, [onClose, onSelect, router])
+  }, [activeFilters, onBeforeNavigate, onClose, onSelect, query, router, trackBuildClick])
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -326,7 +384,7 @@ export function SpotlightBuildPicker({
           const buildIdx = selectedIndex - categoriesCount - skillsCount
           if (buildIdx >= 0 && buildIdx < resultsCount) {
             const selectedBuild = searchResults.results[buildIdx].build
-            handleBuildSelect(selectedBuild)
+            handleBuildSelect(selectedBuild, buildIdx)
           }
         }
         break
@@ -335,7 +393,7 @@ export function SpotlightBuildPicker({
         if (activeFilters.length > 0) {
           clearAllFilters()
         } else {
-          onClose()
+          handleClose()
         }
         break
       case 'Backspace':
@@ -346,7 +404,7 @@ export function SpotlightBuildPicker({
         }
         break
     }
-  }, [activeFilters, addFiltersFromCategory, addSkillFilter, clearAllFilters, handleBuildSelect, onClose, query, removeFilter, searchResults, selectedIndex, skillSuggestions])
+  }, [activeFilters, addFiltersFromCategory, addSkillFilter, clearAllFilters, handleBuildSelect, handleClose, query, removeFilter, searchResults, selectedIndex, skillSuggestions])
 
   // Handle hint clicks
   const handleHintClick = useCallback(async (hint: string) => {
@@ -398,7 +456,7 @@ export function SpotlightBuildPicker({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
             className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50"
-            onClick={onClose}
+            onClick={handleClose}
           />
 
           {/* Modal wrapper - full screen on mobile for proper scroll context */}
@@ -414,9 +472,9 @@ export function SpotlightBuildPicker({
           >
             {/* Modal container - explicit height for iOS scroll */}
             <div className="bg-bg-elevated border border-border rounded-xl shadow-2xl w-full max-w-2xl flex flex-col h-[calc(100%-8px)] sm:h-auto sm:max-h-[80vh] overflow-hidden pointer-events-auto">
-              {/* Search input with filter pills - all on one line */}
-              <div className="relative px-3 py-1.5 sm:px-4 sm:py-2 shrink-0">
-                <div className="flex items-center gap-1.5 sm:gap-3">
+              {/* Search input with filter pills */}
+              <div className="relative px-3 py-2 sm:px-4 sm:py-3 shrink-0">
+                <div className="flex items-center flex-wrap gap-1.5 sm:gap-2">
                   <Search className="w-4 h-4 sm:w-5 sm:h-5 text-text-muted shrink-0" aria-hidden="true" />
 
                   {/* Filter pills */}
@@ -485,38 +543,46 @@ export function SpotlightBuildPicker({
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={activeFilters.length > 0 ? 'Add filter...' : 'W/Mo, #meta, skill name...'}
+                    placeholder={activeFilters.length > 0 ? 'Add...' : 'W/Mo, #meta, skill...'}
                     aria-label="Search builds by profession, tag, or skill"
-                    className="flex-1 min-w-0 min-h-[36px] sm:min-h-[40px] bg-transparent text-base text-text-primary placeholder:text-text-muted focus:outline-none font-mono"
+                    className="flex-1 min-w-[60px] h-9 sm:h-10 bg-transparent text-base text-text-primary placeholder:text-text-muted focus:outline-none font-mono"
                   />
 
-                  {/* Clear button */}
-                  {(query || activeFilters.length > 0) && (
-                    <button
-                      onClick={query ? () => setQuery('') : clearAllFilters}
-                      aria-label={query ? 'Clear search' : 'Clear all filters'}
-                      className="p-1.5 sm:p-2 flex items-center justify-center text-text-muted hover:text-text-primary active:text-text-primary shrink-0 cursor-pointer"
-                    >
-                      <X className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </button>
-                  )}
-
-                  {/* AND/OR toggle */}
-                  {activeFilters.length >= 2 && (
-                    <button
-                      onClick={() => setFilterMode(m => m === 'and' ? 'or' : 'and')}
-                      title={filterMode === 'and' ? 'AND: all filters must match' : 'OR: any filter can match'}
-                      aria-label={filterMode === 'and' ? 'Currently using AND mode, click for OR' : 'Currently using OR mode, click for AND'}
-                      className={cn(
-                        'px-2 sm:px-3 py-1 sm:py-1.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wide transition-colors shrink-0 border cursor-pointer',
-                        filterMode === 'and'
-                          ? 'bg-bg-secondary text-text-secondary border-border hover:border-border-hover active:bg-bg-hover'
-                          : 'bg-accent-green/15 text-accent-green border-accent-green/30 hover:bg-accent-green/25 active:bg-accent-green/35'
-                      )}
-                    >
-                      {filterMode === 'and' ? 'AND' : 'OR'}
-                    </button>
-                  )}
+                  {/* Action buttons - grouped so they stay together when wrapping */}
+                  <div className="flex items-center gap-1 shrink-0 ml-auto">
+                    {/* X button to clear, or Close button on mobile when empty */}
+                    {(query || activeFilters.length > 0) ? (
+                      <button
+                        onClick={() => query ? handleClearSearch() : clearAllFilters()}
+                        aria-label={query ? 'Clear search' : 'Clear all filters'}
+                        className="p-1.5 sm:p-2 flex items-center justify-center text-text-muted hover:text-text-primary active:text-text-primary cursor-pointer"
+                      >
+                        <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleClose}
+                        className="sm:hidden px-3 py-1.5 text-sm text-text-muted hover:text-text-primary cursor-pointer"
+                      >
+                        Close
+                      </button>
+                    )}
+                    {activeFilters.length >= 2 && (
+                      <button
+                        onClick={() => setFilterMode(m => m === 'and' ? 'or' : 'and')}
+                        title={filterMode === 'and' ? 'AND: all filters must match' : 'OR: any filter can match'}
+                        aria-label={filterMode === 'and' ? 'Currently using AND mode, click for OR' : 'Currently using OR mode, click for AND'}
+                        className={cn(
+                          'px-2 sm:px-3 py-1 sm:py-1.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wide transition-colors border cursor-pointer',
+                          filterMode === 'and'
+                            ? 'bg-bg-secondary text-text-secondary border-border hover:border-border-hover active:bg-bg-hover'
+                            : 'bg-accent-green/15 text-accent-green border-accent-green/30 hover:bg-accent-green/25 active:bg-accent-green/35'
+                        )}
+                      >
+                        {filterMode === 'and' ? 'AND' : 'OR'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -551,7 +617,7 @@ export function SpotlightBuildPicker({
               {/* Results - scrollable area with iOS-friendly scroll */}
               <div
                 ref={scrollContainerRef}
-                className="flex-1 min-h-0 overflow-y-scroll overscroll-contain touch-pan-y"
+                className="flex-1 min-h-0 overflow-y-auto overscroll-contain"
               >
                 {isLoading ? (
                   <div className="p-8 text-center text-text-muted">
@@ -722,7 +788,7 @@ export function SpotlightBuildPicker({
                                   .filter(f => f.type === 'tag')
                                   .map(f => f.value)}
                                 className="cursor-pointer"
-                                onClick={() => handleBuildSelect(result.build)}
+                                onClick={() => handleBuildSelect(result.build, index)}
                               />
                             </div>
                           )
