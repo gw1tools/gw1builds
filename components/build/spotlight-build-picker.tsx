@@ -3,7 +3,7 @@
  * @module components/build/spotlight-build-picker
  *
  * A spotlight-style search modal for finding GW1 builds.
- * Supports profession notation (W/Mo), hashtags (#meta), skill names.
+ * Supports profession notation (Mo/Me), hashtags (#meta), skill names.
  *
  * Features:
  * - Multiple filters with AND/OR mode toggle
@@ -263,7 +263,7 @@ export function SpotlightBuildPicker({
     }
     if (cat.type === 'profession') {
       if (cat.combo) {
-        // For slash combos like W/Mo, add separate filters for primary and secondary
+        // For slash combos like Mo/Me, add separate filters for primary and secondary
         const filters: BuildFilter[] = []
         if (cat.combo.primary) {
           filters.push({ type: 'profession', value: cat.combo.primary, role: 'primary' })
@@ -401,7 +401,7 @@ export function SpotlightBuildPicker({
 
   // Handle hint clicks
   const handleHintClick = useCallback(async (hint: string) => {
-    // Check if it's a profession pattern like W/Mo
+    // Check if it's a profession pattern like Mo/Me
     const slashMatch = parseSlashPattern(hint)
     if (slashMatch) {
       const filters: BuildFilter[] = []
@@ -582,7 +582,7 @@ export function SpotlightBuildPicker({
               {/* Help bar - more compact on mobile, fixed below search */}
               <div className="px-3 py-1 sm:px-4 sm:py-1.5 bg-bg-secondary/50 border-b border-border flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] text-text-muted overflow-x-auto shrink-0">
                 <span className="shrink-0 opacity-60">Try:</span>
-                {['W/Mo', '#meta', '#team', 'Energy Surge'].map(hint => (
+                {['Mo/Me', '#meta', '#team', 'Energy Surge'].map(hint => (
                   <button
                     key={hint}
                     onClick={() => handleHintClick(hint)}
@@ -853,7 +853,7 @@ function BuildSearchEmptyState({ onHintClick }: { onHintClick: (query: string) =
         <div role="group" aria-label="Profession examples">
           <div className="text-text-muted mb-1.5 font-medium">Profession</div>
           <div className="space-y-1">
-            {['W/Mo', 'Me/', '/N'].map(h => (
+            {['Mo/Me', 'Me/', '/N'].map(h => (
               <button
                 key={h}
                 onClick={() => onHintClick(h)}
