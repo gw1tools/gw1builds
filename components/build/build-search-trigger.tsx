@@ -19,7 +19,7 @@ import type { BuildListItem } from '@/types/database'
 import type { SearchableBuild, BuildFilter } from '@/lib/search/build-search'
 
 // ============================================================================
-// HASH UTILITIES
+// STATE UTILITIES
 // ============================================================================
 
 interface SearchState {
@@ -27,38 +27,36 @@ interface SearchState {
   filters: BuildFilter[]
 }
 
+const STORAGE_KEY = 'gw1builds_search_state'
+
 /** Check if hash indicates search modal should be open */
 function isSearchHash(hash: string): boolean {
   return hash === '#search' || hash.startsWith('#search?')
 }
 
-/** Parse search state from hash */
-function parseSearchHash(hash: string): SearchState {
-  if (!hash.startsWith('#search')) {
-    return { query: '', filters: [] }
-  }
-
+/** Save search state to sessionStorage (reliable on mobile) */
+function saveSearchState(state: SearchState): void {
   try {
-    const queryString = hash.replace('#search?', '').replace('#search', '')
-    const params = new URLSearchParams(queryString)
-    const query = params.get('q') || ''
-    const filtersJson = params.get('f')
-    const filters = filtersJson ? JSON.parse(decodeURIComponent(filtersJson)) : []
-    return { query, filters }
+    if (state.query || state.filters.length > 0) {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+    }
   } catch {
-    return { query: '', filters: [] }
+    // Ignore storage errors
   }
 }
 
-/** Build hash string from search state */
-function buildSearchHash(state: SearchState): string {
-  const params = new URLSearchParams()
-  if (state.query) params.set('q', state.query)
-  if (state.filters.length > 0) {
-    params.set('f', encodeURIComponent(JSON.stringify(state.filters)))
+/** Load and clear search state from sessionStorage */
+function loadSearchState(): SearchState | null {
+  try {
+    const stored = sessionStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      sessionStorage.removeItem(STORAGE_KEY)
+      return JSON.parse(stored)
+    }
+  } catch {
+    // Ignore storage errors
   }
-  const queryString = params.toString()
-  return queryString ? `#search?${queryString}` : '#search'
+  return null
 }
 
 // ============================================================================
@@ -111,30 +109,35 @@ export function BuildSearchTrigger({
   }, [])
 
   // Called by SpotlightBuildPicker right before navigating to a build
-  // This saves the current search state to URL so back button restores it
+  // Saves state to sessionStorage (more reliable on mobile than history.replaceState)
   const handleBeforeNavigate = useCallback((query: string, filters: BuildFilter[]) => {
-    const hash = buildSearchHash({ query, filters })
-    window.history.replaceState(null, '', hash)
+    saveSearchState({ query, filters })
   }, [])
 
-  // Handle hash-based modal state: check on mount and listen for back/forward navigation
+  // Handle modal state: check hash and sessionStorage on mount and back/forward navigation
   useEffect(() => {
-    function syncWithHash(): void {
+    function syncState(): void {
       const hash = window.location.hash
+
+      // Check if we should open the search modal
       if (isSearchHash(hash)) {
-        setInitialState(parseSearchHash(hash))
+        // Try to restore state from sessionStorage (saved before navigation)
+        const savedState = loadSearchState()
+        if (savedState) {
+          setInitialState(savedState)
+        }
         setIsOpen(true)
       } else {
         setIsOpen(false)
       }
     }
 
-    // Check initial hash on mount
-    syncWithHash()
+    // Check on mount
+    syncState()
 
     // Listen for popstate (back/forward navigation)
-    window.addEventListener('popstate', syncWithHash)
-    return () => window.removeEventListener('popstate', syncWithHash)
+    window.addEventListener('popstate', syncState)
+    return () => window.removeEventListener('popstate', syncState)
   }, [])
 
   // Handle keyboard shortcut (Cmd+K / Ctrl+K)
