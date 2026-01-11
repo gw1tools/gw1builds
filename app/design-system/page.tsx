@@ -662,6 +662,39 @@ export default function DesignSystemPage() {
             </div>
           </section>
 
+          {/* Build Search */}
+          <section>
+            <h2 className="text-2xl font-semibold text-text-primary mb-6">
+              Build Search
+            </h2>
+            <div className="max-w-lg">
+              <p className="text-text-muted text-sm mb-4">
+                Spotlight-style search with tiered matching. Supports profession
+                notation (W/Mo), hashtags (#meta), and skill names. Used on the
+                homepage.
+              </p>
+              <div className="p-4 bg-bg-card rounded-xl border border-border">
+                <p className="text-text-muted text-xs text-center italic">
+                  See homepage for live demo - requires build data from database
+                </p>
+              </div>
+              <div className="mt-4 text-xs text-text-muted space-y-1">
+                <p>
+                  <code className="bg-bg-primary px-1.5 py-0.5 rounded">W/Mo</code>{' '}
+                  — Search by profession combo
+                </p>
+                <p>
+                  <code className="bg-bg-primary px-1.5 py-0.5 rounded">#meta</code>{' '}
+                  — Search by tag
+                </p>
+                <p>
+                  <code className="bg-bg-primary px-1.5 py-0.5 rounded">energy surge</code>{' '}
+                  — Search by skill name
+                </p>
+              </div>
+            </div>
+          </section>
+
           {/* Skeletons */}
           <section>
             <h2 className="text-2xl font-semibold text-text-primary mb-6">

@@ -49,3 +49,6 @@ next-env.d.ts
 # MCP config (contains tokens - NEVER commit!)
 .mcp.json
 # Note: .mcp.json.example is safe to commit as a template
+
+# PvX raw scrape data (large file, regenerate with scripts/scrape-pvx.ts)
+lib/data/pvx-raw.json

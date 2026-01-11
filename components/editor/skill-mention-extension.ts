@@ -45,7 +45,7 @@ export const SkillMention = Mention.extend<SkillMentionOptions>({
         allowSpaces: true,
         items: async ({ query }: { query: string }) => {
           if (!query || query.length < 2) return []
-          return await searchSkills(query, 8)
+          return await searchSkills(query, 12)
         },
         render: () => {
           let component: ReactRenderer | null = null

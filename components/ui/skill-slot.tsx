@@ -394,7 +394,7 @@ function SkillTooltipContent({
                   />
                   {skill.adrenaline}
                 </span>
-              ) : skill.energy !== undefined && skill.energy >= 0 ? (
+              ) : skill.energy !== undefined && skill.energy > 0 ? (
                 <span className="flex items-center gap-1">
                   <Image
                     src="/icons/tango-energy.png"

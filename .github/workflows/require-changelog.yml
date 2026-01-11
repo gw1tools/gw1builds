@@ -1,0 +1,40 @@
+name: Require Changelog
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-changelog:
+    name: Check CHANGELOG.md updated
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if CHANGELOG.md was modified
+        run: |
+          # Get the list of changed files in this PR
+          CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+
+          echo "Changed files in this PR:"
+          echo "$CHANGED_FILES"
+          echo ""
+
+          if echo "$CHANGED_FILES" | grep -q "^CHANGELOG.md$"; then
+            echo "✓ CHANGELOG.md was updated"
+            exit 0
+          else
+            echo ""
+            echo "✗ ERROR: CHANGELOG.md was not updated"
+            echo ""
+            echo "Before merging to main, you must:"
+            echo "  1. Run /release in Claude Code to generate release notes"
+            echo "  2. Review and commit the changes"
+            echo "  3. Push to this branch"
+            echo ""
+            echo "This ensures users can see what changed in each release."
+            exit 1
+          fi

@@ -7,17 +7,19 @@
  */
 'use client'
 
+import { memo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
-import { Star, Eye, Users, AlertTriangle } from 'lucide-react'
+import { Star, Eye, Users, AlertTriangle, ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ProfessionBadge } from '@/components/ui/profession-badge'
 import { Badge } from '@/components/ui/badge'
 import { Tag, TagGroup } from '@/components/ui/tag'
 import { getSkillIconUrlById } from '@/lib/gw/icons'
+import { MAX_DISPLAYED_TAGS, TAG_LABELS } from '@/lib/constants'
 import type { BuildListItem } from '@/types/database'
 import type { ProfessionKey } from '@/types/gw1'
+import { isPvxBuildId } from '@/lib/pvx'
 
 export interface BuildFeedCardProps {
   build: BuildListItem
@@ -25,12 +27,22 @@ export interface BuildFeedCardProps {
   asLink?: boolean
   /** Custom href override */
   href?: string
+  /** External URL for PvX builds - opens in new tab */
+  externalUrl?: string
   /** Hide stats (stars, views) */
   hideStats?: boolean
   /** Hide tags */
   hideTags?: boolean
+  /** Tags to highlight/prioritize (shown first) */
+  highlightTags?: string[]
+  /** Number of variant builds (PvX only) */
+  variantCount?: number
+  /** Whether the search matched a variant (PvX only) */
+  matchedVariant?: boolean
   /** Card size - lg has larger skills and text */
   size?: 'default' | 'lg'
+  /** Click handler (only used when asLink=false) */
+  onClick?: () => void
   className?: string
 }
 
@@ -49,7 +61,7 @@ function formatCount(count: number): string {
  * Empty slots match the build detail page styling (dark with ghost icon)
  * Horizontally scrollable on small screens to fit all 8 icons
  */
-function SkillPreview({ skills, size = 'default' }: { skills: number[]; size?: 'default' | 'lg' }) {
+const SkillPreview = memo(function SkillPreview({ skills, size = 'default' }: { skills: number[]; size?: 'default' | 'lg' }) {
   // Ensure 8 slots
   const normalizedSkills = [...skills]
   while (normalizedSkills.length < 8) {
@@ -59,7 +71,7 @@ function SkillPreview({ skills, size = 'default' }: { skills: number[]; size?: '
   const iconSize = size === 'lg' ? 52 : 44
 
   return (
-    <div className="overflow-x-auto scrollbar-none -mx-4 px-4">
+    <div className="overflow-x-auto scrollbar-none -mx-4 px-4" aria-label="Skill bar preview">
       <div className="flex gap-0.5 w-fit">
         {normalizedSkills.slice(0, 8).map((skillId, index) => {
           const iconUrl = skillId > 0 ? getSkillIconUrlById(skillId) : null
@@ -67,7 +79,7 @@ function SkillPreview({ skills, size = 'default' }: { skills: number[]; size?: '
 
           return (
             <div
-              key={index}
+              key={`slot-${index}-${skillId}`}
               className={cn(
                 'relative flex shrink-0 items-center justify-center overflow-hidden',
                 size === 'lg' ? 'w-[52px] h-[52px]' : 'w-11 h-11',
@@ -94,7 +106,7 @@ function SkillPreview({ skills, size = 'default' }: { skills: number[]; size?: '
       </div>
     </div>
   )
-}
+})
 
 /**
  * Ghost placeholder for empty skill slots (matches detail page)
@@ -133,22 +145,54 @@ function EmptySlotGhost({ size = 'default' }: { size?: 'default' | 'lg' }) {
  * // Minimal (no stats/tags)
  * <BuildFeedCard build={build} hideStats hideTags />
  */
-export function BuildFeedCard({
+export const BuildFeedCard = memo(function BuildFeedCard({
   build,
   asLink = true,
   href,
+  externalUrl,
   hideStats = false,
   hideTags = false,
+  highlightTags = [],
+  variantCount,
+  matchedVariant = false,
   size = 'default',
+  onClick,
   className,
 }: BuildFeedCardProps) {
   const isTeamBuild = build.bars.length > 1
   const heroCount = build.bars.length
   const isDelisted = build.moderation_status === 'delisted'
+  const isPvxBuild = isPvxBuildId(build.id)
 
-  // Get first bar for profession display
+  // Check if a tag matches any highlighted tag (by key or label)
+  const isHighlightedTag = (tag: string): boolean => {
+    const tagLower = tag.toLowerCase()
+    return highlightTags.some(h => {
+      const hLower = h.toLowerCase()
+      if (tagLower === hLower) return true
+      const tagKey = Object.entries(TAG_LABELS).find(
+        ([, label]) => label.toLowerCase() === hLower
+      )?.[0]
+      return tagLower === tagKey?.toLowerCase()
+    })
+  }
+
+  // Sort tags: highlighted tags first, then others
+  const sortedTags = [...build.tags].sort((a, b) => {
+    const aHighlight = isHighlightedTag(a)
+    const bHighlight = isHighlightedTag(b)
+    if (aHighlight && !bHighlight) return -1
+    if (!aHighlight && bHighlight) return 1
+    return 0
+  })
+  const displayedTags = sortedTags.slice(0, MAX_DISPLAYED_TAGS)
+  const remainingCount = sortedTags.length - displayedTags.length
+
+  // Get first bar for profession display (with fallback for empty bars)
   const firstBar = build.bars[0]
-  const primaryKey = firstBar?.primary.toLowerCase() as ProfessionKey
+  const primaryKey = firstBar?.primary
+    ? (firstBar.primary.toLowerCase() as ProfessionKey)
+    : ('warrior' as ProfessionKey) // Fallback for malformed data
   const secondaryKey =
     firstBar?.secondary && firstBar.secondary !== 'None'
       ? (firstBar.secondary.toLowerCase() as ProfessionKey)
@@ -156,14 +200,22 @@ export function BuildFeedCard({
 
   const cardContent = (
     <>
-      {/* Header: Name + Delisted Badge */}
+      {/* Header: Name + Badges */}
       <div className="mb-2 flex items-start justify-between gap-2">
-        <h3 className={cn(
-          'font-semibold text-text-primary leading-tight line-clamp-1',
-          size === 'lg' ? 'text-lg' : 'text-sm'
-        )}>
-          {build.name}
-        </h3>
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <h3 className={cn(
+            'font-semibold text-text-primary leading-tight line-clamp-1',
+            size === 'lg' ? 'text-lg' : 'text-sm'
+          )}>
+            {build.name}
+          </h3>
+          {isPvxBuild && (
+            <span className="shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-accent-purple/20 text-accent-purple border border-accent-purple/30">
+              PvX
+              <ExternalLink className="w-2.5 h-2.5" aria-hidden="true" />
+            </span>
+          )}
+        </div>
         {isDelisted && (
           <Badge variant="danger" size="sm" icon={<AlertTriangle className="w-3 h-3" />}>
             Delisted
@@ -171,8 +223,8 @@ export function BuildFeedCard({
         )}
       </div>
 
-      {/* Badge row - Profession or Team indicator */}
-      <div className={size === 'lg' ? 'mb-4' : 'mb-3'}>
+      {/* Badge row - Profession/Team + Variants */}
+      <div className={cn('flex items-center gap-2', size === 'lg' ? 'mb-4' : 'mb-3')}>
         {isTeamBuild ? (
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-accent-gold/30 bg-accent-gold/10">
             <Users className="w-3 h-3 text-accent-gold" />
@@ -187,6 +239,18 @@ export function BuildFeedCard({
             size="sm"
           />
         )}
+        {/* Variant count badge */}
+        {isPvxBuild && variantCount && variantCount > 0 && (
+          <span className={cn(
+            'text-[11px] px-2 py-0.5 rounded-full border',
+            matchedVariant
+              ? 'text-accent-gold border-accent-gold/40 bg-accent-gold/10 font-medium'
+              : 'text-text-muted border-border bg-bg-hover/50'
+          )}>
+            {matchedVariant ? '✓ ' : '+'}
+            {variantCount} variant{variantCount > 1 ? 's' : ''}
+          </span>
+        )}
       </div>
 
       {/* Skill Preview */}
@@ -194,70 +258,106 @@ export function BuildFeedCard({
         <SkillPreview skills={firstBar?.skills || []} size={size} />
       </div>
 
-      {/* Footer: Tags (left) + Stats (right) */}
+      {/* Footer: Tags (left) + Stats/Attribution (right) */}
       <div className="flex items-center justify-between gap-2">
-        {/* Tags - bottom left */}
-        {!hideTags && build.tags.length > 0 ? (
-          <TagGroup max={3} className="shrink-0">
-            {build.tags.slice(0, 3).map(tag => (
-              <Tag key={tag} label={tag} size="sm" />
-            ))}
-          </TagGroup>
+        {/* Tags - bottom left (highlighted tags shown first, horizontally scrollable on mobile) */}
+        {!hideTags && sortedTags.length > 0 ? (
+          <div className="flex items-center gap-1.5 min-w-0 overflow-x-auto scrollbar-none -mx-1 px-1">
+            <TagGroup className="flex-nowrap shrink-0">
+              {displayedTags.map(tag => (
+                <Tag key={tag} label={tag} size="sm" />
+              ))}
+            </TagGroup>
+            {remainingCount > 0 && (
+              <span className="text-[10px] text-text-muted shrink-0">
+                +{remainingCount}
+              </span>
+            )}
+          </div>
         ) : (
           <span />
         )}
 
-        {/* Stats - bottom right */}
-        {!hideStats && (
-          <div className="flex items-center gap-3 shrink-0 text-text-muted text-xs">
-            <span className="flex items-center gap-1">
-              <Star className="w-3 h-3" />
-              {formatCount(build.star_count)}
-            </span>
-            <span className="flex items-center gap-1">
-              <Eye className="w-3 h-3" />
-              {formatCount(build.view_count)}
-            </span>
-          </div>
+        {/* Stats (community builds) or Attribution (PvX builds) - bottom right */}
+        {isPvxBuild ? (
+          <span className="text-[11px] text-text-muted italic">
+            via PvX Wiki
+          </span>
+        ) : (
+          !hideStats && (
+            <div className="flex items-center gap-3 shrink-0 text-text-muted text-xs">
+              <span className="flex items-center gap-1">
+                <Star className="w-3 h-3" />
+                {formatCount(build.star_count)}
+              </span>
+              <span className="flex items-center gap-1">
+                <Eye className="w-3 h-3" />
+                {formatCount(build.view_count)}
+              </span>
+            </div>
+          )
         )}
       </div>
     </>
   )
 
   const cardClasses = cn(
-    'block rounded-xl border border-border bg-bg-card',
-    'shadow-sticky transition-colors',
+    'block rounded-xl border border-border bg-bg-card cursor-pointer',
+    'shadow-sticky transition-all duration-150',
     size === 'lg' ? 'p-5' : 'p-4',
-    asLink &&
-      'hover:border-border-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary'
+    'hover:border-accent-gold/50 hover:shadow-lg hover:shadow-accent-gold/10',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary'
   )
 
-  if (!asLink) {
+  // PvX builds with external URLs always open in new tab (highest priority)
+  if (isPvxBuild && externalUrl) {
     return (
       <div className={cn('group', className)}>
-        <div className={cardClasses}>{cardContent}</div>
+        <a
+          href={externalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(cardClasses, 'text-left')}
+        >
+          {cardContent}
+        </a>
       </div>
     )
   }
 
+  // Non-link mode (for modals, etc.)
+  if (!asLink) {
+    // If onClick is provided, make it a clickable button
+    if (onClick) {
+      return (
+        <div className={cn('group', className)}>
+          <button
+            type="button"
+            onClick={onClick}
+            aria-label={`Select build: ${build.name}`}
+            className={cn(cardClasses, 'w-full text-left')}
+          >
+            {cardContent}
+          </button>
+        </div>
+      )
+    }
+    return (
+      <div className={cn('group', className)}>
+        <div className={cn(cardClasses, 'cursor-default')}>{cardContent}</div>
+      </div>
+    )
+  }
+
+  // Default: internal link
   return (
-    <motion.div
-      whileHover={{
-        y: -2,
-        transition: { duration: 0.12, ease: [0, 0, 0.2, 1] },
-      }}
-      whileTap={{
-        y: 0,
-        transition: { duration: 0.08 },
-      }}
-      className={cn('group', className)}
-    >
+    <div className={cn('group', className)}>
       <Link href={href || `/b/${build.id}`} className={cardClasses}>
         {cardContent}
       </Link>
-    </motion.div>
+    </div>
   )
-}
+})
 
 /**
  * Skeleton loading state for BuildFeedCard

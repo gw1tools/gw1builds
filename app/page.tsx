@@ -1,5 +1,5 @@
 /**
- * @fileoverview Homepage - Simple, lightweight build sharing
+ * @fileoverview Homepage - Build workbench for the GW1 community
  * @module app/page
  */
 
@@ -7,32 +7,53 @@ import { Plus } from 'lucide-react'
 import { Container } from '@/components/layout/container'
 import { Button } from '@/components/ui'
 import { BuildFeed } from '@/components/build/build-feed'
-import { getBuilds } from '@/lib/supabase/queries'
+import { BuildSearchTrigger } from '@/components/build/build-search-trigger'
+import { getBuilds, type BuildSortType } from '@/lib/supabase/queries'
+import { loadBuildsForSearch } from '@/lib/actions/search'
 
-export default async function HomePage() {
-  // Fetch popular builds for initial load
-  const { builds, nextOffset } = await getBuilds({ type: 'popular', limit: 6 })
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>
+}) {
+  // Read and validate tab parameter
+  const { tab } = await searchParams
+  const initialTab: BuildSortType = tab === 'recent' ? 'recent' : 'popular'
+
+  // Fetch builds for the selected tab
+  const { builds, nextOffset } = await getBuilds({ type: initialTab, limit: 6 })
 
   return (
     <>
       {/* Hero */}
-      <section className="relative py-16 sm:py-24">
+      <section className="relative pt-12 sm:pt-20 pb-8 sm:pb-18">
         <Container size="md" className="text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-text-primary mb-4">
+          <h1 className="text-4xl sm:text-5xl font-bold text-text-primary mb-3">
             <span className="text-accent-gold">GW1</span> Builds
           </h1>
-          <p className="text-text-muted text-lg mb-14">
+          <p className="text-text-muted text-lg mb-18">
             A <span className="text-accent-gold italic">lightweight</span> build
             sharing tool for the Reforged era
           </p>
-          <Button
-            href="/new"
-            variant="primary"
-            size="lg"
-            leftIcon={<Plus className="w-5 h-5" />}
-          >
-            Create Build
-          </Button>
+
+          {/* Search + Create - always in one row */}
+          <div className="flex flex-row items-center justify-center gap-2 sm:gap-3 max-w-lg mx-auto">
+            <div className="flex-1 min-w-0">
+              <BuildSearchTrigger
+                loadBuilds={loadBuildsForSearch}
+                placeholder="Search builds..."
+              />
+            </div>
+            <Button
+              href="/new"
+              variant="primary"
+              size="lg"
+              leftIcon={<Plus className="w-4 h-4 sm:w-5 sm:h-5" />}
+              className="flex-shrink-0 whitespace-nowrap"
+            >
+              Create
+            </Button>
+          </div>
         </Container>
       </section>
 
@@ -41,7 +62,7 @@ export default async function HomePage() {
         <Container size="md">
           <BuildFeed
             initialBuilds={builds}
-            initialTab="popular"
+            initialTab={initialTab}
             initialNextOffset={nextOffset}
           />
         </Container>

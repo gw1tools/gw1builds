@@ -8,6 +8,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Star, Clock } from 'lucide-react'
 
@@ -39,6 +40,7 @@ export function BuildFeed({
   initialTab = 'popular',
   initialNextOffset = null,
 }: BuildFeedProps) {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<BuildSortType>(initialTab)
   const [builds, setBuilds] = useState<Record<BuildSortType, BuildListItem[]>>({
     popular: initialTab === 'popular' ? initialBuilds : [],
@@ -73,6 +75,10 @@ export function BuildFeed({
 
       setActiveTab(tab)
 
+      // Update URL to persist tab state
+      const url = tab === 'popular' ? '/' : '/?tab=recent'
+      router.replace(url, { scroll: false })
+
       // If we haven't loaded this tab yet, fetch it
       if (builds[tab].length === 0) {
         setTabLoading(true)
@@ -87,7 +93,7 @@ export function BuildFeed({
         }
       }
     },
-    [activeTab, builds, fetchBuilds]
+    [activeTab, builds, fetchBuilds, router]
   )
 
   return (
