@@ -166,16 +166,23 @@ export function SpotlightBuildPicker({
     return () => { cancelled = true }
   }, [loadBuilds])
 
-  // Track previous open state to detect transitions
-  const wasOpenRef = useRef(false)
+  // Track the last restored initial state to avoid re-restoring the same values
+  const lastRestoredKeyRef = useRef('')
 
-  // Initialize state when modal opens (not on subsequent prop changes while open)
+  // Initialize state when modal opens or when initial values change (back button navigation)
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    const justOpened = isOpen && !wasOpenRef.current
-    wasOpenRef.current = isOpen
+    if (!isOpen) {
+      lastRestoredKeyRef.current = ''
+      return
+    }
 
-    if (justOpened) {
+    // Create a key from the initial values to detect changes
+    const stateKey = `${initialQuery}|${JSON.stringify(initialFilters)}`
+
+    // Only restore if this is new state (modal just opened or back button with different state)
+    if (stateKey !== lastRestoredKeyRef.current) {
+      lastRestoredKeyRef.current = stateKey
       setQuery(initialQuery)
       setActiveFilters(initialFilters)
       setSelectedIndex(0)
@@ -332,20 +339,20 @@ export function SpotlightBuildPicker({
     // Track click for analytics (1-based position)
     trackBuildClick(build.id, positionInResults + 1)
 
-    // Close without abandon tracking (we tracked the click)
-    onClose()
-
     if (onSelect) {
+      onClose()
       onSelect(build)
       return
     }
 
     // Default behavior: navigate to build page
     if (build.externalUrl) {
-      // External links open in new tab, no need to save state
+      // External links open in new tab, modal stays open
       window.open(build.externalUrl, '_blank', 'noopener,noreferrer')
     } else {
-      // Save search state to URL before navigating (so back button restores it)
+      // For internal navigation: save state to URL, then navigate
+      // Don't call onClose() - the navigation will unmount the modal
+      // This avoids race conditions on mobile with history.pushState
       onBeforeNavigate?.(query, activeFilters)
       router.push(`/b/${build.id}`)
     }
