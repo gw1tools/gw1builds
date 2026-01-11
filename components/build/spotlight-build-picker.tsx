@@ -86,7 +86,6 @@ export function SpotlightBuildPicker({
   const [allBuilds, setAllBuilds] = useState<SearchableBuild[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
-  const resultsRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const selectedItemRef = useRef<HTMLElement | null>(null)
   const router = useRouter()
@@ -166,28 +165,15 @@ export function SpotlightBuildPicker({
     return () => { cancelled = true }
   }, [loadBuilds])
 
-  // Track the last restored initial state to avoid re-restoring the same values
-  const lastRestoredKeyRef = useRef('')
-
-  // Initialize state when modal opens or when initial values change (back button navigation)
+  // Initialize state when modal opens with initial values (e.g., back button navigation)
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    if (!isOpen) {
-      lastRestoredKeyRef.current = ''
-      return
-    }
+    if (!isOpen) return
 
-    // Create a key from the initial values to detect changes
-    const stateKey = `${initialQuery}|${JSON.stringify(initialFilters)}`
-
-    // Only restore if this is new state (modal just opened or back button with different state)
-    if (stateKey !== lastRestoredKeyRef.current) {
-      lastRestoredKeyRef.current = stateKey
-      setQuery(initialQuery)
-      setActiveFilters(initialFilters)
-      setSelectedIndex(0)
-      requestAnimationFrame(() => inputRef.current?.focus())
-    }
+    setQuery(initialQuery)
+    setActiveFilters(initialFilters)
+    setSelectedIndex(0)
+    requestAnimationFrame(() => inputRef.current?.focus())
   }, [isOpen, initialQuery, initialFilters])
 
   // Reset selected index and scroll when results change
@@ -550,7 +536,7 @@ export function SpotlightBuildPicker({
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={activeFilters.length > 0 ? 'Add...' : 'W/Mo, #meta, skill...'}
+                    placeholder={activeFilters.length > 0 ? 'Add...' : 'Mo/Me, #meta, skill...'}
                     aria-label="Search builds by profession, tag, or skill"
                     className="flex-1 min-w-[60px] h-9 sm:h-10 bg-transparent text-base text-text-primary placeholder:text-text-muted focus:outline-none font-mono"
                   />
@@ -762,7 +748,6 @@ export function SpotlightBuildPicker({
                     {/* Build results grid */}
                     {searchResults.results.length > 0 && (
                       <div
-                        ref={resultsRef}
                         className="flex flex-col gap-3 py-2"
                         role="listbox"
                         aria-label="Build search results"

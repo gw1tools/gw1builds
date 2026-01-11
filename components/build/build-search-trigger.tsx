@@ -31,7 +31,7 @@ const STORAGE_KEY = 'gw1builds_search_state'
 
 /** Check if hash indicates search modal should be open */
 function isSearchHash(hash: string): boolean {
-  return hash === '#search' || hash.startsWith('#search?')
+  return hash === '#search'
 }
 
 /** Save search state to sessionStorage (reliable on mobile) */
