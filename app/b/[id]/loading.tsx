@@ -11,7 +11,7 @@
  */
 export default function BuildLoading() {
   return (
-    <main className="max-w-3xl mx-auto px-4 py-8 pb-24">
+    <div className="max-w-3xl mx-auto px-4 py-8 pb-24">
       {/* Breadcrumb skeleton */}
       <div className="h-4 w-32 bg-bg-card/50 rounded animate-pulse mb-6" />
 
@@ -86,6 +86,6 @@ export default function BuildLoading() {
         </div>
         <div className="h-4 w-12 bg-bg-card/50 rounded animate-pulse" />
       </div>
-    </main>
+    </div>
   )
 }

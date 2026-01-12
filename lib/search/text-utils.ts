@@ -47,9 +47,12 @@ export function extractTextFromTiptap(
       textParts.push(node.text)
     }
 
-    // Skill mention - extract skill name from attrs
-    if (node.type === 'skillMention' && node.attrs?.name) {
-      textParts.push(String(node.attrs.name))
+    // Skill mention - extract skill name from attrs (label is the display name)
+    if (node.type === 'skillMention') {
+      const label = node.attrs?.label || node.attrs?.name
+      if (label) {
+        textParts.push(String(label))
+      }
     }
 
     // Block-level elements - add line break after

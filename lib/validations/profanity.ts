@@ -69,27 +69,6 @@ function escapeRegex(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-/**
- * Extract plain text from Tiptap JSON document
- * Recursively traverses the document structure to find all text nodes
- *
- * @param doc - Tiptap JSON document (or any nested node)
- * @returns Concatenated text content
- */
-export function extractTextFromTiptap(doc: unknown): string {
-  if (!doc || typeof doc !== 'object') return ''
-
-  const node = doc as { type?: string; text?: string; content?: unknown[] }
-
-  // Text node - return the text
-  if (node.type === 'text' && typeof node.text === 'string') {
-    return node.text
-  }
-
-  // Has content array - recursively extract
-  if (Array.isArray(node.content)) {
-    return node.content.map(extractTextFromTiptap).join(' ')
-  }
-
-  return ''
-}
+// Re-export extractTextFromTiptap from canonical source
+// This ensures consistent text extraction across validation, search, and profanity checks
+export { extractTextFromTiptap } from '@/lib/search/text-utils'

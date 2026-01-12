@@ -12,7 +12,6 @@ import {
   useState,
   useEffect,
   useRef,
-  useSyncExternalStore,
   createContext,
   useContext,
   useCallback,
@@ -53,21 +52,9 @@ const AuthModalContext = createContext<AuthModalContextValue | undefined>(
   undefined
 )
 
-// Hook to detect if we're on client after hydration
-// Uses useSyncExternalStore for proper SSR support without hydration mismatch
-const emptySubscribe = () => () => {}
-function useIsClient() {
-  return useSyncExternalStore(
-    emptySubscribe,
-    () => true, // Client value
-    () => false // Server value
-  )
-}
-
 export function AuthModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
   const [redirectTo, setRedirectTo] = useState<string | null>(null)
-  const isClient = useIsClient()
 
   const openModal = useCallback((redirect?: string) => {
     setRedirectTo(redirect || null)
@@ -84,9 +71,7 @@ export function AuthModalProvider({ children }: { children: ReactNode }) {
       value={{ isOpen, openModal, closeModal, redirectTo }}
     >
       {children}
-      {isClient && (
-        <AuthModal open={isOpen} onClose={closeModal} redirectTo={redirectTo} />
-      )}
+      <AuthModal open={isOpen} onClose={closeModal} redirectTo={redirectTo} />
     </AuthModalContext.Provider>
   )
 }

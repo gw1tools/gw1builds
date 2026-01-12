@@ -29,7 +29,7 @@ export default function Error({ error, reset }: ErrorProps) {
   }, [error])
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-16 text-center">
+    <div className="max-w-3xl mx-auto px-4 py-16 text-center">
       <div className="text-6xl mb-4">⚠️</div>
       <h1 className="text-2xl font-bold text-text-primary mb-2">
         Something went wrong
@@ -46,6 +46,6 @@ export default function Error({ error, reset }: ErrorProps) {
           Return home
         </Button>
       </div>
-    </main>
+    </div>
   )
 }

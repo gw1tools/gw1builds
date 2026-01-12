@@ -18,6 +18,8 @@ import {
   MAX_TAG_LENGTH,
   SKILLS_PER_BAR,
 } from './constants'
+import { extractTextFromTiptap } from './search/text-utils'
+import type { TipTapDocument } from '@/types/database'
 
 // ============================================================================
 // SANITIZATION
@@ -201,12 +203,12 @@ export function validateNotes(notes: unknown): ValidationResult {
     return { valid: false, error: 'Notes must be an object' }
   }
 
-  // Check serialized size
-  const serialized = JSON.stringify(notes)
-  if (serialized.length > MAX_NOTES_LENGTH) {
+  // Check actual text content length (not JSON structure)
+  const textContent = extractTextFromTiptap(notes as TipTapDocument)
+  if (textContent.length > MAX_NOTES_LENGTH) {
     return {
       valid: false,
-      error: `Notes are too long (max ${MAX_NOTES_LENGTH} characters)`,
+      error: `Notes are too long (max ${MAX_NOTES_LENGTH.toLocaleString()} characters)`,
     }
   }
 
@@ -359,11 +361,16 @@ export function sanitizeBuildInput(input: {
   bars: Record<string, unknown>[]
   notes?: unknown
   tags?: string[]
-}) {
+}): {
+  name: string
+  bars: Record<string, unknown>[]
+  notes: TipTapDocument
+  tags: string[]
+} {
   return {
     name: sanitizeSingleLine(input.name),
     bars: input.bars.map(sanitizeSkillBar),
-    notes: input.notes || { type: 'doc', content: [] },
+    notes: (input.notes as TipTapDocument) || { type: 'doc', content: [] },
     tags: (input.tags || []).map(t => sanitizeSingleLine(t)),
   }
 }

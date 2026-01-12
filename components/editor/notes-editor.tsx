@@ -8,7 +8,7 @@
 
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import { BubbleMenu } from '@tiptap/react/menus'
 import StarterKit from '@tiptap/starter-kit'
@@ -28,6 +28,8 @@ import {
   Unlink,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { extractTextFromTiptap } from '@/lib/search/text-utils'
+import { MAX_NOTES_LENGTH } from '@/lib/constants'
 import { SkillMention } from './skill-mention-extension'
 import { SlashCommand } from './slash-command-extension'
 import type { TipTapDocument } from '@/types/database'
@@ -84,6 +86,10 @@ export function NotesEditor({ value, onChange, footer }: NotesEditorProps) {
   useEffect(() => {
     setIsTouchDevice(!window.matchMedia('(hover: hover)').matches)
   }, [])
+
+  // Calculate character count from actual text content
+  const charCount = useMemo(() => extractTextFromTiptap(value).length, [value])
+  const isOverLimit = charCount > MAX_NOTES_LENGTH
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -483,23 +489,28 @@ export function NotesEditor({ value, onChange, footer }: NotesEditorProps) {
         )}
       </div>
 
-      {/* Helper text */}
-      <p className="text-xs text-text-muted mt-1.5">
-        <span className="text-text-secondary">Tip:</span>{' '}
-        {isTouchDevice ? (
-          <>
-            Select text for formatting. Type{' '}
-            <span className="text-text-secondary">/</span> for commands,{' '}
-            <span className="text-accent-gold">[[</span> for skills.
-          </>
-        ) : (
-          <>
-            Type <span className="text-text-secondary">/</span> for commands,{' '}
-            <span className="text-accent-gold">[[</span> for skills. Paste URLs
-            to auto-link.
-          </>
-        )}
-      </p>
+      {/* Helper text and character count */}
+      <div className="flex items-center justify-between mt-1.5 text-xs text-text-muted">
+        <p>
+          <span className="text-text-secondary">Tip:</span>{' '}
+          {isTouchDevice ? (
+            <>
+              Select text for formatting. Type{' '}
+              <span className="text-text-secondary">/</span> for commands,{' '}
+              <span className="text-accent-gold">[[</span> for skills.
+            </>
+          ) : (
+            <>
+              Type <span className="text-text-secondary">/</span> for commands,{' '}
+              <span className="text-accent-gold">[[</span> for skills. Paste URLs
+              to auto-link.
+            </>
+          )}
+        </p>
+        <span className={cn(isOverLimit && 'text-accent-red font-medium')}>
+          {charCount.toLocaleString()} / {MAX_NOTES_LENGTH.toLocaleString()}
+        </span>
+      </div>
     </div>
   )
 }
