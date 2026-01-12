@@ -14,7 +14,7 @@ import { Button } from '@/components/ui'
  */
 export default function NotFound() {
   return (
-    <main className="max-w-3xl mx-auto px-4 py-16 text-center">
+    <div className="max-w-3xl mx-auto px-4 py-16 text-center">
       <div className="text-6xl mb-4">🔍</div>
       <h1 className="text-2xl font-bold text-text-primary mb-2">
         Page not found
@@ -25,6 +25,6 @@ export default function NotFound() {
       <Button href="/" variant="primary">
         Return home
       </Button>
-    </main>
+    </div>
   )
 }

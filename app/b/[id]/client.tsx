@@ -82,7 +82,7 @@ export function BuildPageClient({
   }, [build.id])
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-8 pb-12">
+    <div className="max-w-3xl mx-auto px-4 py-8 pb-12">
       {/* Delisted banner - only shown to author */}
       {isOwner && isDelisted && (
         <div className="mb-6 p-4 rounded-xl border border-accent-red/30 bg-accent-red/5">
@@ -227,7 +227,7 @@ export function BuildPageClient({
         isOpen={reportModalOpen}
         onClose={() => setReportModalOpen(false)}
       />
-    </main>
+    </div>
   )
 }
 

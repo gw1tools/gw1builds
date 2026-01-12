@@ -65,7 +65,7 @@ export default async function ChangesPage() {
   }
 
   return (
-    <main className="min-h-screen">
+    <div className="min-h-screen">
       <div className="max-w-2xl mx-auto px-4 py-12 sm:py-16">
         {/* Card container */}
         <div>
@@ -113,6 +113,6 @@ export default async function ChangesPage() {
           )}
         </div>
       </div>
-    </main>
+    </div>
   )
 }

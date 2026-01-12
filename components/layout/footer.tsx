@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Github } from 'lucide-react'
 
-// Compute year once at module level to prevent hydration mismatch
-const CURRENT_YEAR = new Date().getFullYear()
+// Year the site launched - used as "since 2026" to avoid needing updates
+const LAUNCH_YEAR = 2026
 
 // All 10 profession colors
 const professionColors = [
@@ -81,7 +81,7 @@ export function Footer() {
             initial="initial"
             whileHover="hover"
           >
-            <span className="text-xs text-text-muted">© {CURRENT_YEAR}</span>
+            <span className="text-xs text-text-muted">since {LAUNCH_YEAR}</span>
             <div className="flex items-center gap-1">
               {professionColors.map((color, i) => (
                 <motion.span
