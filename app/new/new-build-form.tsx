@@ -30,7 +30,8 @@ import {
   MIN_MEANINGFUL_NOTES_LENGTH,
   MIN_MEANINGFUL_TAG_COUNT,
 } from '@/lib/constants'
-import type { SkillBar, TipTapDocument, TipTapNode } from '@/types/database'
+import { extractTextFromTiptap } from '@/lib/search/text-utils'
+import type { SkillBar, TipTapDocument } from '@/types/database'
 
 const EMPTY_SKILL_BAR: SkillBar = {
   name: '',
@@ -52,34 +53,6 @@ type DraftData = {
   bars: SkillBar[]
   notes: TipTapDocument
   tags: string[]
-}
-
-/**
- * Extract plain text from TipTap document
- * Recursively walks the document tree and concatenates all text nodes
- * @param doc - TipTap JSON document
- * @returns Plain text without formatting
- */
-function extractTextFromTipTap(doc: TipTapDocument): string {
-  const extractFromNode = (node: TipTapNode): string => {
-    // Text nodes have a text property
-    if (node.text) {
-      return node.text
-    }
-
-    // Container nodes have children
-    if (node.content) {
-      return node.content.map(extractFromNode).join('')
-    }
-
-    return ''
-  }
-
-  if (!doc.content || doc.content.length === 0) {
-    return ''
-  }
-
-  return doc.content.map(extractFromNode).join('\n')
 }
 
 /**
@@ -110,7 +83,7 @@ function draftIsMeaningful(data: DraftData): boolean {
   if (hasBarName) return true
 
   // 3. Check for real notes content
-  const notesText = extractTextFromTipTap(data.notes)
+  const notesText = extractTextFromTiptap(data.notes)
   if (notesText.trim().length >= MIN_MEANINGFUL_NOTES_LENGTH) return true
 
   // 4. Check for multiple tags (intentional selection)

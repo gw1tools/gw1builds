@@ -340,6 +340,21 @@ textarea:focus {
   border-top: 1px solid var(--color-border);
 }
 
+/* Ensure content after hr maintains correct color */
+.prose hr + p,
+.prose hr + ul,
+.prose hr + ol,
+.prose hr + blockquote {
+  color: var(--color-text-secondary);
+}
+
+.prose hr + h1,
+.prose hr + h2,
+.prose hr + h3,
+.prose hr + h4 {
+  color: var(--color-text-primary);
+}
+
 .prose a {
   color: var(--color-accent-blue);
   text-decoration: none;

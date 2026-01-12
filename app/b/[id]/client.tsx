@@ -82,7 +82,7 @@ export function BuildPageClient({
   }, [build.id])
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-8 pb-12">
+    <div className="max-w-3xl mx-auto px-4 py-8 pb-12">
       {/* Delisted banner - only shown to author */}
       {isOwner && isDelisted && (
         <div className="mb-6 p-4 rounded-xl border border-accent-red/30 bg-accent-red/5">
@@ -227,7 +227,7 @@ export function BuildPageClient({
         isOpen={reportModalOpen}
         onClose={() => setReportModalOpen(false)}
       />
-    </main>
+    </div>
   )
 }
 
@@ -517,9 +517,6 @@ function FormattedDate({ date }: { date: string }) {
 }
 
 /**
- * Simple notes renderer for TipTap JSON content
- */
-/**
  * Renders inline content (text with marks, skill mentions)
  */
 function renderInlineContent(
@@ -527,66 +524,75 @@ function renderInlineContent(
 ): React.ReactNode {
   if (!content) return null
 
-  return content.map((child, childIndex) => {
-    // Handle skill mentions with tooltip
-    if (child.type === 'skillMention') {
-      const attrs = child.attrs as
-        | { id?: string; label?: string; elite?: boolean }
-        | undefined
-      return (
-        <SkillMentionTooltip
-          key={childIndex}
-          skillId={attrs?.id || '0'}
-          label={attrs?.label || 'Unknown Skill'}
-          elite={attrs?.elite === true}
-        />
-      )
-    }
-
-    // Handle text nodes
-    if (child.type === 'text') {
-      let content: React.ReactNode = child.text
-
-      // Apply marks (bold, italic, link, etc.)
-      if (child.marks) {
-        for (const mark of child.marks) {
-          if (mark.type === 'bold') {
-            content = <strong key={`${childIndex}-bold`}>{content}</strong>
-          } else if (mark.type === 'italic') {
-            content = <em key={`${childIndex}-italic`}>{content}</em>
-          } else if (mark.type === 'code') {
-            content = <code key={`${childIndex}-code`}>{content}</code>
-          } else if (mark.type === 'link') {
-            const href = (mark.attrs as { href?: string } | undefined)?.href
-            content = (
-              <a
-                key={`${childIndex}-link`}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer nofollow"
-                className="text-accent-blue hover:text-accent-blue/80 underline"
-              >
-                {content}
-              </a>
-            )
-          }
-        }
+  return content.map((child, index) => {
+    switch (child.type) {
+      case 'skillMention': {
+        const attrs = child.attrs as
+          | { id?: string; label?: string; elite?: boolean }
+          | undefined
+        return (
+          <SkillMentionTooltip
+            key={index}
+            skillId={attrs?.id || '0'}
+            label={attrs?.label || 'Unknown Skill'}
+            elite={attrs?.elite === true}
+          />
+        )
       }
 
-      return <span key={childIndex}>{content}</span>
-    }
+      case 'text': {
+        let node: React.ReactNode = child.text
+        for (const mark of child.marks ?? []) {
+          node = wrapWithMark(node, mark, index)
+        }
+        return <span key={index}>{node}</span>
+      }
 
-    // Handle hard breaks
-    if (child.type === 'hardBreak') {
-      return <br key={childIndex} />
-    }
+      case 'hardBreak':
+        return <br key={index} />
 
-    return null
+      default:
+        return null
+    }
   })
 }
 
 /**
- * Renders list items with full inline content support
+ * Wraps content with the appropriate mark element
+ */
+function wrapWithMark(
+  content: React.ReactNode,
+  mark: { type: string; attrs?: unknown },
+  index: number
+): React.ReactNode {
+  switch (mark.type) {
+    case 'bold':
+      return <strong key={`${index}-bold`}>{content}</strong>
+    case 'italic':
+      return <em key={`${index}-italic`}>{content}</em>
+    case 'code':
+      return <code key={`${index}-code`}>{content}</code>
+    case 'link': {
+      const href = (mark.attrs as { href?: string } | undefined)?.href
+      return (
+        <a
+          key={`${index}-link`}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+          className="text-accent-blue hover:text-accent-blue/80 underline"
+        >
+          {content}
+        </a>
+      )
+    }
+    default:
+      return content
+  }
+}
+
+/**
+ * Renders list items with nested list support
  */
 function renderListItems(
   content: BuildWithAuthor['notes']['content'] | undefined
@@ -595,70 +601,72 @@ function renderListItems(
 
   return content.map((item, itemIndex) => (
     <li key={itemIndex}>
-      {item.content?.map((para, paraIndex) => (
-        <span key={paraIndex}>{renderInlineContent(para.content)}</span>
-      ))}
+      {item.content?.map((child, index) => {
+        switch (child.type) {
+          case 'paragraph':
+            return <span key={index}>{renderInlineContent(child.content)}</span>
+          case 'bulletList':
+            return <ul key={index}>{renderListItems(child.content)}</ul>
+          case 'orderedList':
+            return <ol key={index}>{renderListItems(child.content)}</ol>
+          case 'horizontalRule':
+            return <hr key={index} />
+          default:
+            return null
+        }
+      })}
     </li>
   ))
 }
 
-function NotesRenderer({ notes }: { notes: BuildWithAuthor['notes'] }) {
-  if (!notes || !notes.content) return null
+type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
-  return (
-    <>
-      {notes.content.map((node, index) => {
-        // Headings
-        if (node.type === 'heading') {
-          const level =
-            (node.attrs as { level?: number } | undefined)?.level || 1
-          const HeadingTag = `h${level}` as
-            | 'h1'
-            | 'h2'
-            | 'h3'
-            | 'h4'
-            | 'h5'
-            | 'h6'
-          return (
-            <HeadingTag key={index}>
-              {renderInlineContent(node.content)}
-            </HeadingTag>
-          )
-        }
+/**
+ * Renders block-level content (paragraphs, lists, headings, blockquotes, etc.)
+ */
+function renderBlockContent(
+  content: BuildWithAuthor['notes']['content'] | undefined
+): React.ReactNode {
+  if (!content) return null
 
-        // Paragraphs
-        if (node.type === 'paragraph') {
-          return <p key={index}>{renderInlineContent(node.content)}</p>
-        }
+  return content.map((node, index) => {
+    switch (node.type) {
+      case 'heading': {
+        const level = (node.attrs as { level?: number } | undefined)?.level || 1
+        const HeadingTag = `h${level}` as HeadingLevel
+        return (
+          <HeadingTag key={index}>
+            {renderInlineContent(node.content)}
+          </HeadingTag>
+        )
+      }
 
-        // Bullet lists
-        if (node.type === 'bulletList') {
-          return <ul key={index}>{renderListItems(node.content)}</ul>
-        }
+      case 'paragraph':
+        return <p key={index}>{renderInlineContent(node.content)}</p>
 
-        // Ordered lists
-        if (node.type === 'orderedList') {
-          return <ol key={index}>{renderListItems(node.content)}</ol>
-        }
+      case 'bulletList':
+        return <ul key={index}>{renderListItems(node.content)}</ul>
 
-        // Blockquotes
-        if (node.type === 'blockquote') {
-          return (
-            <blockquote key={index}>
-              {node.content?.map((child, childIndex) => (
-                <p key={childIndex}>{renderInlineContent(child.content)}</p>
-              ))}
-            </blockquote>
-          )
-        }
+      case 'orderedList':
+        return <ol key={index}>{renderListItems(node.content)}</ol>
 
-        // Horizontal rule
-        if (node.type === 'horizontalRule') {
-          return <hr key={index} />
-        }
+      case 'blockquote':
+        return (
+          <blockquote key={index}>
+            {renderBlockContent(node.content)}
+          </blockquote>
+        )
 
+      case 'horizontalRule':
+        return <hr key={index} />
+
+      default:
         return null
-      })}
-    </>
-  )
+    }
+  })
+}
+
+function NotesRenderer({ notes }: { notes: BuildWithAuthor['notes'] }): React.ReactNode {
+  if (!notes?.content) return null
+  return <>{renderBlockContent(notes.content)}</>
 }
