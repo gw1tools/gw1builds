@@ -1,5 +1,11 @@
 # What's New
 
+## January 12, 2026
+
+- Notes editor now shows a live character count (and fixed a bug where character limits were counting JSON bytes instead of actual text)
+- Nested lists, blockquotes, and dividers now render correctly in build notes
+- Improved search experience on mobile devices
+
 ## January 11, 2026
 
 - Search for builds by name, profession, or skills
