@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json()
-    const { name, bars, notes, tags } = body
+    const { name, bars, notes, tags, is_private } = body
 
     // Create build
     const build = await createBuild({
@@ -67,6 +67,7 @@ export async function POST(request: NextRequest) {
       bars,
       notes,
       tags,
+      is_private: is_private ?? false,
     })
 
     return NextResponse.json({ id: build.id }, { status: 201 })

@@ -12,18 +12,25 @@ import { useMemo, useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { trackTemplateCopied } from '@/lib/analytics'
+import { useVariantData } from '@/hooks'
+import { mapSkillsFromIds, type Skill } from '@/lib/gw/skills'
 import { SkillBar } from '@/components/ui/skill-bar'
 import { AttributeBar } from '@/components/ui/attribute-bar'
 import { ProfessionBadge } from '@/components/ui/profession-badge'
+import { Badge } from '@/components/ui/badge'
+import { VariantTabs } from '@/components/ui/variant-tabs'
 import type { ProfessionKey } from '@/types/gw1'
 import type { SkillBar as SkillBarType } from '@/types/database'
-import type { Skill } from '@/lib/gw/skills'
 
 interface HeroBuildCardProps {
   bar: SkillBarType
   index: number
   buildId: string
   skillMap: Record<number, Skill>
+  /** Active variant index (0 = base, 1+ = variants) */
+  activeVariantIndex?: number
+  /** Called when variant tab is clicked */
+  onVariantChange?: (index: number) => void
   className?: string
 }
 
@@ -32,33 +39,15 @@ export function HeroBuildCard({
   index,
   buildId,
   skillMap,
+  activeVariantIndex = 0,
+  onVariantChange,
   className,
 }: HeroBuildCardProps) {
   const [copied, setCopied] = useState(false)
-
+  const { allVariants, currentVariant, hasVariants } = useVariantData(bar, activeVariantIndex)
   const skills = useMemo(
-    () =>
-      bar.skills.map(id => {
-        if (id === 0) return null
-        const skill = skillMap[id]
-        if (!skill) return null
-        return {
-          id: skill.id,
-          name: skill.name,
-          description: skill.description,
-          profession: skill.profession,
-          attribute: skill.attribute,
-          energy: skill.energy,
-          activation: skill.activation,
-          recharge: skill.recharge,
-          elite: skill.elite,
-          adrenaline: skill.adrenaline,
-          sacrifice: skill.sacrifice,
-          upkeep: skill.upkeep,
-          overcast: skill.overcast,
-        }
-      }),
-    [bar.skills, skillMap]
+    () => mapSkillsFromIds(currentVariant.skills, skillMap),
+    [currentVariant.skills, skillMap]
   )
 
   const primaryKey = bar.primary.toLowerCase() as ProfessionKey
@@ -68,7 +57,7 @@ export function HeroBuildCard({
       : undefined
 
   const handleCopyCode = async () => {
-    await navigator.clipboard.writeText(bar.template)
+    await navigator.clipboard.writeText(currentVariant.template)
     setCopied(true)
     trackTemplateCopied({ build_id: buildId, bar_count: 1 })
     setTimeout(() => setCopied(false), 2000)
@@ -88,6 +77,13 @@ export function HeroBuildCard({
           {index + 1}
         </span>
 
+        {/* Player count badge - only show if > 1 */}
+        {bar.playerCount && bar.playerCount > 1 && (
+          <Badge variant="gold" size="sm">
+            ×{bar.playerCount}
+          </Badge>
+        )}
+
         {/* Name */}
         <h3 className="font-semibold text-text-primary truncate">
           {bar.name}
@@ -98,6 +94,17 @@ export function HeroBuildCard({
           )}
         </h3>
       </div>
+
+      {/* Variant tabs - only show if variants exist */}
+      {hasVariants && (
+        <div className="px-4 py-2 border-t border-border/30 bg-bg-secondary/30">
+          <VariantTabs
+            variants={allVariants}
+            activeIndex={activeVariantIndex}
+            onChange={onVariantChange || (() => {})}
+          />
+        </div>
+      )}
 
       {/* Content */}
       <div className="p-4 pt-3 border-t border-border/50">
@@ -115,7 +122,7 @@ export function HeroBuildCard({
 
         {/* Attributes */}
         <div className="mt-4">
-          <AttributeBar attributes={bar.attributes} />
+          <AttributeBar attributes={currentVariant.attributes} />
         </div>
 
         {/* Template Code - integrated clickable row */}
@@ -137,7 +144,7 @@ export function HeroBuildCard({
               copied ? 'text-accent-green border-accent-green/50 bg-accent-green/5' : 'text-text-secondary'
             )}
           >
-            {bar.template}
+            {currentVariant.template}
           </code>
           <span
             className={cn(

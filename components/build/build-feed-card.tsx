@@ -10,7 +10,7 @@
 import { memo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Star, Eye, Users, AlertTriangle, ExternalLink } from 'lucide-react'
+import { Star, Eye, Users, AlertTriangle, ExternalLink, Lock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ProfessionBadge } from '@/components/ui/profession-badge'
 import { Badge } from '@/components/ui/badge'
@@ -159,9 +159,14 @@ export const BuildFeedCard = memo(function BuildFeedCard({
   onClick,
   className,
 }: BuildFeedCardProps) {
-  const isTeamBuild = build.bars.length > 1
-  const heroCount = build.bars.length
+  // Calculate total players (sum of playerCount across all bars)
+  const totalPlayers = build.bars.reduce(
+    (sum, bar) => sum + (bar.playerCount || 1),
+    0
+  )
+  const isTeamBuild = build.bars.length > 1 || totalPlayers > 1
   const isDelisted = build.moderation_status === 'delisted'
+  const isPrivate = build.is_private === true
   const isPvxBuild = isPvxBuildId(build.id)
 
   // Check if a tag matches any highlighted tag (by key or label)
@@ -216,11 +221,18 @@ export const BuildFeedCard = memo(function BuildFeedCard({
             </span>
           )}
         </div>
-        {isDelisted && (
-          <Badge variant="danger" size="sm" icon={<AlertTriangle className="w-3 h-3" />}>
-            Delisted
-          </Badge>
-        )}
+        <div className="flex items-center gap-1.5">
+          {isPrivate && (
+            <Badge variant="default" size="sm" icon={<Lock className="w-3 h-3" />}>
+              Private
+            </Badge>
+          )}
+          {isDelisted && (
+            <Badge variant="danger" size="sm" icon={<AlertTriangle className="w-3 h-3" />}>
+              Delisted
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Badge row - Profession/Team + Variants */}
@@ -229,7 +241,7 @@ export const BuildFeedCard = memo(function BuildFeedCard({
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-accent-gold/30 bg-accent-gold/10">
             <Users className="w-3 h-3 text-accent-gold" />
             <span className="text-[11px] font-semibold text-accent-gold">
-              Team ({heroCount})
+              Team ({totalPlayers})
             </span>
           </div>
         ) : (

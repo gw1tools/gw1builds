@@ -8,15 +8,18 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Lock } from 'lucide-react'
 import { trackBuildEdited } from '@/lib/analytics'
 import { useAuth } from '@/components/providers/auth-provider'
 import { useAuthModal } from '@/components/auth/auth-modal'
 import { SkillBarEditor } from '@/components/editor/skill-bar-editor'
 import { NotesEditor } from '@/components/editor/notes-editor'
 import { BuildTagsSelector } from '@/components/editor/build-tags-selector'
+import { TeamSummary } from '@/components/editor/team-summary'
+import { CollaboratorsSection } from '@/components/build/collaborators-section'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Toggle } from '@/components/ui/toggle'
 import { ProfessionSpinner } from '@/components/ui/profession-spinner'
 import { pageTransitionVariants, listContainerVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
@@ -25,11 +28,13 @@ import {
   MIN_BARS,
   MAX_NAME_LENGTH,
   MIN_NAME_LENGTH,
+  MAX_TEAM_PLAYERS,
 } from '@/lib/constants'
 import type {
   SkillBar,
   TipTapDocument,
   BuildWithAuthor,
+  CollaboratorWithUser,
 } from '@/types/database'
 
 const EMPTY_SKILL_BAR: SkillBar = {
@@ -48,7 +53,7 @@ interface EditBuildFormProps {
 
 export function EditBuildForm({ buildId }: EditBuildFormProps) {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
+  const { user } = useAuth()
   const { openModal } = useAuthModal()
 
   const [isLoading, setIsLoading] = useState(true)
@@ -59,12 +64,14 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
     content: [],
   })
   const [tags, setTags] = useState<string[]>([])
+  const [isPrivate, setIsPrivate] = useState(false)
 
   const [originalData, setOriginalData] = useState<{
     name: string
     bars: SkillBar[]
     notes: TipTapDocument
     tags: string[]
+    is_private: boolean
   } | null>(null)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -72,31 +79,60 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const isTeamBuild = bars.length > 1
+  // Collaborator state
+  const [collaborators, setCollaborators] = useState<CollaboratorWithUser[]>([])
+  const [isOwner, setIsOwner] = useState(false)
+  const [ownerUsername, setOwnerUsername] = useState<string | undefined>()
 
-  // Fetch build data
+  // Compute total players across all bars for validation
+  const totalTeamPlayers = bars.reduce(
+    (sum, bar) => sum + (bar.playerCount || 1),
+    0
+  )
+
+  // Team build if multiple bars OR single bar with multiple players
+  const isTeamBuild = bars.length > 1 || totalTeamPlayers > 1
+
+  // Fetch build data and collaborators
   useEffect(() => {
     const fetchBuild = async () => {
-      if (!user || authLoading) return
+      if (!user) return
 
       try {
-        const response = await fetch(`/api/builds/${buildId}`)
+        // Fetch build and collaborators in parallel
+        const [buildResponse, collabResponse] = await Promise.all([
+          fetch(`/api/builds/${buildId}`),
+          fetch(`/api/builds/${buildId}/collaborators`),
+        ])
 
-        if (response.status === 401) {
+        if (buildResponse.status === 401) {
           openModal()
           return
         }
 
-        if (response.status === 403) {
+        if (buildResponse.status === 403) {
           router.push(`/b/${buildId}`)
           return
         }
 
-        if (!response.ok) {
+        if (!buildResponse.ok) {
           throw new Error('Failed to fetch build')
         }
 
-        const { data } = (await response.json()) as { data: BuildWithAuthor }
+        const { data, isOwner: ownerFlag } = (await buildResponse.json()) as {
+          data: BuildWithAuthor
+          isOwner: boolean
+        }
+
+        // Set ownership info
+        setIsOwner(ownerFlag)
+        setOwnerUsername(data.author?.username ?? undefined)
+
+        // Fetch collaborators if response was ok
+        if (collabResponse.ok) {
+          const collabData = await collabResponse.json()
+          setCollaborators(collabData.collaborators || [])
+        }
 
         // For single builds, the build name was stored as the first bar's name
         // For team builds, team name is stored as build name
@@ -110,6 +146,7 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
             bars: updatedBars,
             notes: data.notes,
             tags: data.tags,
+            is_private: data.is_private ?? false,
           })
         } else {
           // Team build: keep names as-is
@@ -120,10 +157,12 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
             bars: data.bars,
             notes: data.notes,
             tags: data.tags,
+            is_private: data.is_private ?? false,
           })
         }
         setNotes(data.notes)
         setTags(data.tags)
+        setIsPrivate(data.is_private ?? false)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load build')
       } finally {
@@ -132,7 +171,7 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
     }
 
     fetchBuild()
-  }, [buildId, user, authLoading, openModal, router])
+  }, [buildId, user, openModal, router])
 
   const hasChanges = () => {
     if (!originalData) return false
@@ -140,7 +179,8 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
       teamName !== originalData.name ||
       JSON.stringify(bars) !== JSON.stringify(originalData.bars) ||
       JSON.stringify(notes) !== JSON.stringify(originalData.notes) ||
-      JSON.stringify(tags) !== JSON.stringify(originalData.tags)
+      JSON.stringify(tags) !== JSON.stringify(originalData.tags) ||
+      isPrivate !== originalData.is_private
     )
   }
 
@@ -176,6 +216,14 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
     setBars(newBars)
   }
 
+  const handleCollaboratorAdded = (collaborator: CollaboratorWithUser) => {
+    setCollaborators(prev => [...prev, collaborator])
+  }
+
+  const handleCollaboratorRemoved = (collaboratorId: string) => {
+    setCollaborators(prev => prev.filter(c => c.id !== collaboratorId))
+  }
+
   const validateForm = (): string | null => {
     if (bars.length < MIN_BARS) {
       return 'At least one skill bar is required'
@@ -208,6 +256,16 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
           return `Build ${i + 1} needs a name`
         }
       }
+
+    }
+
+    // Validate total player count (applies to all builds)
+    const totalPlayers = bars.reduce(
+      (sum, bar) => sum + (bar.playerCount || 1),
+      0
+    )
+    if (totalPlayers > MAX_TEAM_PLAYERS) {
+      return `Total players (${totalPlayers}) exceeds maximum of ${MAX_TEAM_PLAYERS}`
     }
 
     return null
@@ -242,6 +300,7 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
           bars,
           notes,
           tags,
+          is_private: isPrivate,
         }),
       })
 
@@ -264,7 +323,7 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
       })
 
       // Update original data and redirect
-      setOriginalData({ name: teamName, bars, notes, tags })
+      setOriginalData({ name: teamName, bars, notes, tags, is_private: isPrivate })
       router.push(`/b/${buildId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update build')
@@ -298,7 +357,7 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
   }
 
   // Show loading while fetching
-  if (authLoading || isLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-[calc(100dvh-3.5rem)] flex items-center justify-center">
         <ProfessionSpinner />
@@ -376,11 +435,14 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
           )}
         </AnimatePresence>
 
+        {/* Team summary - overview for collaborators */}
+        <TeamSummary bars={bars} />
+
         {/* Skill bars */}
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-3">
             {isTeamBuild
-              ? `Team Builds (${bars.length}/${MAX_BARS})`
+              ? `Team Builds (${totalTeamPlayers} players)`
               : 'Your Build'}
           </label>
 
@@ -391,19 +453,22 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
             animate="visible"
           >
             {bars.map((bar, index) => (
-              <SkillBarEditor
-                key={index}
-                index={index}
-                totalBars={bars.length}
-                data={bar}
-                onChange={bar => updateBar(index, bar)}
-                onRemove={
-                  bars.length > MIN_BARS ? () => removeBar(index) : undefined
-                }
-                onMoveUp={() => moveBarUp(index)}
-                onMoveDown={() => moveBarDown(index)}
-                canRemove={bars.length > MIN_BARS}
-              />
+              <div key={index} id={`skill-bar-${index}`}>
+                <SkillBarEditor
+                  index={index}
+                  totalBars={bars.length}
+                  data={bar}
+                  onChange={bar => updateBar(index, bar)}
+                  onRemove={
+                    bars.length > MIN_BARS ? () => removeBar(index) : undefined
+                  }
+                  onMoveUp={() => moveBarUp(index)}
+                  onMoveDown={() => moveBarDown(index)}
+                  canRemove={bars.length > MIN_BARS}
+                  totalTeamPlayers={totalTeamPlayers}
+                  maxTeamPlayers={MAX_TEAM_PLAYERS}
+                />
+              </div>
             ))}
           </motion.div>
 
@@ -425,6 +490,44 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
 
         {/* Notes */}
         <NotesEditor value={notes} onChange={setNotes} />
+
+        {/* Collaborators */}
+        <CollaboratorsSection
+          buildId={buildId}
+          isOwner={isOwner}
+          ownerUsername={ownerUsername}
+          collaborators={collaborators}
+          onCollaboratorAdded={handleCollaboratorAdded}
+          onCollaboratorRemoved={handleCollaboratorRemoved}
+        />
+
+        {/* Privacy Toggle - only owner can change */}
+        {isOwner && (
+          <div
+            role="group"
+            onClick={(e) => {
+              // Only toggle if clicking the container, not the toggle itself
+              if ((e.target as HTMLElement).closest('button[role="switch"]')) return
+              setIsPrivate(!isPrivate)
+            }}
+            className="flex items-center justify-between py-3 px-4 bg-bg-secondary rounded-lg border border-border hover:border-border-hover transition-colors cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <Lock className="w-4 h-4 text-text-muted" />
+              <div>
+                <span className="text-sm font-medium text-text-primary">Private Build</span>
+                <p className="text-xs text-text-muted mt-0.5">
+                  Only visible to you and people with the link
+                </p>
+              </div>
+            </div>
+            <Toggle
+              checked={isPrivate}
+              onChange={setIsPrivate}
+              label="Toggle private build"
+            />
+          </div>
+        )}
 
         {/* Error message */}
         {error && (
@@ -456,17 +559,19 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
             Cancel
           </Button>
 
-          <Button
-            type="button"
-            variant="danger"
-            size="lg"
-            onClick={() => setShowDeleteConfirm(true)}
-            disabled={isSubmitting}
-            leftIcon={<Trash2 className="w-4 h-4" />}
-            className="sm:ml-auto"
-          >
-            Delete
-          </Button>
+          {isOwner && (
+            <Button
+              type="button"
+              variant="danger"
+              size="lg"
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={isSubmitting}
+              leftIcon={<Trash2 className="w-4 h-4" />}
+              className="sm:ml-auto"
+            >
+              Delete
+            </Button>
+          )}
         </div>
       </form>
 

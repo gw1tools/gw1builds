@@ -16,6 +16,8 @@ import {
   trackBuildShared,
 } from '@/lib/analytics'
 import { cn } from '@/lib/utils'
+import { useVariantData } from '@/hooks'
+import { mapSkillsFromIds, type Skill } from '@/lib/gw/skills'
 import { useAuthModal } from '@/components/auth/auth-modal'
 import { SkillMentionTooltip } from '@/components/ui/skill-mention-tooltip'
 import { SkillBar } from '@/components/ui/skill-bar'
@@ -24,11 +26,12 @@ import { Button } from '@/components/ui/button'
 import { StarButton } from '@/components/ui/star-button'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
 import { Tag, TagGroup } from '@/components/ui/tag'
+import { CollaboratorList } from '@/components/ui/collaborator-list'
 import { HeroBuildCard } from '@/components/build/hero-build-card'
 import { TeamOverview } from '@/components/build/team-overview'
+import { VariantTabs } from '@/components/ui/variant-tabs'
 import { ReportModal } from '@/components/build/report-modal'
 import type { BuildWithAuthor } from '@/types/database'
-import type { Skill } from '@/lib/gw/skills'
 import type { ProfessionKey } from '@/types/gw1'
 
 interface BuildPageClientProps {
@@ -36,6 +39,8 @@ interface BuildPageClientProps {
   /** Pre-fetched skill data from server, keyed by skill ID */
   skillMap: Record<number, Skill>
   isOwner: boolean
+  /** Whether user can edit (owner or collaborator) */
+  canEdit: boolean
   professionColors: Record<string, string>
   /** Whether current user has starred this build */
   initialStarred: boolean
@@ -49,13 +54,22 @@ export function BuildPageClient({
   build,
   skillMap,
   isOwner,
+  canEdit,
   professionColors,
   initialStarred,
   starCount,
   isAuthenticated,
 }: BuildPageClientProps) {
-  const isSingleBuild = build.bars.length === 1
+  // Calculate total players to determine if this is a team build
+  const totalPlayers = build.bars.reduce(
+    (sum, bar) => sum + (bar.playerCount || 1),
+    0
+  )
+  // Single build only if one bar AND one player
+  const isSingleBuild = build.bars.length === 1 && totalPlayers === 1
   const [reportModalOpen, setReportModalOpen] = useState(false)
+  // Track active variant for each bar in team builds { barIndex: variantIndex }
+  const [activeVariants, setActiveVariants] = useState<Record<number, number>>({})
   const isDelisted = build.moderation_status === 'delisted'
   const { openModal } = useAuthModal()
 
@@ -115,7 +129,7 @@ export function BuildPageClient({
         {/* Actions always in breadcrumb row for consistency */}
         <PageActions
           buildId={build.id}
-          isOwner={isOwner}
+          canEdit={canEdit}
           initialStarred={initialStarred}
           starCount={starCount}
           isAuthenticated={isAuthenticated}
@@ -127,6 +141,7 @@ export function BuildPageClient({
         <SingleBuildView
           buildName={build.name}
           authorName={build.author?.username ?? undefined}
+          collaborators={build.collaborators}
           bar={build.bars[0]}
           buildId={build.id}
           skillMap={skillMap}
@@ -142,6 +157,7 @@ export function BuildPageClient({
             buildId={build.id}
             buildName={build.name}
             authorName={build.author?.username ?? undefined}
+            collaborators={build.collaborators}
             bars={build.bars}
             skillMap={skillMap}
           />
@@ -149,13 +165,18 @@ export function BuildPageClient({
           {/* Detailed Stacked Cards */}
           <div className="space-y-3 mt-4">
             {build.bars.map((bar, index) => (
-              <HeroBuildCard
-                key={index}
-                bar={bar}
-                index={index}
-                buildId={build.id}
-                skillMap={skillMap}
-              />
+              <div key={index} id={`skill-bar-${index}`}>
+                <HeroBuildCard
+                  bar={bar}
+                  index={index}
+                  buildId={build.id}
+                  skillMap={skillMap}
+                  activeVariantIndex={activeVariants[index] || 0}
+                  onVariantChange={(variantIndex) =>
+                    setActiveVariants(prev => ({ ...prev, [index]: variantIndex }))
+                  }
+                />
+              </div>
             ))}
           </div>
         </>
@@ -236,13 +257,13 @@ export function BuildPageClient({
  */
 function PageActions({
   buildId,
-  isOwner,
+  canEdit,
   initialStarred,
   starCount,
   isAuthenticated,
 }: {
   buildId: string
-  isOwner: boolean
+  canEdit: boolean
   initialStarred: boolean
   starCount: number
   isAuthenticated: boolean
@@ -300,7 +321,7 @@ function PageActions({
         {linkCopied ? 'Copied!' : 'Copy Link'}
       </Button>
 
-      {isOwner && (
+      {canEdit && (
         <Button
           variant="secondary"
           size="sm"
@@ -321,6 +342,7 @@ function PageActions({
 function SingleBuildView({
   buildName,
   authorName,
+  collaborators,
   bar,
   buildId,
   skillMap,
@@ -328,37 +350,22 @@ function SingleBuildView({
 }: {
   buildName: string
   authorName?: string
+  collaborators?: Array<{ username: string }>
   bar: BuildWithAuthor['bars'][0]
   buildId: string
   skillMap: Record<number, Skill>
   professionColors: Record<string, string>
 }) {
   const [copied, setCopied] = useState(false)
-
-  // Convert skill IDs to skill data using pre-fetched map (memoized)
+  const [activeVariantIndex, setActiveVariantIndex] = useState(0)
+  const { allVariants, currentVariant, hasVariants } = useVariantData(bar, activeVariantIndex)
   const skills = useMemo(
-    () =>
-      bar.skills.map(id => {
-        if (id === 0) return null
-        const skill = skillMap[id]
-        if (!skill) return null
-        return {
-          id: skill.id,
-          name: skill.name,
-          description: skill.description,
-          profession: skill.profession,
-          attribute: skill.attribute,
-          energy: skill.energy,
-          activation: skill.activation,
-          recharge: skill.recharge,
-          elite: skill.elite,
-        }
-      }),
-    [bar.skills, skillMap]
+    () => mapSkillsFromIds(currentVariant.skills, skillMap),
+    [currentVariant.skills, skillMap]
   )
 
   const handleCopyCode = async () => {
-    await navigator.clipboard.writeText(bar.template)
+    await navigator.clipboard.writeText(currentVariant.template)
     setCopied(true)
     trackTemplateCopied({ build_id: buildId, bar_count: 1 })
     setTimeout(() => setCopied(false), 2000)
@@ -376,9 +383,21 @@ function SingleBuildView({
           {authorName && (
             <p className="text-text-muted text-sm mt-1">
               by <span className="text-text-secondary">{authorName}</span>
+              <CollaboratorList collaborators={collaborators || []} />
             </p>
           )}
         </div>
+
+        {/* Variant tabs - only show if variants exist */}
+        {hasVariants && (
+          <div className="px-5 py-3 border-t border-border/50 bg-bg-secondary/30">
+            <VariantTabs
+              variants={allVariants}
+              activeIndex={activeVariantIndex}
+              onChange={setActiveVariantIndex}
+            />
+          </div>
+        )}
 
         {/* Divider */}
         <div className="border-t border-border" />
@@ -419,7 +438,7 @@ function SingleBuildView({
 
           {/* Attributes */}
           <div className="mt-5">
-            <AttributeBar attributes={bar.attributes} />
+            <AttributeBar attributes={currentVariant.attributes} />
           </div>
 
           {/* Divider */}
@@ -443,7 +462,7 @@ function SingleBuildView({
                 copied ? 'text-accent-green' : 'text-text-primary'
               )}
             >
-              {bar.template}
+              {currentVariant.template}
             </code>
             <span
               className={cn(

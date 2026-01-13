@@ -48,18 +48,20 @@ import {
   ChevronDown,
   ChevronRight,
   RotateCcw,
-  Swords,
-  Shield,
-  Wand2,
   Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getAllSkills, type Skill } from '@/lib/gw/skills'
 import { getSkillIconUrlById } from '@/lib/gw/icons'
 import { ATTRIBUTES_BY_PROFESSION, PROFESSION_TO_ID, ATTRIBUTE_BY_ID } from '@/lib/constants'
-import { PROFESSIONS, type Profession } from '@/types/gw1'
+import { PROFESSIONS, type Profession, professionToKey } from '@/types/gw1'
 import { loadBuildsForSearch } from '@/lib/actions/search'
 import { SpotlightBuildPicker } from '@/components/build/spotlight-build-picker'
+import { EquipmentEditor, type EquipmentSetConfig } from '@/components/equipment/equipment-editor'
+import { calculateAttributeBonuses } from '@/lib/gw/equipment/armor'
+import { EquipmentTemplateInput } from '@/components/editor/equipment-template-input'
+import { type DecodedEquipment, toWeaponConfig } from '@/lib/gw/equipment/template'
+import { EMPTY_ARMOR_SET } from '@/types/database'
 import Image from 'next/image'
 
 // ============================================================================
@@ -101,35 +103,6 @@ const PROFESSION_ALIASES: Record<string, string> = {
   'derv': 'Dervish',
 }
 
-const WEAPONS = {
-  melee: [
-    { id: 'sword', name: 'Sword', type: 'One-Handed', attribute: 'Swordsmanship', profession: 'Warrior' },
-    { id: 'axe', name: 'Axe', type: 'One-Handed', attribute: 'Axe Mastery', profession: 'Warrior' },
-    { id: 'hammer', name: 'Hammer', type: 'Two-Handed', attribute: 'Hammer Mastery', profession: 'Warrior' },
-    { id: 'daggers', name: 'Daggers', type: 'Dual Wield', attribute: 'Dagger Mastery', profession: 'Assassin' },
-    { id: 'scythe', name: 'Scythe', type: 'Two-Handed', attribute: 'Scythe Mastery', profession: 'Dervish' },
-  ],
-  ranged: [
-    { id: 'bow', name: 'Bow', type: 'Two-Handed', attribute: 'Marksmanship', profession: 'Ranger' },
-    { id: 'flatbow', name: 'Flatbow', type: 'Two-Handed', attribute: 'Marksmanship', profession: 'Ranger' },
-    { id: 'hornbow', name: 'Hornbow', type: 'Two-Handed', attribute: 'Marksmanship', profession: 'Ranger' },
-    { id: 'longbow', name: 'Longbow', type: 'Two-Handed', attribute: 'Marksmanship', profession: 'Ranger' },
-    { id: 'recurve', name: 'Recurve Bow', type: 'Two-Handed', attribute: 'Marksmanship', profession: 'Ranger' },
-    { id: 'shortbow', name: 'Shortbow', type: 'Two-Handed', attribute: 'Marksmanship', profession: 'Ranger' },
-    { id: 'spear', name: 'Spear', type: 'One-Handed', attribute: 'Spear Mastery', profession: 'Paragon' },
-  ],
-  caster: [
-    { id: 'wand', name: 'Wand', type: 'One-Handed', attribute: 'Various', profession: 'Any' },
-    { id: 'staff', name: 'Staff', type: 'Two-Handed', attribute: 'Various', profession: 'Any' },
-  ],
-  offhand: [
-    { id: 'shield', name: 'Shield', type: 'Off-Hand', attribute: 'Strength/Tactics/Command/Motivation', profession: 'Various' },
-    { id: 'focus', name: 'Focus Item', type: 'Off-Hand', attribute: 'Various', profession: 'Caster' },
-  ],
-} as const
-
-type WeaponData = (typeof WEAPONS.melee)[number] | (typeof WEAPONS.ranged)[number] | (typeof WEAPONS.caster)[number] | (typeof WEAPONS.offhand)[number]
-
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -143,11 +116,6 @@ interface AttributeValue {
   name: string
   rank: number
   isPrimary: boolean
-}
-
-interface WeaponSet {
-  mainHand: WeaponData | null
-  offHand: WeaponData | null
 }
 
 interface SkillCategoryMatch {
@@ -176,17 +144,21 @@ export default function PrototypePage() {
   const [primaryProfession, setPrimaryProfession] = useState<Profession | null>(null)
   const [secondaryProfession, setSecondaryProfession] = useState<Profession | null>(null)
   const [attributes, setAttributes] = useState<AttributeValue[]>([])
-  const [weaponSets, setWeaponSets] = useState<[WeaponSet, WeaponSet]>([
-    { mainHand: null, offHand: null },
-    { mainHand: null, offHand: null },
-  ])
-  const [activeWeaponSet, setActiveWeaponSet] = useState<0 | 1>(0)
+  // Equipment editor state
+  const [equipmentConfig, setEquipmentConfig] = useState<EquipmentSetConfig | undefined>()
+  const [equipmentCode, setEquipmentCode] = useState('')
+
+  const handleEquipmentDecode = useCallback((decoded: DecodedEquipment) => {
+    setEquipmentConfig({
+      mainHand: toWeaponConfig(decoded.mainHand),
+      offHand: toWeaponConfig(decoded.offHand),
+      armor: EMPTY_ARMOR_SET, // TODO: decode armor from template
+    })
+  }, [])
 
   // UI state
   const [activeSlot, setActiveSlot] = useState<number | null>(null)
   const [isSkillPickerOpen, setIsSkillPickerOpen] = useState(false)
-  const [isWeaponPickerOpen, setIsWeaponPickerOpen] = useState(false)
-  const [weaponSlotType, setWeaponSlotType] = useState<'mainHand' | 'offHand'>('mainHand')
   const [isBuildPickerOpen, setIsBuildPickerOpen] = useState(false)
 
   // Initialize attributes when profession changes - this is derived state initialization
@@ -214,6 +186,13 @@ export default function PrototypePage() {
     return attributes.reduce((sum, attr) => sum + getPointCost(attr.rank), 0)
   }, [attributes])
   const unusedPoints = MAX_ATTRIBUTE_POINTS - totalPointsSpent
+
+  // Calculate attribute bonuses from armor runes
+  const armorConfig = equipmentConfig?.armor
+  const attributeBonuses = useMemo(() => {
+    if (!armorConfig) return {}
+    return calculateAttributeBonuses(armorConfig)
+  }, [armorConfig])
 
   const handleSlotClick = (position: number) => {
     setActiveSlot(position)
@@ -247,20 +226,6 @@ export default function PrototypePage() {
 
   const handleResetAttributes = () => {
     setAttributes(prev => prev.map(attr => ({ ...attr, rank: 0 })))
-  }
-
-  const handleWeaponSlotClick = (slotType: 'mainHand' | 'offHand') => {
-    setWeaponSlotType(slotType)
-    setIsWeaponPickerOpen(true)
-  }
-
-  const handleWeaponSelect = (weapon: WeaponData | null) => {
-    setWeaponSets(prev => {
-      const newSets = [...prev] as [WeaponSet, WeaponSet]
-      newSets[activeWeaponSet] = { ...newSets[activeWeaponSet], [weaponSlotType]: weapon }
-      return newSets
-    })
-    setIsWeaponPickerOpen(false)
   }
 
   return (
@@ -306,6 +271,7 @@ export default function PrototypePage() {
                 <AttributeRow
                   key={attr.name}
                   attribute={attr}
+                  runeBonus={attributeBonuses[attr.name] || 0}
                   canIncrease={unusedPoints >= (getPointCost(attr.rank + 1) - getPointCost(attr.rank))}
                   onIncrement={() => handleAttributeChange(attr.name, 1)}
                   onDecrement={() => handleAttributeChange(attr.name, -1)}
@@ -315,32 +281,29 @@ export default function PrototypePage() {
           </section>
         )}
 
-        <section className="bg-bg-card border border-border rounded-lg overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 bg-bg-secondary border-b border-border">
-            <span className="text-sm font-medium text-text-primary">Weapons</span>
-            <div className="flex gap-1">
-              {[0, 1].map(idx => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveWeaponSet(idx as 0 | 1)}
-                  className={cn(
-                    'px-2 py-0.5 text-xs rounded transition-colors',
-                    activeWeaponSet === idx
-                      ? 'bg-accent-gold/20 text-accent-gold'
-                      : 'bg-bg-hover text-text-muted hover:text-text-secondary'
-                  )}
-                >
-                  Set {idx + 1}
-                </button>
-              ))}
-            </div>
+        {/* Equipment (Weapons + Armor) */}
+        <section className="bg-bg-card border border-border rounded-lg p-4">
+          <div className="mb-3">
+            <span className="text-xs font-medium text-accent-gold uppercase tracking-wider">Equipment</span>
           </div>
-          <div className="p-4">
-            <div className="flex gap-3">
-              <WeaponSlotButton label="Main Hand" weapon={weaponSets[activeWeaponSet].mainHand} onClick={() => handleWeaponSlotClick('mainHand')} icon={<Swords className="w-5 h-5" />} />
-              <WeaponSlotButton label="Off-Hand" weapon={weaponSets[activeWeaponSet].offHand} onClick={() => handleWeaponSlotClick('offHand')} icon={<Shield className="w-5 h-5" />} />
-            </div>
+          <EquipmentEditor
+            key={equipmentCode || 'empty'}
+            value={equipmentConfig}
+            onChange={setEquipmentConfig}
+            profession={primaryProfession ? professionToKey(primaryProfession) : undefined}
+          />
+        </section>
+
+        {/* Equipment Template Input */}
+        <section className="bg-bg-card border border-border rounded-lg p-4">
+          <div className="mb-3">
+            <span className="text-xs font-medium text-accent-gold uppercase tracking-wider">Equipment Code</span>
           </div>
+          <EquipmentTemplateInput
+            value={equipmentCode}
+            onChange={setEquipmentCode}
+            onDecode={handleEquipmentDecode}
+          />
         </section>
 
         <section className="bg-bg-card border border-border rounded-lg p-4">
@@ -383,13 +346,6 @@ export default function PrototypePage() {
         currentSkills={slots.map(s => s.skill).filter(Boolean) as Skill[]}
         primaryProfession={primaryProfession}
         secondaryProfession={secondaryProfession}
-      />
-
-      <SpotlightWeaponPicker
-        isOpen={isWeaponPickerOpen}
-        onClose={() => setIsWeaponPickerOpen(false)}
-        onSelect={handleWeaponSelect}
-        slotType={weaponSlotType}
       />
 
       <SpotlightBuildPicker
@@ -515,13 +471,15 @@ function ProfessionDropdown({ value, onChange, exclude, placeholder, allowNone =
 // ATTRIBUTE ROW
 // ============================================================================
 
-function AttributeRow({ attribute, canIncrease, onIncrement, onDecrement }: {
+function AttributeRow({ attribute, runeBonus = 0, canIncrease, onIncrement, onDecrement }: {
   attribute: AttributeValue
+  runeBonus?: number
   canIncrease: boolean
   onIncrement: () => void
   onDecrement: () => void
 }) {
   const { name, rank, isPrimary } = attribute
+  const hasBonus = runeBonus > 0
 
   return (
     <div className="flex items-center gap-2 py-1">
@@ -531,6 +489,10 @@ function AttributeRow({ attribute, canIncrease, onIncrement, onDecrement }: {
         </span>
       </div>
       <div className="flex items-center">
+        {/* Rune bonus on the left */}
+        {hasBonus && (
+          <span className="text-accent-green text-sm font-medium tabular-nums mr-1.5">+{runeBonus}</span>
+        )}
         <button
           onClick={onDecrement}
           disabled={rank === 0}
@@ -559,36 +521,6 @@ function AttributeRow({ attribute, canIncrease, onIncrement, onDecrement }: {
         </button>
       </div>
     </div>
-  )
-}
-
-// ============================================================================
-// WEAPON SLOT BUTTON
-// ============================================================================
-
-function WeaponSlotButton({ label, weapon, onClick, icon }: {
-  label: string
-  weapon: WeaponData | null
-  onClick: () => void
-  icon: React.ReactNode
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        'flex-1 flex items-center gap-3 p-3 rounded-lg border transition-all',
-        'border-border bg-bg-secondary hover:bg-bg-hover hover:border-border-hover',
-        weapon && 'border-accent-gold/30'
-      )}
-    >
-      <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', weapon ? 'bg-accent-gold/10 text-accent-gold' : 'bg-bg-card text-text-muted')}>
-        {icon}
-      </div>
-      <div className="flex-1 text-left">
-        <div className="text-[10px] uppercase tracking-wider text-text-muted">{label}</div>
-        <div className="text-sm text-text-primary truncate">{weapon?.name ?? 'Select...'}</div>
-      </div>
-    </button>
   )
 }
 
@@ -828,7 +760,7 @@ function SpotlightSkillPicker({
     return smartSearchResults.skills.length
   }, [smartSearchResults])
 
-  // Toggle attribute collapse
+  // Toggle attribute collapse - scroll to top when collapsing
   const toggleAttributeCollapse = (attr: string) => {
     setCollapsedAttributes(prev => {
       const next = new Set(prev)
@@ -836,6 +768,8 @@ function SpotlightSkillPicker({
         next.delete(attr)
       } else {
         next.add(attr)
+        // Scroll to top when collapsing a section
+        listRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
       }
       return next
     })
@@ -1188,7 +1122,6 @@ function GroupedSkillRow({
   eliteBlocked: boolean
   onSelect: () => void
 }) {
-  const [isExpanded, setIsExpanded] = useState(false)
   const [isTooltipOpen, setIsTooltipOpen] = useState(false)
   const disabled = isInBar || eliteBlocked
 
@@ -1206,28 +1139,15 @@ function GroupedSkillRow({
   })
 
   const hover = useHover(context, {
-    delay: { open: 400, close: 150 },
+    delay: { open: 200, close: 150 },
     handleClose: safePolygon(),
   })
   const dismiss = useDismiss(context, { outsidePress: true })
   const { getReferenceProps, getFloatingProps } = useInteractions([hover, dismiss])
 
-  // Truncate description for inline display
-  const truncatedDescription = useMemo(() => {
-    if (!skill.description) return null
-    const maxLength = 80
-    if (skill.description.length <= maxLength) return skill.description
-    return skill.description.substring(0, maxLength).trim() + '...'
-  }, [skill.description])
-
   const handleClick = () => {
     if (disabled) return
     onSelect()
-  }
-
-  const handleExpandToggle = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsExpanded(!isExpanded)
   }
 
   return (
@@ -1240,8 +1160,7 @@ function GroupedSkillRow({
           'border border-transparent',
           disabled
             ? 'opacity-40 cursor-not-allowed'
-            : 'hover:bg-bg-hover/80 hover:border-border/50',
-          isExpanded && 'bg-bg-card border-border/30'
+            : 'hover:bg-bg-hover/80 hover:border-border/50'
         )}
       >
         {/* Main row - always visible */}
@@ -1250,11 +1169,11 @@ function GroupedSkillRow({
           disabled={disabled}
           className="w-full flex items-start gap-3 p-2.5 text-left"
         >
-          {/* Skill icon with elite glow effect */}
+          {/* Skill icon - matches SkillSlot styling */}
           <div className={cn(
-            'relative w-10 h-10 rounded-md overflow-hidden flex-shrink-0 transition-transform duration-150',
-            'group-hover:scale-105',
-            skill.elite && 'ring-1 ring-accent-gold/60 shadow-[0_0_12px_rgba(232,184,73,0.3)]'
+            'relative w-10 h-10 flex-shrink-0 overflow-hidden bg-bg-card',
+            'transition-transform duration-75 ease-out group-hover:translate-y-0.5',
+            skill.elite ? 'shadow-sticky-gold' : 'shadow-sticky'
           )}>
             <Image
               src={getSkillIconUrlById(skill.id)}
@@ -1264,9 +1183,6 @@ function GroupedSkillRow({
               className="object-cover"
               unoptimized
             />
-            {skill.elite && (
-              <div className="absolute inset-0 bg-gradient-to-t from-accent-gold/20 to-transparent" />
-            )}
           </div>
 
           {/* Skill info */}
@@ -1291,10 +1207,10 @@ function GroupedSkillRow({
               )}
             </div>
 
-            {/* Inline description - shows truncated version */}
-            {truncatedDescription && (
-              <p className="text-xs text-text-muted/80 leading-relaxed mt-1 line-clamp-2">
-                {isExpanded ? skill.description : truncatedDescription}
+            {/* Inline description - full text with line clamp */}
+            {skill.description && (
+              <p className="text-xs text-text-muted/80 leading-relaxed mt-1 line-clamp-3">
+                {skill.description}
               </p>
             )}
           </div>
@@ -1342,24 +1258,12 @@ function GroupedSkillRow({
             </div>
           </div>
         </button>
-
-        {/* Expand/collapse for full description */}
-        {skill.description && skill.description.length > 80 && (
-          <button
-            onClick={handleExpandToggle}
-            className="w-full px-2.5 pb-2 pt-0 text-left"
-          >
-            <span className="text-[10px] text-text-muted/60 hover:text-accent-gold transition-colors">
-              {isExpanded ? '− Show less' : '+ Read more'}
-            </span>
-          </button>
-        )}
       </div>
 
       {/* Floating Tooltip - appears on hover with full details */}
       <FloatingPortal>
         <AnimatePresence>
-          {isTooltipOpen && !isExpanded && (
+          {isTooltipOpen && (
             <motion.div
               // eslint-disable-next-line react-hooks/refs -- callback ref, not .current access
               ref={refs.setFloating}
@@ -1497,19 +1401,11 @@ function SkillResultRowWithTooltip({
   })
 
   const hover = useHover(context, {
-    delay: { open: 400, close: 150 },
+    delay: { open: 200, close: 150 },
     handleClose: safePolygon(),
   })
   const dismiss = useDismiss(context, { outsidePress: true })
   const { getReferenceProps, getFloatingProps } = useInteractions([hover, dismiss])
-
-  // Truncate description for inline preview
-  const truncatedDescription = useMemo(() => {
-    if (!skill.description) return null
-    const maxLength = 70
-    if (skill.description.length <= maxLength) return skill.description
-    return skill.description.substring(0, maxLength).trim() + '...'
-  }, [skill.description])
 
   return (
     <>
@@ -1521,15 +1417,16 @@ function SkillResultRowWithTooltip({
         {...getReferenceProps()}
         className={cn(
           'w-full flex items-start gap-3 p-2.5 rounded-lg text-left transition-all duration-150',
-          'border border-transparent',
+          'border border-transparent group',
           isSelected && 'bg-bg-hover/80 border-accent-gold/30 shadow-sm',
           disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-bg-hover/60'
         )}
       >
-        {/* Skill icon */}
+        {/* Skill icon - matches SkillSlot styling */}
         <div className={cn(
-          'relative w-10 h-10 rounded-md overflow-hidden flex-shrink-0',
-          skill.elite && 'ring-1 ring-accent-gold/50 shadow-[0_0_10px_rgba(232,184,73,0.2)]'
+          'relative w-10 h-10 flex-shrink-0 overflow-hidden bg-bg-card',
+          'transition-transform duration-75 ease-out group-hover:translate-y-0.5',
+          skill.elite ? 'shadow-sticky-gold' : 'shadow-sticky'
         )}>
           <Image
             src={getSkillIconUrlById(skill.id)}
@@ -1569,10 +1466,10 @@ function SkillResultRowWithTooltip({
             {skill.attribute !== 'No Attribute' && <span className="text-text-secondary/80">{skill.attribute}</span>}
           </div>
 
-          {/* Inline description preview */}
-          {truncatedDescription && (
-            <p className="text-xs text-text-muted/70 leading-relaxed mt-1 line-clamp-1">
-              {truncatedDescription}
+          {/* Inline description - full text with line clamp */}
+          {skill.description && (
+            <p className="text-xs text-text-muted/70 leading-relaxed mt-1 line-clamp-2">
+              {skill.description}
             </p>
           )}
         </div>
@@ -1630,156 +1527,3 @@ function SkillResultRowWithTooltip({
   )
 }
 
-// ============================================================================
-// SPOTLIGHT WEAPON PICKER
-// ============================================================================
-
-function SpotlightWeaponPicker({ isOpen, onClose, onSelect, slotType }: {
-  isOpen: boolean
-  onClose: () => void
-  onSelect: (weapon: WeaponData | null) => void
-  slotType: 'mainHand' | 'offHand'
-}) {
-  const [query, setQuery] = useState('')
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  // Reset state when modal opens - standard modal reset pattern
-  useEffect(() => {
-    if (isOpen) {
-      /* eslint-disable react-hooks/set-state-in-effect -- modal state reset */
-      setQuery('')
-      setSelectedIndex(0)
-      /* eslint-enable react-hooks/set-state-in-effect */
-      requestAnimationFrame(() => inputRef.current?.focus())
-    }
-  }, [isOpen])
-
-  const availableWeapons = useMemo(() => {
-    let weapons: WeaponData[]
-    if (slotType === 'offHand') {
-      weapons = [...WEAPONS.offhand]
-    } else {
-      weapons = [...WEAPONS.melee, ...WEAPONS.ranged, ...WEAPONS.caster]
-    }
-    if (query.trim() === '') return weapons
-    const lowerQuery = query.toLowerCase()
-    return weapons.filter(w =>
-      w.name.toLowerCase().includes(lowerQuery) ||
-      w.type.toLowerCase().includes(lowerQuery) ||
-      w.attribute.toLowerCase().includes(lowerQuery) ||
-      w.profession.toLowerCase().includes(lowerQuery)
-    )
-  }, [slotType, query])
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      e.preventDefault()
-      onClose()
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setSelectedIndex(i => Math.min(i + 1, availableWeapons.length))
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setSelectedIndex(i => Math.max(i - 1, 0))
-    } else if (e.key === 'Enter') {
-      e.preventDefault()
-      if (selectedIndex === 0) {
-        onSelect(null)
-      } else {
-        onSelect(availableWeapons[selectedIndex - 1])
-      }
-    }
-  }, [availableWeapons, selectedIndex, onSelect, onClose])
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50"
-            onClick={onClose}
-          />
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -10 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="fixed top-[10%] left-1/2 -translate-x-1/2 w-[95%] max-w-lg z-50"
-          >
-            <div className="bg-bg-elevated border border-border rounded-xl shadow-2xl overflow-hidden">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={query}
-                  onChange={e => { setQuery(e.target.value); setSelectedIndex(0) }}
-                  onKeyDown={handleKeyDown}
-                  placeholder={`Search ${slotType === 'offHand' ? 'off-hand items' : 'weapons'}...`}
-                  className="w-full bg-transparent text-text-primary pl-12 pr-4 py-4 text-lg placeholder:text-text-muted focus:outline-none"
-                />
-              </div>
-
-              <div className="h-px bg-border" />
-
-              <div className="max-h-[60vh] overflow-y-auto overscroll-contain p-2">
-                <button
-                  onClick={() => onSelect(null)}
-                  className={cn(
-                    'w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors',
-                    selectedIndex === 0 ? 'bg-bg-hover' : 'hover:bg-bg-hover'
-                  )}
-                >
-                  <div className="w-10 h-10 rounded-lg border-2 border-dashed border-text-muted flex items-center justify-center">
-                    <X className="w-4 h-4 text-text-muted" />
-                  </div>
-                  <span className="text-sm text-text-muted">None</span>
-                </button>
-
-                <div className="h-px bg-border my-2" />
-
-                {availableWeapons.map((weapon, index) => (
-                  <button
-                    key={weapon.id}
-                    onClick={() => onSelect(weapon)}
-                    className={cn(
-                      'w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors',
-                      selectedIndex === index + 1 ? 'bg-bg-hover' : 'hover:bg-bg-hover'
-                    )}
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-accent-gold/10 flex items-center justify-center text-accent-gold">
-                      {weapon.type === 'Off-Hand' ? <Shield className="w-5 h-5" /> :
-                       weapon.type === 'Two-Handed' && weapon.attribute === 'Marksmanship' ? <span className="text-lg">🏹</span> :
-                       weapon.type === 'One-Handed' && weapon.attribute === 'Various' ? <Wand2 className="w-5 h-5" /> :
-                       <Swords className="w-5 h-5" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm text-text-primary">{weapon.name}</div>
-                      <div className="text-xs text-text-muted">{weapon.type} • {weapon.profession}</div>
-                    </div>
-                    <span className="text-xs text-text-muted">{weapon.attribute.split('/')[0]}</span>
-                  </button>
-                ))}
-              </div>
-
-              <div className="h-px bg-border" />
-              <div className="px-4 py-2 text-xs text-text-muted flex justify-between">
-                <span>
-                  <kbd className="px-1.5 py-0.5 bg-bg-card rounded">↑↓</kbd> navigate
-                  {' '}<kbd className="px-1.5 py-0.5 bg-bg-card rounded">↵</kbd> select
-                </span>
-                <span>{availableWeapons.length} weapons</span>
-              </div>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  )
-}

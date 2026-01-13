@@ -84,6 +84,7 @@ export function NotesEditor({ value, onChange, footer }: NotesEditorProps) {
 
   // Detect touch device on mount
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- window only available client-side
     setIsTouchDevice(!window.matchMedia('(hover: hover)').matches)
   }, [])
 

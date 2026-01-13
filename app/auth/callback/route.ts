@@ -1,8 +1,9 @@
 /**
- * @fileoverview OAuth callback handler for Google authentication
+ * @fileoverview OAuth/Magic Link callback handler for authentication
  * @module app/auth/callback/route
  *
- * Handles the OAuth redirect from Google after user consent.
+ * Handles the redirect from OAuth providers (Google, Discord) or
+ * Magic Link email authentication after user consent/verification.
  * Exchanges the authorization code for a session and creates
  * the user profile if this is their first login.
  *
@@ -99,9 +100,18 @@ export async function GET(request: Request) {
   // Create profile on first login (username = null, will be set in modal)
   // PGRST116 = "no rows returned" which means user doesn't exist yet
   if (!existingUser && fetchError?.code === 'PGRST116') {
+    // Determine provider_id based on auth method
+    // OAuth providers (Google, Discord) have a 'sub' in user_metadata
+    // Email auth (Magic Link) doesn't have a provider_id
+    const provider = data.user.app_metadata.provider
+    const isEmailAuth = provider === 'email'
+    const providerId = isEmailAuth
+      ? null
+      : data.user.user_metadata.sub || data.user.id
+
     const { error: insertError } = await supabase.from('users').insert({
       id: data.user.id,
-      google_id: data.user.user_metadata.sub || data.user.id,
+      provider_id: providerId,
       username: null,
       avatar_url: data.user.user_metadata.avatar_url || null,
     })

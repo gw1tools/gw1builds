@@ -11,7 +11,9 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronUp, ChevronDown, Copy, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { PROFESSION_COLORS, MAX_BAR_NAME_LENGTH } from '@/lib/constants'
+import { PROFESSION_COLORS, MAX_BAR_NAME_LENGTH, MAX_VARIANT_NAME_LENGTH } from '@/lib/constants'
+import { sanitizeSingleLine } from '@/lib/validation'
+import { useVariantData } from '@/hooks'
 import type { DecodedTemplate } from '@/lib/gw/decoder'
 import type { Skill } from '@/lib/gw/skills'
 import { getSkillsByIds } from '@/lib/gw/skills'
@@ -19,7 +21,10 @@ import { SkillBar } from '@/components/ui/skill-bar'
 import { AttributeBar } from '@/components/ui/attribute-bar'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
 import { ProfessionSpinner } from '@/components/ui/profession-spinner'
+import { PlayerCountControl } from '@/components/ui/player-count-control'
+import { VariantTabs } from '@/components/ui/variant-tabs'
 import type { ProfessionKey } from '@/types/gw1'
+import type { SkillBarVariant } from '@/types/database'
 import { BuildCard } from './build-card'
 import { TemplateInput } from './template-input'
 
@@ -31,6 +36,8 @@ export interface SkillBarData {
   secondary: string
   attributes: Record<string, number>
   skills: number[]
+  playerCount?: number
+  variants?: SkillBarVariant[]
 }
 
 export interface SkillBarEditorProps {
@@ -43,6 +50,10 @@ export interface SkillBarEditorProps {
   onMoveDown?: () => void
   canRemove?: boolean
   className?: string
+  /** Total players across all bars (for validation) */
+  totalTeamPlayers?: number
+  /** Maximum team size */
+  maxTeamPlayers?: number
 }
 
 const emptySkillBarData: Partial<SkillBarData> = {
@@ -51,6 +62,7 @@ const emptySkillBarData: Partial<SkillBarData> = {
   secondary: '',
   attributes: {},
   skills: [],
+  playerCount: 1,
 }
 
 export function SkillBarEditor({
@@ -63,43 +75,52 @@ export function SkillBarEditor({
   onMoveDown,
   canRemove = false,
   className,
+  totalTeamPlayers,
+  maxTeamPlayers = 12,
 }: SkillBarEditorProps) {
   const [loadedSkills, setLoadedSkills] = useState<(Skill | null)[]>([])
   const [isLoadingSkills, setIsLoadingSkills] = useState(false)
   const [showCopied, setShowCopied] = useState(false)
   const [templateCode, setTemplateCode] = useState(data.template)
   const [justDecoded, setJustDecoded] = useState(false)
+  const [activeVariantIndex, setActiveVariantIndex] = useState(0)
 
   // Track last loaded skills to prevent re-fetches
   const lastSkillsRef = useRef<string>('')
 
-  // Sync template code from parent
-  useEffect(() => {
-    setTemplateCode(data.template)
-  }, [data.template])
+  // Use shared hook for variant data
+  const { allVariants, currentVariant, hasVariants } = useVariantData(data, activeVariantIndex)
 
-  // Load skill data when skill IDs change
+  // Sync template code from current variant
   useEffect(() => {
-    if (!data.skills || data.skills.length === 0) {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync local state with parent prop
+    setTemplateCode(currentVariant.template)
+  }, [currentVariant.template])
+
+  // Load skill data when skill IDs change (for current variant)
+  useEffect(() => {
+    const skills = currentVariant.skills
+    if (!skills || skills.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- async data loading from skills change
       setLoadedSkills([])
       lastSkillsRef.current = ''
       return
     }
 
-    const skillsKey = data.skills.join(',')
+    const skillsKey = `${activeVariantIndex}:${skills.join(',')}`
     if (skillsKey === lastSkillsRef.current) return
 
     setIsLoadingSkills(true)
     lastSkillsRef.current = skillsKey
 
-    getSkillsByIds(data.skills)
-      .then(skills => setLoadedSkills(skills.map(s => s || null)))
+    getSkillsByIds(skills)
+      .then(loadedSkills => setLoadedSkills(loadedSkills.map(s => s || null)))
       .catch(err => {
         console.error('Failed to load skills:', err)
         setLoadedSkills([])
       })
       .finally(() => setIsLoadingSkills(false))
-  }, [data.skills])
+  }, [currentVariant.skills, activeVariantIndex])
 
   const handleDecode = useCallback(
     (decoded: DecodedTemplate, code: string) => {
@@ -107,22 +128,71 @@ export function SkillBarEditor({
       setJustDecoded(true)
       setTimeout(() => setJustDecoded(false), 600)
 
-      onChange({
-        ...data,
-        template: code,
-        primary: decoded.primary,
-        secondary: decoded.secondary,
-        attributes: decoded.attributes,
-        skills: decoded.skills,
-      })
+      if (activeVariantIndex === 0) {
+        // Update base bar
+        onChange({
+          ...data,
+          template: code,
+          primary: decoded.primary,
+          secondary: decoded.secondary,
+          attributes: decoded.attributes,
+          skills: decoded.skills,
+        })
+      } else {
+        // Update variant
+        const newVariants = [...(data.variants || [])]
+        newVariants[activeVariantIndex - 1] = {
+          ...newVariants[activeVariantIndex - 1],
+          template: code,
+          attributes: decoded.attributes,
+          skills: decoded.skills,
+        }
+        onChange({ ...data, variants: newVariants })
+      }
     },
-    [onChange, data]
+    [onChange, data, activeVariantIndex]
   )
 
   const handleClear = () => {
     setTemplateCode('')
-    onChange({ ...data, ...emptySkillBarData })
+    if (activeVariantIndex === 0) {
+      onChange({ ...data, ...emptySkillBarData })
+    } else {
+      // Clear variant data but keep it in the list
+      const newVariants = [...(data.variants || [])]
+      newVariants[activeVariantIndex - 1] = {
+        ...newVariants[activeVariantIndex - 1],
+        template: '',
+        skills: [],
+        attributes: {},
+      }
+      onChange({ ...data, variants: newVariants })
+    }
     lastSkillsRef.current = ''
+  }
+
+  const handleAddVariant = () => {
+    // Copy current variant as starting point
+    const newVariant: SkillBarVariant = {
+      template: currentVariant.template,
+      skills: [...currentVariant.skills],
+      attributes: { ...currentVariant.attributes },
+    }
+    const newVariants = [...(data.variants || []), newVariant]
+    onChange({ ...data, variants: newVariants })
+    // Switch to new variant
+    setActiveVariantIndex(newVariants.length)
+  }
+
+  const handleDeleteVariant = (variantIndex: number) => {
+    if (variantIndex === 0) return // Can't delete base
+    const newVariants = [...(data.variants || [])]
+    newVariants.splice(variantIndex - 1, 1)
+    onChange({ ...data, variants: newVariants.length > 0 ? newVariants : undefined })
+    // If we deleted the active variant, go back to default
+    if (activeVariantIndex >= variantIndex) {
+      setActiveVariantIndex(Math.max(0, activeVariantIndex - 1))
+    }
   }
 
   const handleCopyTemplate = async () => {
@@ -132,7 +202,10 @@ export function SkillBarEditor({
     setTimeout(() => setShowCopied(false), 2000)
   }
 
-  const hasSkills = data.skills && data.skills.some(s => s !== 0)
+  // Check if current variant has skills (for showing decoded content)
+  const hasSkills = currentVariant.skills && currentVariant.skills.some(s => s !== 0)
+  // Check if base bar has skills (for card active state)
+  const baseHasSkills = data.skills && data.skills.some(s => s !== 0)
   const isFirst = index === 0
   const isLast = index === totalBars - 1
   const showReorderControls = totalBars > 1
@@ -150,7 +223,7 @@ export function SkillBarEditor({
       transition={{ duration: 0.2 }}
       className={className}
     >
-      <BuildCard active={hasSkills}>
+      <BuildCard active={baseHasSkills}>
         {/* Number badge */}
         <div className="absolute -top-2 -left-2 z-10">
           <motion.div
@@ -229,6 +302,72 @@ export function SkillBarEditor({
             />
           </div>
 
+          {/* Variant tabs - show when base has skills or variants exist */}
+          {(baseHasSkills || hasVariants) && (
+            <div className="mb-3">
+              <VariantTabs
+                variants={allVariants}
+                activeIndex={activeVariantIndex}
+                onChange={setActiveVariantIndex}
+                editable
+                onAdd={handleAddVariant}
+                onDelete={handleDeleteVariant}
+              />
+            </div>
+          )}
+
+          {/* Variant name input - only for non-default variants */}
+          <AnimatePresence>
+            {activeVariantIndex > 0 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.15 }}
+                className="overflow-hidden"
+              >
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-text-secondary mb-1.5">
+                    Variant Name <span className="text-text-muted font-normal">(optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={data.variants?.[activeVariantIndex - 1]?.name || ''}
+                    onChange={e => {
+                      const newVariants = [...(data.variants || [])]
+                      newVariants[activeVariantIndex - 1] = {
+                        ...newVariants[activeVariantIndex - 1],
+                        name: e.target.value || undefined,
+                      }
+                      onChange({ ...data, variants: newVariants })
+                    }}
+                    onBlur={e => {
+                      // Sanitize on blur: remove control chars, collapse spaces, trim
+                      const sanitized = sanitizeSingleLine(e.target.value)
+                      if (sanitized !== e.target.value) {
+                        const newVariants = [...(data.variants || [])]
+                        newVariants[activeVariantIndex - 1] = {
+                          ...newVariants[activeVariantIndex - 1],
+                          name: sanitized || undefined,
+                        }
+                        onChange({ ...data, variants: newVariants })
+                      }
+                    }}
+                    placeholder="e.g., Anti-Caster, Budget..."
+                    maxLength={MAX_VARIANT_NAME_LENGTH}
+                    className={cn(
+                      'w-full px-3 py-2 rounded-lg',
+                      'bg-bg-primary border border-border',
+                      'text-text-primary placeholder:text-text-muted/50 placeholder:text-sm',
+                      'focus:outline-none focus:border-accent-gold',
+                      'transition-colors'
+                    )}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Template section */}
           <div className="mb-3">
             <label className="block text-xs font-medium text-text-secondary mb-1.5">
@@ -292,36 +431,53 @@ export function SkillBarEditor({
                 transition={{ duration: 0.3, ease: 'easeOut' }}
                 className="space-y-3 overflow-hidden"
               >
-                {/* Profession badge - matching build view style */}
+                {/* Profession badge and player count row */}
                 <motion.div
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-semibold w-fit"
-                  style={{
-                    borderColor: `${primaryColor}40`,
-                    backgroundColor: `${primaryColor}12`,
-                  }}
+                  className="flex items-center justify-between gap-3"
                 >
-                  <ProfessionIcon
+                  {/* Profession badge */}
+                  <div
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-semibold"
+                    style={{
+                      borderColor: `${primaryColor}40`,
+                      backgroundColor: `${primaryColor}12`,
+                    }}
+                  >
+                    <ProfessionIcon
+                      profession={data.primary.toLowerCase() as ProfessionKey}
+                      size="sm"
+                    />
+                    <span style={{ color: primaryColor }}>{data.primary}</span>
+                    {data.secondary && data.secondary !== 'None' && (
+                      <>
+                        <span className="text-text-muted/40 mx-0.5">/</span>
+                        <ProfessionIcon
+                          profession={
+                            data.secondary.toLowerCase() as ProfessionKey
+                          }
+                          size="sm"
+                        />
+                        <span style={{ color: secondaryColor }}>
+                          {data.secondary}
+                        </span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Player count control - always show so single builds can specify multiples */}
+                  <PlayerCountControl
+                    count={data.playerCount || 1}
+                    onChange={count => onChange({ ...data, playerCount: count })}
                     profession={data.primary.toLowerCase() as ProfessionKey}
-                    size="sm"
+                    max={
+                      totalTeamPlayers !== undefined
+                        ? maxTeamPlayers - totalTeamPlayers + (data.playerCount || 1)
+                        : maxTeamPlayers
+                    }
                   />
-                  <span style={{ color: primaryColor }}>{data.primary}</span>
-                  {data.secondary && data.secondary !== 'None' && (
-                    <>
-                      <span className="text-text-muted/40 mx-0.5">/</span>
-                      <ProfessionIcon
-                        profession={
-                          data.secondary.toLowerCase() as ProfessionKey
-                        }
-                        size="sm"
-                      />
-                      <span style={{ color: secondaryColor }}>
-                        {data.secondary}
-                      </span>
-                    </>
-                  )}
                 </motion.div>
 
                 {/* Skills */}
@@ -343,7 +499,7 @@ export function SkillBarEditor({
                 </motion.div>
 
                 {/* Attributes */}
-                {data.attributes && Object.keys(data.attributes).length > 0 && (
+                {currentVariant.attributes && Object.keys(currentVariant.attributes).length > 0 && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -352,7 +508,7 @@ export function SkillBarEditor({
                     <div className="text-xs font-medium text-text-secondary mb-2">
                       Attributes
                     </div>
-                    <AttributeBar attributes={data.attributes} />
+                    <AttributeBar attributes={currentVariant.attributes} />
                   </motion.div>
                 )}
               </motion.div>

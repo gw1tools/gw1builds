@@ -5,18 +5,20 @@
  * @module app/new/new-build-form
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus } from 'lucide-react'
+import { Plus, Share2, Lock } from 'lucide-react'
 import { trackBuildCreated } from '@/lib/analytics'
 import { useAuth } from '@/components/providers/auth-provider'
 import { useAuthModal } from '@/components/auth/auth-modal'
 import { useBuildDraft } from '@/hooks/use-build-draft'
 import { SkillBarEditor } from '@/components/editor/skill-bar-editor'
+import { TeamSummary } from '@/components/editor/team-summary'
 import { NotesEditor } from '@/components/editor/notes-editor'
 import { BuildTagsSelector } from '@/components/editor/build-tags-selector'
 import { Button } from '@/components/ui/button'
+import { Toggle } from '@/components/ui/toggle'
 import { ProfessionSpinner } from '@/components/ui/profession-spinner'
 import { pageTransitionVariants, listContainerVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
@@ -29,8 +31,10 @@ import {
   MIN_MEANINGFUL_NAME_LENGTH,
   MIN_MEANINGFUL_NOTES_LENGTH,
   MIN_MEANINGFUL_TAG_COUNT,
+  MAX_TEAM_PLAYERS,
 } from '@/lib/constants'
 import { extractTextFromTiptap } from '@/lib/search/text-utils'
+import { encodeShareableUrl, decodeShareableUrl } from '@/lib/share'
 import type { SkillBar, TipTapDocument } from '@/types/database'
 
 const EMPTY_SKILL_BAR: SkillBar = {
@@ -48,11 +52,15 @@ const EMPTY_NOTES: TipTapDocument = {
   content: [],
 }
 
+// Stored in localStorage to survive OAuth page reload
+const PENDING_PUBLISH_KEY = 'gw1builds:pendingPublish'
+
 type DraftData = {
   name: string
   bars: SkillBar[]
   notes: TipTapDocument
   tags: string[]
+  is_private?: boolean
 }
 
 /**
@@ -104,13 +112,14 @@ function draftIsMeaningful(data: DraftData): boolean {
 
 export function NewBuildForm() {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
+  const { user, profile } = useAuth()
   const { openModal } = useAuthModal()
 
   const [teamName, setTeamName] = useState('')
   const [bars, setBars] = useState<SkillBar[]>([{ ...EMPTY_SKILL_BAR }])
   const [notes, setNotes] = useState<TipTapDocument>(EMPTY_NOTES)
   const [tags, setTags] = useState<string[]>([])
+  const [isPrivate, setIsPrivate] = useState(false)
 
   const { saveDraft, loadDraft, clearDraft } =
     useBuildDraft<DraftData>('new-build')
@@ -118,38 +127,80 @@ export function NewBuildForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showDraftPrompt, setShowDraftPrompt] = useState(false)
+  const [shareMessage, setShareMessage] = useState<string | null>(null)
+  const [shouldAutoSubmit, setShouldAutoSubmit] = useState(false)
   const draftChecked = useRef(false)
+  const urlChecked = useRef(false)
+  const formRef = useRef<HTMLFormElement>(null)
 
-  const isTeamBuild = bars.length > 1
+  const totalTeamPlayers = bars.reduce((sum, bar) => sum + (bar.playerCount || 1), 0)
+  const isTeamBuild = bars.length > 1 || totalTeamPlayers > 1
 
-  // Auth check
+  // Helper to populate form from draft data
+  const applyDraft = (draft: DraftData) => {
+    setTeamName(draft.name)
+    setBars(draft.bars)
+    setNotes(draft.notes)
+    setTags(draft.tags)
+    setIsPrivate(draft.is_private ?? false)
+    setShowDraftPrompt(false)
+  }
+
+  // Load shared build from URL params (once on mount)
   useEffect(() => {
-    if (!authLoading && !user) {
-      openModal()
+    if (urlChecked.current) return
+    urlChecked.current = true
+
+    const shared = decodeShareableUrl(new URLSearchParams(window.location.search))
+    if (shared) {
+      setTeamName(shared.name)
+      setBars(shared.bars)
+      setTags(shared.tags)
+      setShowDraftPrompt(false)
+      window.history.replaceState({}, '', '/new')
     }
-  }, [authLoading, user, openModal])
+  }, [])
 
-  // Check for draft on mount (once)
+  // Check for saved draft on mount (once)
   useEffect(() => {
-    if (draftChecked.current || authLoading || !user) return
+    if (draftChecked.current) return
     draftChecked.current = true
 
     const draft = loadDraft()
-    if (draft && draftIsMeaningful(draft)) {
-      // Only show prompt if draft differs from current (empty) form
-      const currentData = { name: teamName, bars, notes, tags }
-      const isDifferent = JSON.stringify(draft) !== JSON.stringify(currentData)
-      if (isDifferent) {
-        setShowDraftPrompt(true)
-      }
+    if (!draft || !draftIsMeaningful(draft)) return
+
+    const currentData = { name: teamName, bars, notes, tags, is_private: isPrivate }
+    if (JSON.stringify(draft) !== JSON.stringify(currentData)) {
+      setShowDraftPrompt(true)
     }
-  }, [authLoading, user, loadDraft, teamName, bars, notes, tags])
+  }, [loadDraft, teamName, bars, notes, tags, isPrivate])
+
+  // Handle pending publish after OAuth callback - wait for username to be set
+  useEffect(() => {
+    if (!user || !profile?.username) return
+
+    const pendingPublish = localStorage.getItem(PENDING_PUBLISH_KEY)
+    if (!pendingPublish) return
+
+    localStorage.removeItem(PENDING_PUBLISH_KEY)
+
+    const draft = loadDraft()
+    if (draft && draftIsMeaningful(draft)) {
+      applyDraft(draft)
+      setShouldAutoSubmit(true)
+    }
+  }, [user, profile?.username, loadDraft])
+
+  // Auto-submit when flag is set (after draft is restored)
+  useEffect(() => {
+    if (!shouldAutoSubmit) return
+    setShouldAutoSubmit(false)
+    formRef.current?.requestSubmit()
+  }, [shouldAutoSubmit])
 
   // Save draft on blur/visibility change
   useEffect(() => {
-    if (!user) return
-
-    const currentData = { name: teamName, bars, notes, tags }
+    const currentData = { name: teamName, bars, notes, tags, is_private: isPrivate }
 
     const handleSave = () => {
       if (draftIsMeaningful(currentData)) {
@@ -157,32 +208,45 @@ export function NewBuildForm() {
       }
     }
 
-    window.addEventListener('blur', handleSave)
-    document.addEventListener('visibilitychange', () => {
+    const handleVisibilityChange = () => {
       if (document.hidden) handleSave()
-    })
+    }
+
+    window.addEventListener('blur', handleSave)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
 
     return () => {
       window.removeEventListener('blur', handleSave)
-      document.removeEventListener('visibilitychange', handleSave)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [teamName, bars, notes, tags, user, saveDraft])
+  }, [teamName, bars, notes, tags, isPrivate, saveDraft])
 
   const restoreDraft = () => {
     const draft = loadDraft()
-    if (draft) {
-      setTeamName(draft.name)
-      setBars(draft.bars)
-      setNotes(draft.notes)
-      setTags(draft.tags)
-      setShowDraftPrompt(false)
-    }
+    if (draft) applyDraft(draft)
   }
 
   const dismissDraft = () => {
     clearDraft()
     setShowDraftPrompt(false)
   }
+
+  const handleShareDraft = useCallback(async () => {
+    setError(null)
+    const buildName = isTeamBuild ? teamName.trim() : bars[0]?.name.trim() || ''
+    const { url, truncated, truncationMessage } = encodeShareableUrl(buildName, bars, tags)
+
+    try {
+      await navigator.clipboard.writeText(url)
+      const message = truncated && truncationMessage
+        ? `Link copied! (${truncationMessage})`
+        : 'Link copied to clipboard!'
+      setShareMessage(message)
+      setTimeout(() => setShareMessage(null), 3000)
+    } catch {
+      setError('Failed to copy link. Please copy manually from the address bar.')
+    }
+  }, [isTeamBuild, teamName, bars, tags])
 
   const addBar = () => {
     if (bars.length < MAX_BARS) {
@@ -249,6 +313,16 @@ export function NewBuildForm() {
           return `Build ${i + 1} needs a name`
         }
       }
+
+    }
+
+    // Validate total player count (applies to all builds)
+    const totalPlayers = bars.reduce(
+      (sum, bar) => sum + (bar.playerCount || 1),
+      0
+    )
+    if (totalPlayers > MAX_TEAM_PLAYERS) {
+      return `Total players (${totalPlayers}) exceeds maximum of ${MAX_TEAM_PLAYERS}`
     }
 
     return null
@@ -257,14 +331,22 @@ export function NewBuildForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!user) {
-      openModal()
-      return
-    }
-
+    // Validate BEFORE auth check so users see errors immediately
     const validationError = validateForm()
     if (validationError) {
       setError(validationError)
+      return
+    }
+
+    // Auth-on-save: if not signed in, save draft and open auth modal
+    if (!user) {
+      const currentData = { name: teamName, bars, notes, tags, is_private: isPrivate }
+      if (draftIsMeaningful(currentData)) {
+        saveDraft(currentData)
+      }
+      // Set pending publish flag in localStorage (survives OAuth page reload)
+      localStorage.setItem(PENDING_PUBLISH_KEY, 'true')
+      openModal()
       return
     }
 
@@ -283,6 +365,7 @@ export function NewBuildForm() {
           bars,
           notes,
           tags,
+          is_private: isPrivate,
         }),
       })
 
@@ -312,28 +395,6 @@ export function NewBuildForm() {
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  // Show loading while checking auth
-  if (authLoading) {
-    return (
-      <div className="min-h-[calc(100dvh-3.5rem)] flex items-center justify-center">
-        <ProfessionSpinner />
-      </div>
-    )
-  }
-
-  // Don't render form if not authenticated
-  if (!user) {
-    return (
-      <div className="min-h-[calc(100dvh-3.5rem)] flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <p className="text-text-secondary">
-            Please sign in to create a build
-          </p>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -374,9 +435,35 @@ export function NewBuildForm() {
       </AnimatePresence>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
         {/* Tags - what is this build for? */}
         <BuildTagsSelector value={tags} onChange={setTags} />
+
+        {/* Privacy Toggle */}
+        <div
+          role="group"
+          onClick={(e) => {
+            // Only toggle if clicking the container, not the toggle itself
+            if ((e.target as HTMLElement).closest('button[role="switch"]')) return
+            setIsPrivate(!isPrivate)
+          }}
+          className="flex items-center justify-between py-3 px-4 bg-bg-secondary rounded-lg border border-border hover:border-border-hover transition-colors cursor-pointer"
+        >
+          <div className="flex items-center gap-3">
+            <Lock className="w-4 h-4 text-text-muted" />
+            <div>
+              <span className="text-sm font-medium text-text-primary">Private Build</span>
+              <p className="text-xs text-text-muted mt-0.5">
+                Only visible to you and people with the link
+              </p>
+            </div>
+          </div>
+          <Toggle
+            checked={isPrivate}
+            onChange={setIsPrivate}
+            label="Toggle private build"
+          />
+        </div>
 
         {/* Team build name - only shown for 2+ builds */}
         <AnimatePresence>
@@ -404,11 +491,14 @@ export function NewBuildForm() {
                 )}
               />
               <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-accent-gold/15 text-accent-gold whitespace-nowrap">
-                {bars.length} builds
+                {totalTeamPlayers} players
               </span>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Team summary - overview for collaborators */}
+        <TeamSummary bars={bars} />
 
         {/* Skill bars */}
         <motion.div
@@ -418,19 +508,22 @@ export function NewBuildForm() {
           animate="visible"
         >
           {bars.map((bar, index) => (
-            <SkillBarEditor
-              key={index}
-              index={index}
-              totalBars={bars.length}
-              data={bar}
-              onChange={bar => updateBar(index, bar)}
-              onRemove={
-                bars.length > MIN_BARS ? () => removeBar(index) : undefined
-              }
-              onMoveUp={() => moveBarUp(index)}
-              onMoveDown={() => moveBarDown(index)}
-              canRemove={bars.length > MIN_BARS}
-            />
+            <div key={index} id={`skill-bar-${index}`}>
+              <SkillBarEditor
+                index={index}
+                totalBars={bars.length}
+                data={bar}
+                onChange={bar => updateBar(index, bar)}
+                onRemove={
+                  bars.length > MIN_BARS ? () => removeBar(index) : undefined
+                }
+                onMoveUp={() => moveBarUp(index)}
+                onMoveDown={() => moveBarDown(index)}
+                canRemove={bars.length > MIN_BARS}
+                totalTeamPlayers={totalTeamPlayers}
+                maxTeamPlayers={MAX_TEAM_PLAYERS}
+              />
+            </div>
           ))}
         </motion.div>
 
@@ -458,8 +551,24 @@ export function NewBuildForm() {
           </div>
         )}
 
-        {/* Submit button */}
-        <div className="flex gap-3 pt-4">
+        {/* Share success message */}
+        <AnimatePresence>
+          {shareMessage && (
+            <motion.div
+              role="status"
+              aria-live="polite"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="p-3 rounded-lg bg-accent-green/10 border border-accent-green/20"
+            >
+              <p className="text-sm text-accent-green">{shareMessage}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Action buttons */}
+        <div className="flex flex-wrap gap-3 pt-4">
           <Button
             type="submit"
             variant="primary"
@@ -468,12 +577,27 @@ export function NewBuildForm() {
             disabled={isSubmitting}
             className="flex-1 sm:flex-initial sm:min-w-[200px]"
           >
-            {isSubmitting ? 'Publishing...' : 'Publish Build'}
+            {isSubmitting
+              ? 'Publishing...'
+              : user
+                ? 'Publish Build'
+                : 'Sign in to Publish'}
           </Button>
 
           <Button
             type="button"
             variant="secondary"
+            size="lg"
+            onClick={handleShareDraft}
+            disabled={isSubmitting}
+            leftIcon={<Share2 className="w-4 h-4" />}
+          >
+            Share Draft
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
             size="lg"
             onClick={() => router.push('/')}
             disabled={isSubmitting}

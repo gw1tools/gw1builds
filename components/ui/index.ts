@@ -23,8 +23,14 @@ export {
   type CountBadgeProps,
 } from './badge'
 export { Input, Textarea, type InputProps, type TextareaProps } from './input'
+export { Toggle, type ToggleProps } from './toggle'
 export { IconButton, type IconButtonProps } from './icon-button'
 export { StarButton, type StarButtonProps } from './star-button'
+export {
+  PlayerCountControl,
+  type PlayerCountControlProps,
+} from './player-count-control'
+export { VariantTabs, type VariantTabsProps } from './variant-tabs'
 
 // Build-specific
 export { SkillSlot, type SkillSlotProps } from './skill-slot'
@@ -75,3 +81,10 @@ export { Tooltip, SimpleTooltip, type TooltipProps } from './tooltip'
 
 // Loading
 export { ProfessionSpinner } from './profession-spinner'
+
+// Social
+export {
+  CollaboratorList,
+  type CollaboratorListProps,
+} from './collaborator-list'
+export { UserAvatar, type UserAvatarProps } from './user-avatar'

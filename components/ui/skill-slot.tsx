@@ -22,6 +22,7 @@ import { getSkillIconUrlById } from '@/lib/gw/icons'
 import { getSkillWikiUrl } from '@/lib/gw/wiki'
 
 const slotSizes = {
+  xs: 'w-6 h-6',
   sm: 'w-11 h-11',
   md: 'w-14 h-14',
   lg: 'w-16 h-16',
@@ -175,7 +176,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
         src={iconUrl}
         alt={skill?.name || 'Skill'}
         fill
-        sizes={size === 'sm' ? '44px' : size === 'lg' ? '64px' : '56px'}
+        sizes={size === 'xs' ? '24px' : size === 'sm' ? '44px' : size === 'lg' ? '64px' : '56px'}
         className="object-cover"
         onError={() => setImgError(true)}
         unoptimized
@@ -233,8 +234,8 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
         {/* Tooltip with Floating UI portal */}
         <FloatingPortal>
           {isOpen && (
-            // eslint-disable-next-line react-hooks/refs -- callback ref, not .current access
             <div
+              // eslint-disable-next-line react-hooks/refs -- refs.setFloating is a callback ref from Floating UI
               ref={refs.setFloating}
               style={floatingStyles}
               className={cn(

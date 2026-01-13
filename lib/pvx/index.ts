@@ -32,8 +32,8 @@ export async function loadPvxBuilds(): Promise<PvxBuild[]> {
 
   try {
     // Dynamic import - this file may not exist until scraper is run
-    const module = await import('@/lib/data/pvx-builds.json')
-    pvxBuildsCache = module.default as PvxBuild[]
+    const pvxModule = await import('@/lib/data/pvx-builds.json')
+    pvxBuildsCache = pvxModule.default as PvxBuild[]
     return pvxBuildsCache
   } catch {
     // File doesn't exist yet - return empty array

@@ -51,7 +51,11 @@ export async function generateMetadata({
   }
 
   // Build description based on build type
-  const isSingleBuild = build.bars.length === 1
+  const totalPlayers = build.bars.reduce(
+    (sum, bar) => sum + (bar.playerCount || 1),
+    0
+  )
+  const isSingleBuild = build.bars.length === 1 && totalPlayers === 1
   const professionPart = isSingleBuild
     ? `${build.bars[0].primary}${build.bars[0].secondary !== 'None' ? `/${build.bars[0].secondary}` : ''}`
     : build.bars
@@ -62,7 +66,7 @@ export async function generateMetadata({
 
   const description = isSingleBuild
     ? `${professionPart} build`
-    : `${build.bars.length}-character team: ${professionPart}`
+    : `${totalPlayers}-player team: ${professionPart}`
 
   // Bump version to invalidate CDN cache when OG image design changes
   const ogImageUrl = `${SITE_URL}/api/og/${build.id}?v=3`
@@ -89,16 +93,25 @@ export async function generateMetadata({
 }
 
 /**
- * Collects all skill IDs from build bars and fetches skill data
+ * Collects all skill IDs from build bars (including variants) and fetches skill data
  */
 async function getSkillsForBuild(
   bars: SkillBar[]
 ): Promise<Map<number, Skill>> {
-  // Collect all unique skill IDs
+  // Collect all unique skill IDs from base bars and variants
   const skillIds = new Set<number>()
   for (const bar of bars) {
+    // Base bar skills
     for (const id of bar.skills) {
       if (id > 0) skillIds.add(id)
+    }
+    // Variant skills
+    if (bar.variants) {
+      for (const variant of bar.variants) {
+        for (const id of variant.skills) {
+          if (id > 0) skillIds.add(id)
+        }
+      }
     }
   }
 
@@ -158,6 +171,8 @@ export default async function BuildPage({ params }: BuildPageProps) {
   } = await supabase.auth.getUser()
 
   const isOwner = user?.id === build.author_id
+  const isCollaborator = build.collaborators?.some(c => c.user_id === user?.id) ?? false
+  const canEdit = isOwner || isCollaborator
 
   // Access control: delisted builds only visible to owner
   if (build.moderation_status === 'delisted' && !isOwner) {
@@ -177,6 +192,7 @@ export default async function BuildPage({ params }: BuildPageProps) {
       build={build}
       skillMap={Object.fromEntries(skillMap)}
       isOwner={isOwner}
+      canEdit={canEdit}
       professionColors={PROFESSION_COLORS}
       initialStarred={initialStarred}
       starCount={build.star_count}

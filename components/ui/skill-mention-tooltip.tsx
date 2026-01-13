@@ -60,6 +60,7 @@ export function SkillMentionTooltip({
       offset(8),
       flip({ fallbackPlacements: ['bottom'] }),
       shift({ padding: 12 }),
+      // eslint-disable-next-line react-hooks/refs -- arrowRef is a DOM ref passed to Floating UI middleware
       arrow({ element: arrowRef }),
     ],
     whileElementsMounted: autoUpdate,
@@ -114,6 +115,7 @@ export function SkillMentionTooltip({
       <FloatingPortal>
         {isOpen && (
           <div
+            // eslint-disable-next-line react-hooks/refs -- refs.setFloating is a callback ref from Floating UI
             ref={refs.setFloating}
             style={floatingStyles}
             className={cn(

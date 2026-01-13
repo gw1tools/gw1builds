@@ -19,6 +19,8 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
 import { SkillSlot } from '@/components/ui/skill-slot'
+import { Badge } from '@/components/ui/badge'
+import { CollaboratorList } from '@/components/ui/collaborator-list'
 import type { SkillBar } from '@/types/database'
 import type { Skill } from '@/lib/gw/skills'
 import type { ProfessionKey } from '@/types/gw1'
@@ -30,6 +32,8 @@ interface TeamOverviewProps {
   buildName: string
   /** Author username */
   authorName?: string
+  /** Collaborators list */
+  collaborators?: Array<{ username: string }>
   /** All skill bars in the team */
   bars: SkillBar[]
   /** Pre-fetched skill data, keyed by skill ID */
@@ -45,9 +49,10 @@ interface TeamOverviewProps {
  * Includes "Copy Image" functionality for easy Discord/forum sharing.
  */
 export function TeamOverview({
-  buildId,
+  buildId: _buildId,
   buildName,
   authorName,
+  collaborators,
   bars,
   skillMap,
   className,
@@ -135,6 +140,7 @@ export function TeamOverview({
               {authorName && (
                 <p className="text-sm text-text-muted mt-0.5">
                   by <span className="text-text-secondary">{authorName}</span>
+                  <CollaboratorList collaborators={collaborators || []} />
                 </p>
               )}
             </div>
@@ -171,6 +177,7 @@ export function TeamOverview({
               <TeamOverviewRow
                 key={index}
                 bar={bar}
+                index={index}
                 skillMap={skillMap}
               />
             ))}
@@ -183,7 +190,7 @@ export function TeamOverview({
             GW1Builds.com
           </span>
           <span className="text-[10px] text-text-muted">
-            {bars.length} builds
+            {bars.reduce((sum, bar) => sum + (bar.playerCount || 1), 0)} players
           </span>
         </div>
       </div>
@@ -193,12 +200,15 @@ export function TeamOverview({
 
 /**
  * Single row in the team overview grid
+ * Clickable to jump to the corresponding detailed build card
  */
 function TeamOverviewRow({
   bar,
+  index,
   skillMap,
 }: {
   bar: SkillBar
+  index: number
   skillMap: Record<number, Skill>
 }) {
   const primaryProf = bar.primary.toLowerCase() as ProfessionKey
@@ -207,8 +217,19 @@ function TeamOverviewRow({
       ? (bar.secondary.toLowerCase() as ProfessionKey)
       : null
 
+  function handleJump(): void {
+    const element = document.getElementById(`skill-bar-${index}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }
+
   return (
-    <div className="flex items-center gap-4 px-4 py-1">
+    <button
+      type="button"
+      onClick={handleJump}
+      className="w-full flex items-center gap-4 px-4 py-1 hover:bg-bg-hover transition-colors cursor-pointer text-left"
+    >
       {/* Profession icons - bigger */}
       <div className="flex items-center gap-1 shrink-0">
         <ProfessionIcon profession={primaryProf} size="md" />
@@ -217,6 +238,13 @@ function TeamOverviewRow({
         )}
       </div>
 
+      {/* Player count badge - only show if > 1 */}
+      {bar.playerCount && bar.playerCount > 1 && (
+        <Badge variant="gold" size="sm">
+          ×{bar.playerCount}
+        </Badge>
+      )}
+
       {/* Build name - more space */}
       <div className="shrink-0 w-[120px] sm:w-[200px]">
         <span className="text-sm font-medium text-text-primary block truncate">
@@ -224,34 +252,20 @@ function TeamOverviewRow({
         </span>
       </div>
 
-      {/* Skill icons - pushed right */}
-      <div className="flex items-center gap-0.5 ml-auto shrink-0">
-        {bar.skills.map((skillId, idx) => {
-          const skill = skillId > 0 ? skillMap[skillId] : null
-          return (
-            <SkillSlot
-              key={idx}
-              skill={skill ? {
-                id: skill.id,
-                name: skill.name,
-                description: skill.description,
-                profession: skill.profession,
-                attribute: skill.attribute,
-                energy: skill.energy,
-                activation: skill.activation,
-                recharge: skill.recharge,
-                adrenaline: skill.adrenaline,
-                sacrifice: skill.sacrifice,
-                upkeep: skill.upkeep,
-                overcast: skill.overcast,
-                elite: skill.elite,
-              } : null}
-              size="sm"
-              empty={skillId === 0}
-            />
-          )
-        })}
+      {/* Skill icons - pushed right, stop propagation to prevent jump on skill click */}
+      <div
+        className="flex items-center gap-0.5 ml-auto shrink-0"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {bar.skills.map((skillId, idx) => (
+          <SkillSlot
+            key={idx}
+            skill={skillId > 0 ? skillMap[skillId] : null}
+            size="sm"
+            empty={skillId === 0}
+          />
+        ))}
       </div>
-    </div>
+    </button>
   )
 }

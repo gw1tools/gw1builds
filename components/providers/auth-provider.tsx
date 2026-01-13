@@ -23,8 +23,9 @@ import type { User } from '@/types/database'
 interface AuthContextValue {
   user: SupabaseUser | null
   profile: User | null
-  loading: boolean
   signInWithGoogle: () => Promise<void>
+  signInWithDiscord: () => Promise<void>
+  signInWithEmail: (email: string) => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
 }
@@ -45,10 +46,10 @@ export function AuthProvider({
   initialUser,
   initialProfile,
 }: AuthProviderProps) {
-  // Initialize with server-provided data (no async fetch needed!)
+  // Initialize with server-provided data (no async fetch needed)
   const [user, setUser] = useState<SupabaseUser | null>(initialUser)
   const [profile, setProfile] = useState<User | null>(initialProfile)
-  const [loading] = useState(false) // No loading - we have initial data
+  // No loading state - we have initial data from server
 
   // Subscribe to auth state changes (sign in/out only)
   // IMPORTANT: Never use async/await inside onAuthStateChange - it causes deadlocks
@@ -94,19 +95,55 @@ export function AuthProvider({
     }
   }, [])
 
-  const signInWithGoogle = useCallback(async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${SITE_URL}/auth/callback?next=${window.location.pathname}`,
-      },
-    })
+  const signInWithOAuth = useCallback(
+    async (provider: 'google' | 'discord') => {
+      // Include search params so shared URLs are preserved through OAuth
+      const nextPath = window.location.pathname + window.location.search
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${SITE_URL}/auth/callback?next=${encodeURIComponent(nextPath)}`,
+        },
+      })
 
-    if (error) {
-      console.error('Sign in error:', error)
-      throw error
-    }
-  }, [])
+      if (error) {
+        console.error('Sign in error:', error)
+        throw error
+      }
+    },
+    []
+  )
+
+  const signInWithGoogle = useCallback(
+    () => signInWithOAuth('google'),
+    [signInWithOAuth]
+  )
+
+  const signInWithDiscord = useCallback(
+    () => signInWithOAuth('discord'),
+    [signInWithOAuth]
+  )
+
+  const signInWithEmail = useCallback(
+    async (email: string): Promise<{ error: Error | null }> => {
+      // Include search params so shared URLs are preserved through magic link
+      const nextPath = window.location.pathname + window.location.search
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${SITE_URL}/auth/callback?next=${encodeURIComponent(nextPath)}`,
+        },
+      })
+
+      if (error) {
+        console.error('Magic link error:', error)
+        return { error }
+      }
+
+      return { error: null }
+    },
+    []
+  )
 
   const signOut = useCallback(async () => {
     // Brief delay to show logout spinner (feels more intentional)
@@ -150,8 +187,9 @@ export function AuthProvider({
       value={{
         user,
         profile,
-        loading,
         signInWithGoogle,
+        signInWithDiscord,
+        signInWithEmail,
         signOut,
         refreshProfile,
       }}
