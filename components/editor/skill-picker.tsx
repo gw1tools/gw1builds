@@ -114,13 +114,14 @@ export function SpotlightSkillPicker({
 
   useEffect(() => {
     if (isOpen) {
-      /* eslint-disable react-hooks/set-state-in-effect -- modal state reset */
+      inputRef.current?.focus()
+    } else {
+      /* eslint-disable react-hooks/set-state-in-effect -- reset on close */
       setQuery('')
       setSelectedIndex(0)
       setActiveFilter(null)
       setCollapsedAttributes(new Set())
       /* eslint-enable react-hooks/set-state-in-effect */
-      requestAnimationFrame(() => inputRef.current?.focus())
     }
   }, [isOpen])
 

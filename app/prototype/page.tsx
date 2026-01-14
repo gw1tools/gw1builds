@@ -296,8 +296,6 @@ export default function PrototypePage() {
         onClose={() => { setIsSkillPickerOpen(false); setActiveSlot(null) }}
         onSelect={handleSkillSelect}
         currentSkills={slots.map(s => s.skill).filter(Boolean) as Skill[]}
-        primaryProfession={primaryProfession}
-        secondaryProfession={secondaryProfession}
       />
 
       <SpotlightBuildPicker

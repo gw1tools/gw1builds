@@ -37,7 +37,6 @@ import { Input } from '@/components/ui/input'
 import { ProfessionSpinner } from '@/components/ui/profession-spinner'
 import { ProfessionPicker } from '@/components/ui/profession-picker'
 import { VariantTabs } from '@/components/ui/variant-tabs'
-import { type Profession } from '@/types/gw1'
 import type { SkillBarVariant } from '@/types/database'
 import { BuildCard } from './build-card'
 import { SpotlightSkillPicker } from './skill-picker'
@@ -797,15 +796,19 @@ export function SkillBarEditor({
           </div>
 
           {/* Validation warning - bottom of card */}
-          {invalidSkillIndices.length > 0 && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mt-5 text-xs text-accent-red/80"
-            >
-              {invalidSkillIndices.length} invalid skill{invalidSkillIndices.length > 1 ? 's' : ''} — change profession or remove
-            </motion.p>
-          )}
+          <AnimatePresence>
+            {invalidSkillIndices.length > 0 && (
+              <motion.p
+                initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                animate={{ opacity: 1, height: 'auto', marginTop: 20 }}
+                exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                transition={{ duration: 0.2 }}
+                className="text-xs text-accent-red/80 overflow-hidden"
+              >
+                {invalidSkillIndices.length} invalid skill{invalidSkillIndices.length > 1 ? 's' : ''} — change profession or remove
+              </motion.p>
+            )}
+          </AnimatePresence>
         </div>
       </BuildCard>
 
@@ -815,12 +818,6 @@ export function SkillBarEditor({
         onClose={handlePickerClose}
         onSelect={handleSkillSelect}
         currentSkills={loadedSkills.filter((s): s is Skill => s !== null)}
-        primaryProfession={(data.primary || null) as Profession | null}
-        secondaryProfession={
-          data.secondary && data.secondary !== 'None'
-            ? (data.secondary as Profession)
-            : null
-        }
       />
 
       {/* Clear Confirmation Modal */}
