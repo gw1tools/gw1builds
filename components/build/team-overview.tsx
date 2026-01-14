@@ -20,7 +20,9 @@ import { Button } from '@/components/ui/button'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
 import { SkillSlot } from '@/components/ui/skill-slot'
 import { Badge } from '@/components/ui/badge'
+import { Tooltip } from '@/components/ui/tooltip'
 import { CollaboratorList } from '@/components/ui/collaborator-list'
+import { hasEquipment } from '@/components/build/equipment-display'
 import type { SkillBar } from '@/types/database'
 import type { Skill } from '@/lib/gw/skills'
 import type { ProfessionKey } from '@/types/gw1'
@@ -218,10 +220,16 @@ function TeamOverviewRow({
       : null
 
   function handleJump(): void {
-    const element = document.getElementById(`skill-bar-${index}`)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
+    document.getElementById(`skill-bar-${index}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
+  function expandEquipmentAndScroll(): void {
+    window.dispatchEvent(
+      new CustomEvent('expand-equipment', { detail: { equipmentId: `equipment-${index}` } })
+    )
+    requestAnimationFrame(() => {
+      document.getElementById(`skill-bar-${index}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
   }
 
   return (
@@ -254,9 +262,28 @@ function TeamOverviewRow({
 
       {/* Skill icons - pushed right, stop propagation to prevent jump on skill click */}
       <div
-        className="flex items-center gap-0.5 ml-auto shrink-0"
+        className="relative flex items-center gap-0.5 ml-auto shrink-0"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Equipment indicator - green dot only */}
+        {bar.equipment && hasEquipment(bar.equipment) && (
+          <Tooltip content="Click to view equipment" position="top" offsetClass="mb-4">
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => { e.stopPropagation(); expandEquipmentAndScroll() }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  expandEquipmentAndScroll()
+                }
+              }}
+              className="absolute -left-8 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-bg-primary border border-border hover:border-accent-green/50 hover:bg-bg-hover transition-colors cursor-pointer"
+            >
+              <span className="w-2.5 h-2.5 rounded-full bg-accent-green block" />
+            </span>
+          </Tooltip>
+        )}
         {bar.skills.map((skillId, idx) => (
           <SkillSlot
             key={idx}

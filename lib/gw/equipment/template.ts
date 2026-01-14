@@ -17,8 +17,9 @@
 import { EquipmentTemplate } from '@buildwars/gw-templates'
 import { getItemById, type EquipmentItem, type EquipmentSlot } from './items'
 import { getModifierById, type Modifier } from './modifiers'
-import type { ArmorSetConfig, ArmorSlotConfig } from '@/types/database'
+import type { ArmorSetConfig, ArmorSlotConfig, WeaponConfig } from '@/types/database'
 import type { ArmorSlot } from './armor'
+import { getRuneById, getInsigniaById } from './armor'
 
 // ============================================================================
 // TYPES
@@ -127,23 +128,43 @@ export interface EquipmentToEncode {
  *   console.log(equipment.mainHand?.item?.name) // "PvP Daggers"
  * }
  */
+/** Valid equipment slot IDs (0-6) */
+const VALID_EQUIPMENT_SLOTS = new Set([0, 1, 2, 3, 4, 5, 6])
+
 export function decodeEquipmentTemplate(
   code: string
 ): DecodedEquipment | null {
   const trimmed = code?.trim()
   if (!trimmed) return null
 
+  // Basic format validation - equipment templates are base64 and typically 20+ chars
+  if (trimmed.length < 8) return null
+
   try {
     const decoder = new EquipmentTemplate()
     const raw = decoder.decode(trimmed) as Record<number, RawDecodedItem>
 
+    // Validate we got a proper object with items
+    if (!raw || typeof raw !== 'object') return null
+
     const items = new Map<EquipmentSlot, DecodedEquipmentItem>()
+    let hasRecognizedItem = false
 
     for (const [, rawItem] of Object.entries(raw)) {
+      // Skip invalid items
       if (!rawItem || typeof rawItem.id !== 'number') continue
+      if (rawItem.id <= 0) continue // Item ID 0 is invalid
+      if (!VALID_EQUIPMENT_SLOTS.has(rawItem.slot)) continue // Invalid slot
+
+      const item = getItemById(rawItem.id)
+
+      // Track if we found at least one recognized item
+      if (item) {
+        hasRecognizedItem = true
+      }
 
       const decoded: DecodedEquipmentItem = {
-        item: getItemById(rawItem.id),
+        item,
         itemId: rawItem.id,
         slot: rawItem.slot as EquipmentSlot,
         color: DYE_COLOR_NAMES[rawItem.color] || 'default',
@@ -154,6 +175,12 @@ export function decodeEquipmentTemplate(
       items.set(decoded.slot, decoded)
     }
 
+    // Require at least one recognized item from our database
+    // This prevents garbage base64 from being accepted
+    if (!hasRecognizedItem) {
+      return null
+    }
+
     return {
       mainHand: items.get(0),
       offHand: items.get(1),
@@ -161,7 +188,7 @@ export function decodeEquipmentTemplate(
       code: trimmed,
     }
   } catch (e) {
-    console.warn('[decodeEquipmentTemplate] Failed to decode:', e)
+    // Silently return null for decode errors (common for invalid input)
     return null
   }
 }
@@ -246,8 +273,6 @@ export function extractWeaponSet(code: string): WeaponSet | null {
 // ============================================================================
 // CONVERSION UTILITIES
 // ============================================================================
-
-import type { WeaponConfig } from '@/types/database'
 
 /** Empty weapon config */
 const EMPTY_WEAPON: WeaponConfig = { item: null, prefix: null, suffix: null, inscription: null }
@@ -383,16 +408,23 @@ export function decodeArmorSet(code: string): ArmorSetConfig | null {
     const slotName = slotIdToName[slotId]
     if (!slotName) continue
 
-    // Extract rune and insignia from modifiers
-    // Runes are generally IDs < 400, insignias are >= 290
-    // This is a simplified heuristic - proper detection would check categories
+    // Extract rune and insignia from modifiers by looking them up in our database
     for (const modId of item.modifierIds) {
-      if (modId >= 290 && modId < 400) {
-        // Likely an insignia
-        armor[slotName].insigniaId = modId
-      } else if (modId > 0) {
-        // Likely a rune
+      // Check if it's a known rune
+      const rune = getRuneById(modId)
+      if (rune) {
         armor[slotName].runeId = modId
+        // If it's an attribute rune on head, auto-detect the headpiece attribute
+        if (slotName === 'head' && rune.attribute) {
+          armor.headAttribute = rune.attribute
+        }
+        continue
+      }
+
+      // Check if it's a known insignia
+      const insignia = getInsigniaById(modId)
+      if (insignia) {
+        armor[slotName].insigniaId = modId
       }
     }
   }

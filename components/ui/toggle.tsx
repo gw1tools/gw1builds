@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useId } from 'react'
+import { forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface ToggleProps {
@@ -30,12 +30,9 @@ export interface ToggleProps {
  */
 export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(
   function Toggle({ checked, onChange, disabled = false, label, className }, ref) {
-    const id = useId()
-
     return (
       <button
         ref={ref}
-        id={id}
         type="button"
         role="switch"
         aria-checked={checked}

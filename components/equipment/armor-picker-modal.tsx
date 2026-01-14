@@ -8,7 +8,8 @@
  * Auto-advances to Insignia tab after selecting a rune.
  */
 
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -53,9 +54,25 @@ type SlotTab = 'headpiece' | 'rune' | 'insignia'
 // LABEL FORMATTING HELPERS
 // ============================================================================
 
+function getTierAbbreviation(tier: string | null | undefined): string {
+  switch (tier) {
+    case 'superior': return 'Sup'
+    case 'major': return 'Maj'
+    default: return 'Min'
+  }
+}
+
+function getTierLabel(tier: string | null | undefined): string {
+  switch (tier) {
+    case 'superior': return 'Superior'
+    case 'major': return 'Major'
+    default: return 'Minor'
+  }
+}
+
 /** Format rune name for display (abbreviated tier + category/attribute) */
 export function formatRuneLabel(rune: Rune): string {
-  const tierAbbr = rune.tier === 'superior' ? 'Sup' : rune.tier === 'major' ? 'Maj' : 'Min'
+  const tierAbbr = getTierAbbreviation(rune.tier)
 
   switch (rune.category) {
     case 'vigor':
@@ -100,22 +117,13 @@ function ClearButton({ label, onClick }: { label: string; onClick: () => void })
 
 function SelectionChip({
   label,
-  type,
   onClear,
 }: {
   label: string
-  type: 'headpiece' | 'rune' | 'insignia'
   onClear: () => void
 }) {
   return (
-    <span className={cn(
-      'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium',
-      type === 'headpiece'
-        ? 'bg-purple-500/15 text-purple-400 border border-purple-500/30'
-        : type === 'rune'
-        ? 'bg-accent-gold/15 text-accent-gold border border-accent-gold/30'
-        : 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
-    )}>
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-accent-gold/15 text-accent-gold border border-accent-gold/30">
       <span className="truncate max-w-[100px]">{label}</span>
       {/* Using span instead of button to avoid nested button hydration error */}
       <span
@@ -144,20 +152,12 @@ function SelectionChip({
 // TAB BAR
 // ============================================================================
 
-const TAB_INDICATOR_COLORS: Record<SlotTab, string> = {
-  headpiece: 'bg-purple-400',
-  rune: 'bg-accent-gold',
-  insignia: 'bg-blue-400',
-}
-
 function TabButton({
-  tab,
   label,
   isActive,
   isSelected,
   onClick,
 }: {
-  tab: SlotTab
   label: string
   isActive: boolean
   isSelected: boolean
@@ -175,9 +175,7 @@ function TabButton({
       )}
     >
       <span>{label}</span>
-      {isSelected && (
-        <span className={cn('w-1.5 h-1.5 rounded-full', TAB_INDICATOR_COLORS[tab])} />
-      )}
+      {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-accent-gold" />}
     </button>
   )
 }
@@ -201,7 +199,6 @@ function TabBar({
     <div className="flex gap-1 p-1 bg-bg-secondary rounded-lg">
       {isHeadSlot && (
         <TabButton
-          tab="headpiece"
           label="Headpiece"
           isActive={activeTab === 'headpiece'}
           isSelected={!!headpieceSelected}
@@ -209,14 +206,12 @@ function TabBar({
         />
       )}
       <TabButton
-        tab="rune"
         label="Rune"
         isActive={activeTab === 'rune'}
         isSelected={runeSelected}
         onClick={() => onTabChange('rune')}
       />
       <TabButton
-        tab="insignia"
         label="Insignia"
         isActive={activeTab === 'insignia'}
         isSelected={insigniaSelected}
@@ -258,58 +253,75 @@ function RuneRow({
 
   return (
     <div className={cn(
-      'flex items-center gap-2 px-2.5 py-2 rounded-lg border transition-all',
-      disabled ? 'opacity-40 border-border/30' : 'border-border/50 hover:border-border',
-      isSelected && !disabled && 'border-accent-gold/50 bg-accent-gold/5'
+      'px-3 py-2 rounded-lg border transition-all',
+      disabled
+        ? 'opacity-40 border-border/30'
+        : isSelected
+          ? 'border-accent-gold/60 bg-accent-gold/10'
+          : 'border-border/50 hover:border-border'
     )}>
-      <span className={cn(
-        'flex-1 text-[13px] font-medium min-w-0 truncate',
-        disabled ? 'text-text-muted' : isSelected ? 'text-accent-gold' : 'text-text-primary'
-      )}>
-        {label}
-      </span>
+      {/* Top row: Name + Buttons */}
+      <div className="flex items-center gap-2">
+        <span className={cn(
+          'flex-1 text-[13px] font-medium',
+          disabled ? 'text-text-muted' : isSelected ? 'text-accent-gold' : 'text-text-primary'
+        )}>
+          {label}
+        </span>
 
+        {/* Desktop: show info text inline */}
+        {infoText && !disabled && (
+          <span className={cn(
+            'text-[11px] hidden sm:inline',
+            isSelected ? 'text-accent-gold/70' : 'text-text-muted'
+          )}>{infoText}</span>
+        )}
+
+        {disabled ? (
+          <span className="text-[10px] text-text-muted/60 italic">{disabledReason}</span>
+        ) : isSingleRune ? (
+          <button
+            type="button"
+            onClick={() => onSelect(selectedRuneId === runes[0].id ? null : runes[0].id)}
+            className={cn(
+              'px-3 py-1 text-[11px] font-medium rounded transition-colors cursor-pointer',
+              selectedRuneId === runes[0].id
+                ? 'bg-accent-gold text-black'
+                : 'bg-bg-secondary hover:bg-bg-hover text-text-secondary'
+            )}
+          >
+            {selectedRuneId === runes[0].id ? 'Equipped' : 'Equip'}
+          </button>
+        ) : (
+          <div className="flex gap-0.5">
+            {sortedRunes.map((r) => {
+              const isThisSelected = selectedRuneId === r.id
+              return (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => onSelect(isThisSelected ? null : r.id)}
+                  className={cn(
+                    'px-2 py-1 text-[11px] font-medium rounded transition-colors cursor-pointer',
+                    isThisSelected
+                      ? 'bg-accent-gold text-black'
+                      : 'bg-bg-secondary hover:bg-bg-hover text-text-secondary'
+                  )}
+                >
+                  {getTierLabel(r.tier)}
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Mobile: show info text on second line */}
       {infoText && !disabled && (
-        <span className="text-[10px] text-text-muted/70 hidden sm:inline">{infoText}</span>
-      )}
-
-      {disabled ? (
-        <span className="text-[10px] text-text-muted/60 italic">{disabledReason}</span>
-      ) : isSingleRune ? (
-        <button
-          type="button"
-          onClick={() => onSelect(selectedRuneId === runes[0].id ? null : runes[0].id)}
-          className={cn(
-            'px-3 py-1 text-[11px] font-medium rounded transition-colors cursor-pointer',
-            selectedRuneId === runes[0].id
-              ? 'bg-accent-gold text-black'
-              : 'bg-bg-secondary hover:bg-bg-hover text-text-secondary'
-          )}
-        >
-          {selectedRuneId === runes[0].id ? 'Equipped' : 'Equip'}
-        </button>
-      ) : (
-        <div className="flex gap-0.5">
-          {sortedRunes.map((r) => {
-            const isThisSelected = selectedRuneId === r.id
-            const tierLabel = r.tier === 'superior' ? 'Superior' : r.tier === 'major' ? 'Major' : 'Minor'
-            return (
-              <button
-                key={r.id}
-                type="button"
-                onClick={() => onSelect(isThisSelected ? null : r.id)}
-                className={cn(
-                  'px-2 py-1 text-[11px] font-medium rounded transition-colors cursor-pointer',
-                  isThisSelected
-                    ? 'bg-accent-gold text-black'
-                    : 'bg-bg-secondary hover:bg-bg-hover text-text-secondary'
-                )}
-              >
-                {tierLabel}
-              </button>
-            )
-          })}
-        </div>
+        <div className={cn(
+          'text-[11px] mt-1 sm:hidden',
+          isSelected ? 'text-accent-gold/70' : 'text-text-muted'
+        )}>{infoText}</div>
       )}
     </div>
   )
@@ -319,7 +331,7 @@ function RuneRow({
 // INSIGNIA OPTION BUTTON
 // ============================================================================
 
-function InsigniaButton({
+function InsigniaRow({
   label,
   effect,
   selected,
@@ -331,32 +343,51 @@ function InsigniaButton({
   onClick: () => void
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        'px-3 py-2 rounded-lg border text-left transition-all cursor-pointer',
-        'hover:bg-bg-hover',
-        selected
-          ? 'border-blue-500/50 bg-blue-500/10'
-          : 'border-border/50 hover:border-border'
-      )}
-    >
-      <div className={cn(
-        'text-[12px] font-medium',
-        selected ? 'text-blue-400' : 'text-text-primary'
-      )}>
-        {label}
+    <div className={cn(
+      'px-3 py-2 rounded-lg border transition-all',
+      selected
+        ? 'border-accent-gold/60 bg-accent-gold/10'
+        : 'border-border/50 hover:border-border'
+    )}>
+      {/* Top row: Name + Button */}
+      <div className="flex items-center gap-2">
+        <span className={cn(
+          'flex-1 text-[13px] font-medium',
+          selected ? 'text-accent-gold' : 'text-text-primary'
+        )}>
+          {label}
+        </span>
+
+        {/* Desktop: show effect inline */}
+        {effect && (
+          <span className={cn(
+            'text-[11px] hidden sm:inline',
+            selected ? 'text-accent-gold/70' : 'text-text-muted'
+          )}>{effect}</span>
+        )}
+
+        <button
+          type="button"
+          onClick={onClick}
+          className={cn(
+            'px-3 py-1 text-[11px] font-medium rounded transition-colors cursor-pointer',
+            selected
+              ? 'bg-accent-gold text-black'
+              : 'bg-bg-secondary hover:bg-bg-hover text-text-secondary'
+          )}
+        >
+          {selected ? 'Equipped' : 'Equip'}
+        </button>
       </div>
+
+      {/* Mobile: show effect on second line */}
       {effect && (
         <div className={cn(
-          'text-[10px] mt-0.5',
-          selected ? 'text-blue-400/60' : 'text-text-muted'
-        )}>
-          {effect}
-        </div>
+          'text-[11px] mt-1 sm:hidden',
+          selected ? 'text-accent-gold/70' : 'text-text-muted'
+        )}>{effect}</div>
       )}
-    </button>
+    </div>
   )
 }
 
@@ -391,6 +422,17 @@ function SlotRow({
 }) {
   const isHeadSlot = slot === 'head'
   const [activeTab, setActiveTab] = useState<SlotTab>(isHeadSlot ? 'headpiece' : 'rune')
+  const wasExpandedRef = useRef(expanded)
+  const autoAdvanceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (autoAdvanceTimeoutRef.current) {
+        clearTimeout(autoAdvanceTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const rune = config.runeId ? getRuneById(config.runeId) : null
   const insignia = config.insigniaId ? getInsigniaById(config.insigniaId) : null
@@ -403,9 +445,12 @@ function SlotRow({
     return ATTRIBUTES_BY_PROFESSION[profId] || []
   }, [profession])
 
-  // Reset tab when expanding
+  // Set initial tab only when first expanding (not on every selection change)
   useEffect(() => {
-    if (expanded) {
+    const justExpanded = expanded && !wasExpandedRef.current
+    wasExpandedRef.current = expanded
+
+    if (justExpanded) {
       let newTab: SlotTab
       if (isHeadSlot) {
         // Head slot: start at first unfilled tab
@@ -420,7 +465,7 @@ function SlotRow({
         // Other slots: rune first, then insignia
         newTab = config.runeId ? 'insignia' : 'rune'
       }
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- derived state from props
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync tab to expanded state
       setActiveTab(newTab)
     }
   }, [expanded, config.runeId, headAttribute, isHeadSlot])
@@ -486,7 +531,10 @@ function SlotRow({
     onHeadAttributeChange?.(attr)
     // Auto-advance to rune tab after selecting headpiece
     if (attr !== null) {
-      setTimeout(() => setActiveTab('rune'), 150)
+      if (autoAdvanceTimeoutRef.current) {
+        clearTimeout(autoAdvanceTimeoutRef.current)
+      }
+      autoAdvanceTimeoutRef.current = setTimeout(() => setActiveTab('rune'), 300)
     }
   }, [onHeadAttributeChange])
 
@@ -495,7 +543,10 @@ function SlotRow({
     onRuneChange(runeId)
     // Auto-advance to insignia tab after selecting a rune
     if (runeId !== null) {
-      setTimeout(() => setActiveTab('insignia'), 150)
+      if (autoAdvanceTimeoutRef.current) {
+        clearTimeout(autoAdvanceTimeoutRef.current)
+      }
+      autoAdvanceTimeoutRef.current = setTimeout(() => setActiveTab('insignia'), 300)
     }
   }, [onRuneChange])
 
@@ -503,8 +554,12 @@ function SlotRow({
   const handleInsigniaSelect = useCallback((insigniaId: number | null) => {
     onInsigniaChange(insigniaId)
     // Auto-advance to next slot after selecting an insignia
+    // Delay matches animation duration for smooth transition
     if (insigniaId !== null && onAdvanceToNextSlot) {
-      setTimeout(() => onAdvanceToNextSlot(), 200)
+      if (autoAdvanceTimeoutRef.current) {
+        clearTimeout(autoAdvanceTimeoutRef.current)
+      }
+      autoAdvanceTimeoutRef.current = setTimeout(() => onAdvanceToNextSlot(), 300)
     }
   }, [onInsigniaChange, onAdvanceToNextSlot])
 
@@ -531,21 +586,18 @@ function SlotRow({
           {isHeadSlot && headAttribute && (
             <SelectionChip
               label={`+1 ${headAttribute}`}
-              type="headpiece"
               onClear={() => onHeadAttributeChange?.(null)}
             />
           )}
           {rune && (
             <SelectionChip
               label={formatRuneLabel(rune)}
-              type="rune"
               onClear={() => onRuneChange(null)}
             />
           )}
           {insignia && (
             <SelectionChip
               label={formatInsigniaLabel(insignia)}
-              type="insignia"
               onClear={() => onInsigniaChange(null)}
             />
           )}
@@ -561,166 +613,261 @@ function SlotRow({
         )} />
       </button>
 
-      {/* Expanded Content */}
-      {expanded && (
-        <div className="border-t border-border">
-          {/* Tab Bar */}
-          <div className="px-3 pt-3 pb-2">
-            <TabBar
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              headpieceSelected={!!headAttribute}
-              runeSelected={!!rune}
-              insigniaSelected={!!insignia}
-              isHeadSlot={isHeadSlot}
-            />
-          </div>
+      {/* Expanded Content - always rendered for smooth animation */}
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            <div className="overflow-hidden border-t border-border">
+              {/* Tab Bar */}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.15, delay: 0.05, ease: 'easeOut' }}
+                className="px-3 pt-3 pb-2"
+              >
+                <TabBar
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                  headpieceSelected={!!headAttribute}
+                  runeSelected={!!rune}
+                  insigniaSelected={!!insignia}
+                  isHeadSlot={isHeadSlot}
+                />
+              </motion.div>
 
-          {/* Tab Content */}
-          <div className="px-3 pb-3">
-            {activeTab === 'headpiece' && isHeadSlot ? (
-              /* HEADPIECE TAB */
-              <div className="space-y-2">
-                <div className="text-[11px] text-text-muted mb-2">
-                  Select an attribute for +1 bonus from your headpiece
-                </div>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {professionAttributes.map((attr) => (
-                    <button
-                      key={attr}
-                      type="button"
-                      onClick={() => handleHeadpieceSelect(attr)}
-                      className={cn(
-                        'px-3 py-2 text-[12px] font-medium rounded-lg border transition-colors cursor-pointer text-left',
-                        headAttribute === attr
-                          ? 'bg-purple-500/20 border-purple-500/50 text-purple-300'
-                          : 'bg-bg-secondary border-border/50 text-text-secondary hover:bg-bg-hover hover:border-border'
-                      )}
+              {/* Tab Content with smooth transitions */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.15, delay: 0.1, ease: 'easeOut' }}
+                className="px-3 pb-3"
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  {activeTab === 'headpiece' && isHeadSlot ? (
+                    /* HEADPIECE TAB */
+                    <motion.div
+                      key="headpiece"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.15, ease: 'easeOut' }}
+                      className="space-y-2"
                     >
-                      +1 {attr}
-                    </button>
-                  ))}
-                </div>
-                {headAttribute && (
-                  <ClearButton label="Clear Headpiece" onClick={() => onHeadAttributeChange?.(null)} />
-                )}
-              </div>
-            ) : activeTab === 'rune' ? (
-              /* RUNE TAB */
-              <div className="space-y-1">
-                {/* Universal Runes */}
-                <RuneRow
-                  label="Vigor"
-                  runes={VIGOR_RUNES}
-                  selectedRuneId={config.runeId}
-                  onSelect={handleRuneSelect}
-                  disabled={usedNonStacking.vigor}
-                  disabledReason="Doesn't stack"
-                  infoText="+30/+41/+50 HP"
-                />
-                <RuneRow
-                  label="Vitae"
-                  runes={UNIVERSAL_RUNES.filter(r => r.category === 'vitae')}
-                  selectedRuneId={config.runeId}
-                  onSelect={handleRuneSelect}
-                  infoText="+10 HP"
-                />
-                <RuneRow
-                  label="Attunement"
-                  runes={UNIVERSAL_RUNES.filter(r => r.category === 'attunement')}
-                  selectedRuneId={config.runeId}
-                  onSelect={handleRuneSelect}
-                  infoText="+2 Energy"
-                />
+                      {professionAttributes.length > 0 ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          {professionAttributes.map((attr) => (
+                            <button
+                              key={attr}
+                              type="button"
+                              onClick={() => handleHeadpieceSelect(attr)}
+                              className={cn(
+                                'px-3 py-2 text-[12px] font-medium rounded-lg border transition-all cursor-pointer text-left',
+                                headAttribute === attr
+                                  ? 'border-accent-gold/60 bg-accent-gold/10 text-accent-gold'
+                                  : 'bg-bg-secondary border-border/50 text-text-secondary hover:bg-bg-hover hover:border-border'
+                              )}
+                            >
+                              +1 {attr}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-[12px] text-text-muted/60 text-center py-4">
+                          {profession ? 'No attributes available' : 'Select a profession first'}
+                        </div>
+                      )}
 
-                {/* Absorption (Warrior only) */}
-                {absorptionRunes.length > 0 && (
-                  <RuneRow
-                    label="Absorption"
-                    runes={absorptionRunes}
-                    selectedRuneId={config.runeId}
-                    onSelect={handleRuneSelect}
-                    disabled={usedNonStacking.absorption}
-                    disabledReason="Doesn't stack"
-                    infoText="Phys dmg −1/−2/−3"
-                  />
-                )}
+                      {headAttribute && (
+                        <ClearButton label="Clear Headpiece" onClick={() => onHeadAttributeChange?.(null)} />
+                      )}
+                    </motion.div>
+                  ) : activeTab === 'rune' ? (
+                    /* RUNE TAB */
+                    <motion.div
+                      key="rune"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.15, ease: 'easeOut' }}
+                      className="space-y-2"
+                    >
+                      <RuneRow
+                        label="Vigor"
+                        runes={VIGOR_RUNES}
+                        selectedRuneId={config.runeId}
+                        onSelect={handleRuneSelect}
+                        disabled={usedNonStacking.vigor}
+                        disabledReason="Doesn't stack"
+                        infoText="+30/41/50 HP"
+                      />
+                      <RuneRow
+                        label="Vitae"
+                        runes={UNIVERSAL_RUNES.filter(r => r.category === 'vitae')}
+                        selectedRuneId={config.runeId}
+                        onSelect={handleRuneSelect}
+                        infoText="+10 HP"
+                      />
+                      <RuneRow
+                        label="Attunement"
+                        runes={UNIVERSAL_RUNES.filter(r => r.category === 'attunement')}
+                        selectedRuneId={config.runeId}
+                        onSelect={handleRuneSelect}
+                        infoText="+2 Energy"
+                      />
+                      {absorptionRunes.length > 0 && (
+                        <RuneRow
+                          label="Absorption"
+                          runes={absorptionRunes}
+                          selectedRuneId={config.runeId}
+                          onSelect={handleRuneSelect}
+                          disabled={usedNonStacking.absorption}
+                          disabledReason="Doesn't stack"
+                          infoText="-1/2/3 phys dmg"
+                        />
+                      )}
 
-                {/* Attribute Runes */}
-                {profession && Object.keys(attributeGroups).length > 0 && (
-                  <div className="pt-2 mt-2 border-t border-border/40">
-                    <div className="flex items-center justify-between mb-1.5 px-1">
-                      <span className="text-[10px] text-text-muted uppercase tracking-wide">Attribute Runes</span>
-                      <span className="text-[9px] text-text-muted">+1 / +2 / +3</span>
-                    </div>
-                    <div className="space-y-1">
-                      {Object.entries(attributeGroups).map(([attr, attrRunes]) => {
-                        const firstRune = attrRunes[0]
-                        const { disabled, reason } = isRuneDisabled(firstRune)
-                        return (
-                          <RuneRow
-                            key={attr}
-                            label={attr}
-                            runes={attrRunes}
-                            selectedRuneId={config.runeId}
-                            onSelect={handleRuneSelect}
-                            disabled={disabled}
-                            disabledReason={reason}
-                          />
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
+                      {/* Attribute runes - separated by whitespace */}
+                      {profession && Object.keys(attributeGroups).length > 0 && (
+                        <div className="pt-3 space-y-2">
+                          {Object.entries(attributeGroups).map(([attr, attrRunes]) => {
+                            const firstRune = attrRunes[0]
+                            const { disabled, reason } = isRuneDisabled(firstRune)
+                            return (
+                              <RuneRow
+                                key={attr}
+                                label={attr}
+                                runes={attrRunes}
+                                selectedRuneId={config.runeId}
+                                onSelect={handleRuneSelect}
+                                disabled={disabled}
+                                disabledReason={reason}
+                                infoText="+1/2/3"
+                              />
+                            )
+                          })}
+                        </div>
+                      )}
 
-                {config.runeId && (
-                  <ClearButton label="Clear Rune" onClick={() => onRuneChange(null)} />
-                )}
-              </div>
-            ) : (
-              /* INSIGNIA TAB */
-              <div className="space-y-2">
-                {/* Universal Insignias */}
-                <div className="grid grid-cols-2 gap-1.5">
-                  {UNIVERSAL_INSIGNIAS.map((i) => (
-                    <InsigniaButton
-                      key={i.id}
-                      label={formatInsigniaLabel(i)}
-                      effect={i.slotEffects?.[slot] || i.effect}
-                      selected={config.insigniaId === i.id}
-                      onClick={() => handleInsigniaSelect(i.id)}
-                    />
-                  ))}
-                </div>
-
-                {/* Profession Insignias */}
-                {professionInsignias.length > 0 && (
-                  <div className="pt-2 mt-1 border-t border-border/40">
-                    <div className="text-[10px] text-text-muted uppercase tracking-wide mb-1.5 px-1">
-                      Profession
-                    </div>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {professionInsignias.map((i) => (
-                        <InsigniaButton
+                      {config.runeId && (
+                        <ClearButton label="Clear Rune" onClick={() => onRuneChange(null)} />
+                      )}
+                    </motion.div>
+                  ) : (
+                    /* INSIGNIA TAB */
+                    <motion.div
+                      key="insignia"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.15, ease: 'easeOut' }}
+                      className="space-y-2"
+                    >
+                      {UNIVERSAL_INSIGNIAS.map((i) => (
+                        <InsigniaRow
                           key={i.id}
                           label={formatInsigniaLabel(i)}
-                          effect={i.effect}
+                          effect={i.slotEffects?.[slot] || i.effect}
                           selected={config.insigniaId === i.id}
                           onClick={() => handleInsigniaSelect(i.id)}
                         />
                       ))}
-                    </div>
-                  </div>
-                )}
 
-                {config.insigniaId && (
-                  <ClearButton label="Clear Insignia" onClick={() => onInsigniaChange(null)} />
-                )}
-              </div>
-            )}
+                      {/* Profession insignias - separated by whitespace */}
+                      {professionInsignias.length > 0 && (
+                        <div className="pt-3 space-y-2">
+                          {professionInsignias.map((i) => (
+                            <InsigniaRow
+                              key={i.id}
+                              label={formatInsigniaLabel(i)}
+                              effect={i.effect}
+                              selected={config.insigniaId === i.id}
+                              onClick={() => handleInsigniaSelect(i.id)}
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      {config.insigniaId && (
+                        <ClearButton label="Clear Insignia" onClick={() => onInsigniaChange(null)} />
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ============================================================================
+// SUMMARY SECTION (shows what each configured item does)
+// ============================================================================
+
+function ArmorSummary({ config }: { config: ArmorSetConfig }) {
+  const slots = ['head', 'chest', 'hands', 'legs', 'feet'] as const
+  const slotLabels: Record<typeof slots[number], string> = {
+    head: 'Head',
+    chest: 'Chest',
+    hands: 'Hands',
+    legs: 'Legs',
+    feet: 'Feet',
+  }
+
+  const configuredSlots = slots.filter(slot => {
+    const s = config[slot]
+    return s.runeId || s.insigniaId || (slot === 'head' && config.headAttribute)
+  })
+
+  if (configuredSlots.length === 0) {
+    return (
+      <div className="px-4 py-3 text-sm text-text-muted text-center">
+        No armor configured yet
+      </div>
+    )
+  }
+
+  return (
+    <div className="px-4 py-3 space-y-2">
+      {configuredSlots.map(slot => {
+        const slotConfig = config[slot]
+        const rune = slotConfig.runeId ? getRuneById(slotConfig.runeId) : null
+        const insignia = slotConfig.insigniaId ? getInsigniaById(slotConfig.insigniaId) : null
+        const headAttr = slot === 'head' ? config.headAttribute : null
+
+        return (
+          <div key={slot} className="flex gap-3 text-sm">
+            <span className="w-12 text-text-muted shrink-0">{slotLabels[slot]}</span>
+            <div className="flex-1 space-y-0.5">
+              {headAttr && (
+                <div className="text-text-secondary">
+                  <span className="text-accent-gold">+1 {headAttr}</span>
+                  <span className="text-text-muted ml-2">Headpiece bonus</span>
+                </div>
+              )}
+              {rune && (
+                <div className="text-text-secondary">
+                  <span className="text-text-primary">{formatRuneLabel(rune)}</span>
+                  <span className="text-text-muted ml-2">{rune.effect}</span>
+                </div>
+              )}
+              {insignia && (
+                <div className="text-text-secondary">
+                  <span className="text-text-primary">{formatInsigniaLabel(insignia)}</span>
+                  <span className="text-text-muted ml-2">{insignia.slotEffects?.[slot] || insignia.effect}</span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      })}
     </div>
   )
 }
@@ -808,6 +955,11 @@ export function ArmorPickerModal({
             >
               <X className="w-5 h-5" />
             </button>
+          </div>
+
+          {/* Summary Section */}
+          <div className="border-b border-border bg-bg-secondary/50">
+            <ArmorSummary config={localConfig} />
           </div>
 
           {/* Slot Rows */}

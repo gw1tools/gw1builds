@@ -8,6 +8,7 @@ export { WeaponPickerModal } from './weapon-picker-modal'
 export { WeaponSelector } from './weapon-selector'
 export { EquipmentEditor } from './equipment-editor'
 export { EquipmentPanel } from './equipment-panel'
+export { WeaponSummary, getWeaponEffects } from './weapon-summary'
 
 // Re-export types for convenience
 export type { WeaponConfig, Equipment } from '@/types/database'

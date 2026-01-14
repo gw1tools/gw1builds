@@ -118,6 +118,11 @@ export interface SkillBar {
    * Each variant has its own skills, attributes, and template
    */
   variants?: SkillBarVariant[]
+  /**
+   * Optional equipment configuration (weapons + armor)
+   * Stored separately from skill template code
+   */
+  equipment?: Equipment
 }
 
 /** Moderation status for builds */
@@ -328,6 +333,8 @@ export interface BuildListItem {
   moderation_status?: ModerationStatus
   /** Whether this build is private (only shown in My Builds/Starred/Shared) */
   is_private?: boolean
+  /** Number of collaborators (only loaded for My Builds Created tab) */
+  collaborator_count?: number
 }
 
 // ============================================================================
@@ -385,9 +392,30 @@ export const EMPTY_ARMOR_SET: ArmorSetConfig = {
   headAttribute: null,
 }
 
-/** Full equipment loadout for a skill bar */
-export interface Equipment {
+/** A weapon set (main hand + off-hand) */
+export interface WeaponSet {
+  name?: string
   mainHand: WeaponConfig
   offHand: WeaponConfig
+}
+
+/** Empty weapon set constant */
+export const EMPTY_WEAPON_SET: WeaponSet = {
+  mainHand: { ...EMPTY_WEAPON_CONFIG },
+  offHand: { ...EMPTY_WEAPON_CONFIG },
+}
+
+/** Maximum weapon sets (matches GW1's F1-F4) */
+export const MAX_WEAPON_SETS = 4
+
+/** Full equipment loadout for a skill bar */
+export interface Equipment {
+  weaponSets: WeaponSet[]
   armor: ArmorSetConfig
+}
+
+/** Empty equipment constant */
+export const EMPTY_EQUIPMENT: Equipment = {
+  weaponSets: [{ ...EMPTY_WEAPON_SET }],
+  armor: { ...EMPTY_ARMOR_SET },
 }

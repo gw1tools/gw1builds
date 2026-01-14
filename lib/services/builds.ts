@@ -282,7 +282,8 @@ export async function getUserBuilds(userId: string): Promise<BuildListItem[]> {
     .select(
       `
       id, name, tags, bars, star_count, view_count, created_at, moderation_status, is_private,
-      author:users!builds_author_id_fkey(username, avatar_url)
+      author:users!builds_author_id_fkey(username, avatar_url),
+      build_collaborators(count)
     `
     )
     .eq('author_id', userId)
@@ -294,7 +295,14 @@ export async function getUserBuilds(userId: string): Promise<BuildListItem[]> {
     return []
   }
 
-  return (data || []).map(normalizeAuthor) as BuildListItem[]
+  return (data || []).map(row => {
+    const normalized = normalizeAuthor(row)
+    const collabCount = row.build_collaborators?.[0]?.count ?? 0
+    return {
+      ...normalized,
+      collaborator_count: collabCount > 0 ? collabCount : undefined,
+    }
+  }) as BuildListItem[]
 }
 
 /**

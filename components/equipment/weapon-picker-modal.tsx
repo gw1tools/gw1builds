@@ -30,10 +30,11 @@ import {
   formatEffectMaxValue,
 } from '@/lib/gw/equipment/modifiers'
 import { type WeaponConfig, EMPTY_WEAPON_CONFIG } from '@/types/database'
-import { buildWeaponName } from './equipment-editor'
+import { WeaponSummary } from './weapon-summary'
 
 // Re-export for backwards compatibility
 export type { WeaponConfig } from '@/types/database'
+export { getWeaponEffects } from './weapon-summary'
 
 interface WeaponPickerModalProps {
   isOpen: boolean
@@ -62,8 +63,6 @@ const OFF_HAND_TYPES: WeaponType[] = ['shield', 'focus']
 
 // Weapon types that have multiple profession-specific variants
 const PROFESSION_SPECIFIC_TYPES: WeaponType[] = ['wand', 'staff', 'focus', 'shield']
-
-const PVP_BLUE = '#AAD9FF'
 
 // ============================================================================
 // WEAPON TYPE BUTTON
@@ -216,17 +215,10 @@ function ModSelector({
 }
 
 // ============================================================================
-// LIVE PREVIEW
+// WEAPON PREVIEW (Uses shared WeaponSummary component)
 // ============================================================================
 
 function LivePreview({ config }: { config: WeaponConfig }) {
-  const weaponName = buildWeaponName(config)
-  const effects: string[] = []
-
-  if (config.prefix?.effect) effects.push(formatEffectMaxValue(config.prefix.effect))
-  if (config.inscription?.effect) effects.push(formatEffectMaxValue(config.inscription.effect))
-  if (config.suffix?.effect) effects.push(formatEffectMaxValue(config.suffix.effect))
-
   if (!config.item) {
     return (
       <div className="flex flex-col items-center justify-center h-full py-6 text-center">
@@ -234,38 +226,7 @@ function LivePreview({ config }: { config: WeaponConfig }) {
       </div>
     )
   }
-
-  return (
-    <div className="space-y-2">
-      <div>
-        <h3 className="text-base font-semibold text-text-primary">
-          {weaponName}
-        </h3>
-        {config.item.attribute && (
-          <p className="text-xs text-text-muted mt-0.5">Req. 9 {config.item.attribute}</p>
-        )}
-        {config.item.twoHanded && (
-          <p className="text-xs text-accent-gold/70">Two-Handed</p>
-        )}
-      </div>
-
-      {effects.length > 0 && (
-        <div className="space-y-1 pt-2 border-t border-border/50">
-          {effects.map((effect, i) => (
-            <div key={i} className="text-sm" style={{ color: PVP_BLUE }}>
-              {effect}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {config.inscription && (
-        <div className="text-xs text-text-muted pt-1">
-          {config.inscription.name}
-        </div>
-      )}
-    </div>
-  )
+  return <WeaponSummary config={config} variant="detailed" />
 }
 
 // ============================================================================

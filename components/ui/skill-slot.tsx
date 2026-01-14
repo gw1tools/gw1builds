@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils'
 import { getSkillIconUrlById } from '@/lib/gw/icons'
 import { getSkillWikiUrl } from '@/lib/gw/wiki'
 import { CostStat } from '@/components/ui/cost-stat'
+import { ScaledDescription } from '@/components/ui/scaled-description'
 
 const slotSizes = {
   xs: 'w-6 h-6',
@@ -64,6 +65,8 @@ export interface SkillSlotProps {
   emptyVariant?: 'viewer' | 'editor'
   /** Additional class names */
   className?: string
+  /** Current attribute values for scaling skill descriptions */
+  attributes?: Record<string, number>
 }
 
 /**
@@ -91,6 +94,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
       active = false,
       invalid = false,
       emptyVariant = 'viewer',
+      attributes,
     },
     forwardedRef
   ) => {
@@ -270,6 +274,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
                   elite={elite}
                   wikiUrl={wikiUrl}
                   showWikiLink={!canHover}
+                  attributes={attributes}
                 />
               )}
               <FloatingArrow
@@ -353,6 +358,8 @@ interface SkillTooltipContentProps {
   wikiUrl?: string
   /** Show wiki link inside tooltip (for touch devices) */
   showWikiLink?: boolean
+  /** Current attribute values for scaling skill descriptions */
+  attributes?: Record<string, number>
 }
 
 function SkillTooltipContent({
@@ -360,6 +367,7 @@ function SkillTooltipContent({
   elite,
   wikiUrl,
   showWikiLink,
+  attributes,
 }: SkillTooltipContentProps) {
   const hasBasicCosts =
     (skill.energy !== undefined && skill.energy >= 0) ||
@@ -408,7 +416,10 @@ function SkillTooltipContent({
       {/* Description */}
       {skill.description && (
         <div className="text-sm text-text-secondary leading-relaxed mb-2">
-          {skill.description}
+          <ScaledDescription
+            description={skill.description}
+            attributeLevel={attributes?.[skill.attribute ?? ''] ?? 0}
+          />
         </div>
       )}
 

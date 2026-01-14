@@ -9,7 +9,7 @@
 
 'use client'
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   useFloating,
@@ -22,13 +22,14 @@ import {
   FloatingPortal,
   autoUpdate,
 } from '@floating-ui/react'
-import { X, ChevronUp, ChevronDown, Copy, Check, Plus, Settings, Users } from 'lucide-react'
+import { X, ChevronUp, ChevronDown, Copy, Check, Plus, Settings, Users, SlidersHorizontal } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { modalOverlayVariants, modalContentVariants } from '@/lib/motion'
 import { MAX_BAR_NAME_LENGTH, MAX_VARIANT_NAME_LENGTH, PROFESSION_COLORS } from '@/lib/constants'
 import { sanitizeSingleLine } from '@/lib/validation'
 import { useVariantData } from '@/hooks'
-import { encodeTemplate, decodeTemplate, type DecodedTemplate } from '@/lib/gw/decoder'
+import { encodeTemplate, type DecodedTemplate } from '@/lib/gw/decoder'
+import { TemplateInput } from './template-input'
 import type { Skill } from '@/lib/gw/skills'
 import { getSkillsByIds } from '@/lib/gw/skills'
 import { SkillBar } from '@/components/ui/skill-bar'
@@ -37,9 +38,13 @@ import { Input } from '@/components/ui/input'
 import { ProfessionSpinner } from '@/components/ui/profession-spinner'
 import { ProfessionPicker } from '@/components/ui/profession-picker'
 import { VariantTabs } from '@/components/ui/variant-tabs'
-import type { SkillBarVariant } from '@/types/database'
+import type { SkillBarVariant, Equipment } from '@/types/database'
+import type { ProfessionKey } from '@/types/gw1'
 import { BuildCard } from './build-card'
 import { SpotlightSkillPicker } from './skill-picker'
+import { EquipmentSection } from './equipment-section'
+import { AttributeEditorModal } from './attribute-editor-modal'
+import { getAttributeBonusBreakdown } from '@/lib/gw/equipment/armor'
 
 export interface SkillBarData {
   name: string
@@ -51,6 +56,7 @@ export interface SkillBarData {
   skills: number[]
   playerCount?: number
   variants?: SkillBarVariant[]
+  equipment?: Equipment
 }
 
 export interface SkillBarEditorProps {
@@ -69,6 +75,8 @@ export interface SkillBarEditorProps {
   maxTeamPlayers?: number
   /** Callback when validation state changes (true = has errors) */
   onValidationChange?: (hasErrors: boolean) => void
+  /** Show error state on the name input */
+  nameError?: boolean
 }
 
 const emptySkillBarData: Partial<SkillBarData> = {
@@ -217,7 +225,14 @@ export function SkillBarEditor({
   totalTeamPlayers,
   maxTeamPlayers = 12,
   onValidationChange,
+  nameError,
 }: SkillBarEditorProps) {
+  // Store callback in ref to avoid useEffect dependency issues
+  const onValidationChangeRef = useRef(onValidationChange)
+  useLayoutEffect(() => {
+    onValidationChangeRef.current = onValidationChange
+  })
+
   const [loadedSkills, setLoadedSkills] = useState<(Skill | null)[]>([])
   const [isLoadingSkills, setIsLoadingSkills] = useState(false)
   const [showCopied, setShowCopied] = useState(false)
@@ -234,6 +249,9 @@ export function SkillBarEditor({
 
   // Clear confirmation modal state
   const [showClearConfirm, setShowClearConfirm] = useState(false)
+
+  // Attribute editor modal state
+  const [isAttributeEditorOpen, setIsAttributeEditorOpen] = useState(false)
   const { refs: settingsRefs, floatingStyles: settingsFloatingStyles, context: settingsContext } = useFloating({
     open: isSettingsOpen,
     onOpenChange: setIsSettingsOpen,
@@ -448,8 +466,8 @@ export function SkillBarEditor({
 
   // Notify parent of validation changes
   useEffect(() => {
-    onValidationChange?.(invalidSkillIndices.length > 0)
-  }, [invalidSkillIndices.length, onValidationChange])
+    onValidationChangeRef.current?.(invalidSkillIndices.length > 0)
+  }, [invalidSkillIndices.length])
 
   // Profession change handlers
   const handlePrimaryChange = useCallback((profession: string) => {
@@ -483,6 +501,46 @@ export function SkillBarEditor({
     })
     setTemplateCode(newTemplate)
   }, [data, currentVariant.attributes, currentVariant.skills, onChange])
+
+  // Equipment change handler
+  const handleEquipmentChange = useCallback((equipment: Equipment | undefined) => {
+    onChange({ ...data, equipment })
+  }, [data, onChange])
+
+  // Attribute change handler
+  const handleAttributeChange = useCallback(
+    (newAttributes: Record<string, number>) => {
+      // Generate new template code
+      const newTemplate =
+        encodeTemplate(
+          data.primary || 'None',
+          data.secondary || 'None',
+          newAttributes,
+          currentVariant.skills || []
+        ) || ''
+
+      if (activeVariantIndex === 0) {
+        // Update base bar
+        onChange({
+          ...data,
+          attributes: newAttributes,
+          template: newTemplate,
+        })
+      } else {
+        // Update variant
+        const newVariants = [...(data.variants || [])]
+        newVariants[activeVariantIndex - 1] = {
+          ...newVariants[activeVariantIndex - 1],
+          attributes: newAttributes,
+          template: newTemplate,
+        }
+        onChange({ ...data, variants: newVariants })
+      }
+
+      setTemplateCode(newTemplate)
+    },
+    [data, currentVariant.skills, activeVariantIndex, onChange]
+  )
 
   return (
     <motion.div
@@ -558,6 +616,7 @@ export function SkillBarEditor({
               onChange={e => onChange({ ...data, name: e.target.value })}
               placeholder="Build name..."
               maxLength={MAX_BAR_NAME_LENGTH}
+              error={nameError}
             />
           </div>
 
@@ -714,13 +773,14 @@ export function SkillBarEditor({
                 activeSlot={activeSlotIndex}
                 invalidSlots={invalidSkillIndices}
                 emptyVariant="editor"
+                attributes={currentVariant.attributes}
               />
             )}
           </div>
 
-          {/* Attributes - subtle, only when exist */}
+          {/* Attributes - with edit button */}
           <AnimatePresence>
-            {hasSkills && currentVariant.attributes && Object.keys(currentVariant.attributes).length > 0 && (
+            {data.primary && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
@@ -728,7 +788,32 @@ export function SkillBarEditor({
                 transition={{ duration: 0.15 }}
                 className="overflow-hidden mb-6"
               >
-                <AttributeBar attributes={currentVariant.attributes} />
+                <div className="flex items-center gap-2">
+                  {/* Attributes label + edit button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsAttributeEditorOpen(true)}
+                    className={cn(
+                      'shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors cursor-pointer',
+                      'text-text-muted hover:text-text-primary hover:bg-bg-hover'
+                    )}
+                    title="Edit attributes"
+                  >
+                    <SlidersHorizontal className="w-3.5 h-3.5" />
+                    <span className="text-xs font-medium">Attributes</span>
+                  </button>
+                  {/* Attribute values */}
+                  {currentVariant.attributes && Object.keys(currentVariant.attributes).length > 0 ? (
+                    <AttributeBar
+                      attributes={currentVariant.attributes}
+                      bonusBreakdown={data.equipment?.armor ? getAttributeBonusBreakdown(data.equipment.armor) : undefined}
+                      compact
+                      className="flex-1 min-w-0"
+                    />
+                  ) : (
+                    <span className="text-xs text-text-muted italic py-1">No attributes set</span>
+                  )}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -738,35 +823,12 @@ export function SkillBarEditor({
 
           {/* Template Code */}
           <div className="flex items-center gap-2">
-            <input
-              type="text"
+            <TemplateInput
               value={templateCode}
-              onChange={e => setTemplateCode(e.target.value)}
-              onBlur={() => {
-                if (templateCode.trim()) {
-                  const result = decodeTemplate(templateCode.trim())
-                  if (result.success) {
-                    handleDecode(result.data, templateCode.trim())
-                  }
-                }
-              }}
-              onPaste={e => {
-                const pasted = e.clipboardData.getData('text')
-                if (pasted) {
-                  const result = decodeTemplate(pasted.trim())
-                  if (result.success) {
-                    handleDecode(result.data, pasted.trim())
-                  }
-                }
-              }}
-              placeholder="Paste template code..."
-              className={cn(
-                'flex-1 h-9 px-3 rounded-lg text-sm font-mono',
-                'bg-bg-primary/50 text-text-secondary placeholder:text-text-muted/50',
-                'border border-border/50',
-                'focus:outline-none focus:border-border',
-                'transition-colors'
-              )}
+              onChange={setTemplateCode}
+              variant="skill"
+              onDecodeSkill={handleDecode}
+              className="flex-1"
             />
             {templateCode && (
               <div className="flex items-center gap-1 shrink-0">
@@ -795,6 +857,14 @@ export function SkillBarEditor({
             )}
           </div>
 
+          {/* Equipment Section - collapsible */}
+          <EquipmentSection
+            value={data.equipment}
+            onChange={handleEquipmentChange}
+            profession={data.primary?.toLowerCase() as ProfessionKey | undefined}
+            className="mt-4"
+          />
+
           {/* Validation warning - bottom of card */}
           <AnimatePresence>
             {invalidSkillIndices.length > 0 && (
@@ -818,6 +888,7 @@ export function SkillBarEditor({
         onClose={handlePickerClose}
         onSelect={handleSkillSelect}
         currentSkills={loadedSkills.filter((s): s is Skill => s !== null)}
+        attributes={currentVariant.attributes}
       />
 
       {/* Clear Confirmation Modal */}
@@ -878,6 +949,17 @@ export function SkillBarEditor({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Attribute Editor Modal */}
+      <AttributeEditorModal
+        isOpen={isAttributeEditorOpen}
+        onClose={() => setIsAttributeEditorOpen(false)}
+        primary={data.primary || 'Warrior'}
+        secondary={data.secondary || 'None'}
+        attributes={currentVariant.attributes || {}}
+        onChange={handleAttributeChange}
+        runeBonuses={data.equipment?.armor ? getAttributeBonusBreakdown(data.equipment.armor) : {}}
+      />
     </motion.div>
   )
 }

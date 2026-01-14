@@ -927,3 +927,47 @@ export function calculateAttributeBonuses(config: ArmorSetConfig): Record<string
 
   return bonuses
 }
+
+/**
+ * Get individual attribute bonus breakdown (not summed)
+ * Returns array of bonuses per attribute for display like "+1 +3"
+ *
+ * @example
+ * // Headpiece Fast Casting + Superior Rune of Fast Casting
+ * getAttributeBonusBreakdown(config) // { "Fast Casting": [1, 3] }
+ */
+export function getAttributeBonusBreakdown(
+  config: ArmorSetConfig
+): Record<string, number[]> {
+  const breakdown: Record<string, number[]> = {}
+  const slots: ArmorSlot[] = ['head', 'chest', 'hands', 'legs', 'feet']
+
+  // Headpiece attribute bonus (+1, always stacks)
+  if (config.headAttribute) {
+    breakdown[config.headAttribute] = [1]
+  }
+
+  // Find highest rune bonus per attribute (runes don't stack with each other)
+  const runeBonusByAttribute: Record<string, number> = {}
+  for (const slot of slots) {
+    const slotConfig = config[slot]
+    if (slotConfig.runeId) {
+      const rune = getRuneById(slotConfig.runeId)
+      if (rune && rune.category === 'attribute' && rune.attribute) {
+        const bonus = rune.tier === 'superior' ? 3 : rune.tier === 'major' ? 2 : 1
+        const currentBonus = runeBonusByAttribute[rune.attribute] || 0
+        runeBonusByAttribute[rune.attribute] = Math.max(currentBonus, bonus)
+      }
+    }
+  }
+
+  // Add rune bonuses to breakdown
+  for (const [attr, bonus] of Object.entries(runeBonusByAttribute)) {
+    if (!breakdown[attr]) {
+      breakdown[attr] = []
+    }
+    breakdown[attr].push(bonus)
+  }
+
+  return breakdown
+}

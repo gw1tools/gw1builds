@@ -486,6 +486,12 @@ export function sanitizeSkillBar(bar: Record<string, unknown>): Record<string, u
       .map((v: unknown) => sanitizeSkillBarVariant(v as Record<string, unknown>))
   }
 
+  // Include equipment if present (weapon sets + armor)
+  // Equipment is stored as JSON - validated at display time via decoder
+  if (bar.equipment && typeof bar.equipment === 'object') {
+    sanitized.equipment = bar.equipment
+  }
+
   return sanitized
 }
 

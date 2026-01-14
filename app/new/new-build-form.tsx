@@ -8,7 +8,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Share2, Lock } from 'lucide-react'
+import { Plus, Share2, Users } from 'lucide-react'
 import { trackBuildCreated } from '@/lib/analytics'
 import { useAuth } from '@/components/providers/auth-provider'
 import { useAuthModal } from '@/components/auth/auth-modal'
@@ -16,16 +16,20 @@ import { useBuildDraft } from '@/hooks/use-build-draft'
 import { SkillBarEditor } from '@/components/editor/skill-bar-editor'
 import { TeamSummary } from '@/components/editor/team-summary'
 import { NotesEditor } from '@/components/editor/notes-editor'
-import { BuildTagsSelector } from '@/components/editor/build-tags-selector'
+import { TagsSection } from '@/components/editor/tags-section'
+import { PrivacyToggle } from '@/components/editor/privacy-toggle'
+import { CollaboratorsModal, type PendingCollaborator } from '@/components/editor/collaborators-modal'
 import { Button } from '@/components/ui/button'
-import { Toggle } from '@/components/ui/toggle'
-import { ProfessionSpinner } from '@/components/ui/profession-spinner'
+import { OverflowMenu } from '@/components/ui/overflow-menu'
+import { SubmitOverlay } from '@/components/ui/submit-overlay'
 import { pageTransitionVariants, listContainerVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import {
   MAX_BARS,
   MIN_BARS,
   MIN_NAME_LENGTH,
+  MAX_NAME_LENGTH,
+  MAX_BAR_NAME_LENGTH,
   MIN_MEANINGFUL_TEMPLATE_LENGTH,
   MIN_MEANINGFUL_NAME_LENGTH,
   MIN_MEANINGFUL_NOTES_LENGTH,
@@ -60,6 +64,7 @@ type DraftData = {
   notes: TipTapDocument
   tags: string[]
   is_private?: boolean
+  collaborators?: PendingCollaborator[]
 }
 
 /**
@@ -119,15 +124,22 @@ export function NewBuildForm() {
   const [notes, setNotes] = useState<TipTapDocument>(EMPTY_NOTES)
   const [tags, setTags] = useState<string[]>([])
   const [isPrivate, setIsPrivate] = useState(false)
+  const [pendingCollaborators, setPendingCollaborators] = useState<PendingCollaborator[]>([])
 
   const { saveDraft, loadDraft, clearDraft } =
     useBuildDraft<DraftData>('new-build')
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<{
+    teamName?: boolean
+    barNames?: number[] // indices of bars with missing names
+  }>({})
   const [showDraftPrompt, setShowDraftPrompt] = useState(false)
   const [shareMessage, setShareMessage] = useState<string | null>(null)
   const [shouldAutoSubmit, setShouldAutoSubmit] = useState(false)
+  const [showCollaboratorsModal, setShowCollaboratorsModal] = useState(false)
+  const [barsWithInvalidSkills, setBarsWithInvalidSkills] = useState<Set<number>>(new Set())
   const draftChecked = useRef(false)
   const urlChecked = useRef(false)
   const formRef = useRef<HTMLFormElement>(null)
@@ -142,6 +154,7 @@ export function NewBuildForm() {
     setNotes(draft.notes)
     setTags(draft.tags)
     setIsPrivate(draft.is_private ?? false)
+    setPendingCollaborators(draft.collaborators ?? [])
     setShowDraftPrompt(false)
   }
 
@@ -199,7 +212,14 @@ export function NewBuildForm() {
 
   // Save draft on blur/visibility change
   useEffect(() => {
-    const currentData = { name: teamName, bars, notes, tags, is_private: isPrivate }
+    const currentData = {
+      name: teamName,
+      bars,
+      notes,
+      tags,
+      is_private: isPrivate,
+      collaborators: pendingCollaborators,
+    }
 
     const handleSave = () => {
       if (draftIsMeaningful(currentData)) {
@@ -218,7 +238,7 @@ export function NewBuildForm() {
       window.removeEventListener('blur', handleSave)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [teamName, bars, notes, tags, isPrivate, saveDraft])
+  }, [teamName, bars, notes, tags, isPrivate, pendingCollaborators, saveDraft])
 
   const restoreDraft = () => {
     const draft = loadDraft()
@@ -256,6 +276,25 @@ export function NewBuildForm() {
   const removeBar = (index: number) => {
     if (bars.length > MIN_BARS) {
       setBars(bars.filter((_, i) => i !== index))
+      // Adjust fieldErrors.barNames indices after removal
+      if (fieldErrors.barNames?.length) {
+        setFieldErrors(prev => ({
+          ...prev,
+          barNames: prev.barNames
+            ?.filter(i => i !== index) // Remove the deleted bar's error
+            .map(i => (i > index ? i - 1 : i)), // Shift indices down
+        }))
+      }
+      // Adjust barsWithInvalidSkills indices after removal
+      setBarsWithInvalidSkills(prev => {
+        const next = new Set<number>()
+        for (const i of prev) {
+          if (i < index) next.add(i)
+          else if (i > index) next.add(i - 1)
+          // Skip i === index (removed bar)
+        }
+        return next
+      })
     }
   }
 
@@ -280,6 +319,9 @@ export function NewBuildForm() {
   }
 
   const validateForm = (): string | null => {
+    const newFieldErrors: typeof fieldErrors = {}
+    let errorMessage: string | null = null
+
     if (bars.length < MIN_BARS) {
       return 'At least one skill bar is required'
     }
@@ -292,24 +334,46 @@ export function NewBuildForm() {
 
     // For single builds, the first bar needs a name
     if (!isTeamBuild) {
-      if (!bars[0].name.trim()) {
-        return 'Build name is required'
-      }
-      if (bars[0].name.trim().length < MIN_NAME_LENGTH) {
-        return `Build name must be at least ${MIN_NAME_LENGTH} characters`
+      const barName = bars[0].name.trim()
+      if (!barName) {
+        newFieldErrors.barNames = [0]
+        errorMessage = 'Build name is required'
+      } else if (barName.length < MIN_NAME_LENGTH) {
+        newFieldErrors.barNames = [0]
+        errorMessage = `Build name must be at least ${MIN_NAME_LENGTH} characters`
+      } else if (barName.length > MAX_BAR_NAME_LENGTH) {
+        newFieldErrors.barNames = [0]
+        errorMessage = `Build name must be at most ${MAX_BAR_NAME_LENGTH} characters`
       }
     } else {
       // For team builds, need team name and all bars need names
-      if (!teamName.trim()) {
-        return 'Team build name is required'
+      const trimmedTeamName = teamName.trim()
+      if (!trimmedTeamName) {
+        newFieldErrors.teamName = true
+        errorMessage = 'Team build name is required'
+      } else if (trimmedTeamName.length < MIN_NAME_LENGTH) {
+        newFieldErrors.teamName = true
+        errorMessage = `Team build name must be at least ${MIN_NAME_LENGTH} characters`
+      } else if (trimmedTeamName.length > MAX_NAME_LENGTH) {
+        newFieldErrors.teamName = true
+        errorMessage = `Team build name must be at most ${MAX_NAME_LENGTH} characters`
       }
-      if (teamName.trim().length < MIN_NAME_LENGTH) {
-        return `Team build name must be at least ${MIN_NAME_LENGTH} characters`
-      }
-      // Check each bar has a name
+
+      // Check each bar has a valid name
+      const barsWithInvalidNames: number[] = []
       for (let i = 0; i < bars.length; i++) {
-        if (!bars[i].name.trim()) {
-          return `Build ${i + 1} needs a name`
+        const barName = bars[i].name.trim()
+        if (!barName || barName.length < MIN_NAME_LENGTH) {
+          barsWithInvalidNames.push(i)
+        }
+      }
+      if (barsWithInvalidNames.length > 0) {
+        newFieldErrors.barNames = barsWithInvalidNames
+        if (!errorMessage) {
+          const barName = bars[barsWithInvalidNames[0]].name.trim()
+          errorMessage = !barName
+            ? `Build ${barsWithInvalidNames[0] + 1} needs a name`
+            : `Build ${barsWithInvalidNames[0] + 1} name must be at least ${MIN_NAME_LENGTH} characters`
         }
       }
     }
@@ -320,10 +384,17 @@ export function NewBuildForm() {
       0
     )
     if (totalPlayers > MAX_TEAM_PLAYERS) {
-      return `Total players (${totalPlayers}) exceeds maximum of ${MAX_TEAM_PLAYERS}`
+      errorMessage = `Total players (${totalPlayers}) exceeds maximum of ${MAX_TEAM_PLAYERS}`
     }
 
-    return null
+    // Check for invalid skills (skills that don't match profession)
+    if (barsWithInvalidSkills.size > 0) {
+      const firstInvalidBar = Math.min(...barsWithInvalidSkills)
+      errorMessage = errorMessage || `Build ${firstInvalidBar + 1} has skills that don't match its professions`
+    }
+
+    setFieldErrors(newFieldErrors)
+    return errorMessage
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -338,7 +409,14 @@ export function NewBuildForm() {
 
     // Auth-on-save: if not signed in, save draft and open auth modal
     if (!user) {
-      const currentData = { name: teamName, bars, notes, tags, is_private: isPrivate }
+      const currentData = {
+        name: teamName,
+        bars,
+        notes,
+        tags,
+        is_private: isPrivate,
+        collaborators: pendingCollaborators,
+      }
       if (draftIsMeaningful(currentData)) {
         saveDraft(currentData)
       }
@@ -364,6 +442,7 @@ export function NewBuildForm() {
           notes,
           tags,
           is_private: isPrivate,
+          collaborators: pendingCollaborators.map(c => c.username),
         }),
       })
 
@@ -437,44 +516,14 @@ export function NewBuildForm() {
         ref={formRef}
         onSubmit={handleSubmit}
         onKeyDown={e => {
-          // Prevent Enter from submitting form (too easy to do accidentally)
-          // Only allow submission via the submit button click
-          if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+          // Never submit form via Enter - only via submit button click
+          if (e.key === 'Enter') {
             e.preventDefault()
           }
         }}
         className="space-y-5"
       >
-        {/* Tags - what is this build for? */}
-        <BuildTagsSelector value={tags} onChange={setTags} />
-
-        {/* Privacy Toggle */}
-        <div
-          role="group"
-          onClick={(e) => {
-            // Only toggle if clicking the container, not the toggle itself
-            if ((e.target as HTMLElement).closest('button[role="switch"]')) return
-            setIsPrivate(!isPrivate)
-          }}
-          className="flex items-center justify-between py-3 px-4 bg-bg-secondary rounded-lg border border-border hover:border-border-hover transition-colors cursor-pointer"
-        >
-          <div className="flex items-center gap-3">
-            <Lock className="w-4 h-4 text-text-muted" />
-            <div>
-              <span className="text-sm font-medium text-text-primary">Private Build</span>
-              <p className="text-xs text-text-muted mt-0.5">
-                Only visible to you and people with the link
-              </p>
-            </div>
-          </div>
-          <Toggle
-            checked={isPrivate}
-            onChange={setIsPrivate}
-            label="Toggle private build"
-          />
-        </div>
-
-        {/* Skill bars */}
+        {/* Skill bars - primary content */}
         <motion.div
           className="space-y-4"
           variants={listContainerVariants}
@@ -487,7 +536,20 @@ export function NewBuildForm() {
                 index={index}
                 totalBars={bars.length}
                 data={bar}
-                onChange={bar => updateBar(index, bar)}
+                onChange={updatedBar => {
+                  updateBar(index, updatedBar)
+                  // Clear bar name error when user starts typing
+                  if (fieldErrors.barNames?.includes(index) && updatedBar.name !== bar.name) {
+                    setFieldErrors(prev => ({
+                      ...prev,
+                      barNames: prev.barNames?.filter(i => i !== index),
+                    }))
+                  }
+                  // Clear template error when a template is added
+                  if (updatedBar.template && updatedBar.template !== bar.template && error) {
+                    setError(null)
+                  }
+                }}
                 onRemove={
                   bars.length > MIN_BARS ? () => removeBar(index) : undefined
                 }
@@ -496,6 +558,18 @@ export function NewBuildForm() {
                 canRemove={bars.length > MIN_BARS}
                 totalTeamPlayers={totalTeamPlayers}
                 maxTeamPlayers={MAX_TEAM_PLAYERS}
+                nameError={fieldErrors.barNames?.includes(index)}
+                onValidationChange={(hasErrors) => {
+                  setBarsWithInvalidSkills(prev => {
+                    const next = new Set(prev)
+                    if (hasErrors) {
+                      next.add(index)
+                    } else {
+                      next.delete(index)
+                    }
+                    return next
+                  })
+                }}
               />
             </div>
           ))}
@@ -503,27 +577,44 @@ export function NewBuildForm() {
 
         {/* Add bar button */}
         {bars.length < MAX_BARS && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="md"
-            onClick={addBar}
-            leftIcon={<Plus className="w-4 h-4" />}
-            noLift
-          >
-            Add Team Member
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              onClick={addBar}
+              leftIcon={<Plus className="w-4 h-4" />}
+            >
+              Add Team Member
+            </Button>
+          </div>
         )}
 
         {/* Team summary - name input + overview (appears after adding team members) */}
         <TeamSummary
           bars={bars}
           teamName={teamName}
-          onTeamNameChange={setTeamName}
+          onTeamNameChange={name => {
+            setTeamName(name)
+            // Clear team name error when user starts typing
+            if (fieldErrors.teamName) {
+              setFieldErrors(prev => ({ ...prev, teamName: false }))
+            }
+          }}
+          hasError={fieldErrors.teamName}
         />
 
         {/* Notes Editor */}
-        <NotesEditor value={notes} onChange={setNotes} />
+        <div>
+          <h3 className="text-sm font-medium text-text-secondary mb-2">Notes</h3>
+          <NotesEditor value={notes} onChange={setNotes} />
+        </div>
+
+        {/* Tags Section - collapsible */}
+        <TagsSection value={tags} onChange={setTags} />
+
+        {/* Privacy Toggle */}
+        <PrivacyToggle isPrivate={isPrivate} onChange={setIsPrivate} />
 
         {/* Error message */}
         {error && (
@@ -549,14 +640,16 @@ export function NewBuildForm() {
         </AnimatePresence>
 
         {/* Action buttons */}
-        <div className="flex flex-wrap gap-3 pt-4">
+        {/* Mobile: Publish full-width, then Cancel + ... row */}
+        {/* Desktop: All three in one row, right-aligned */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 pt-4">
           <Button
             type="submit"
             variant="primary"
             size="lg"
             isLoading={isSubmitting}
             disabled={isSubmitting}
-            className="flex-1 sm:flex-initial sm:min-w-[200px]"
+            className="w-full sm:w-auto sm:min-w-[200px]"
           >
             {isSubmitting
               ? 'Publishing...'
@@ -565,47 +658,55 @@ export function NewBuildForm() {
                 : 'Sign in to Publish'}
           </Button>
 
-          <Button
-            type="button"
-            variant="secondary"
-            size="lg"
-            onClick={handleShareDraft}
-            disabled={isSubmitting}
-            leftIcon={<Share2 className="w-4 h-4" />}
-          >
-            Share Draft
-          </Button>
+          {/* Secondary actions - row on mobile, inline on desktop */}
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              onClick={() => router.push('/')}
+              disabled={isSubmitting}
+              className="flex-1 sm:flex-none"
+            >
+              Cancel
+            </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="lg"
-            onClick={() => router.push('/')}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
+            <OverflowMenu
+              disabled={isSubmitting}
+              items={[
+                {
+                  label: 'Share Draft',
+                  icon: <Share2 className="w-4 h-4" />,
+                  onClick: handleShareDraft,
+                },
+                ...(user
+                  ? [
+                      {
+                        label: pendingCollaborators.length > 0
+                          ? `Collaborators (${pendingCollaborators.length})`
+                          : 'Add Collaborators...',
+                        icon: <Users className="w-4 h-4" />,
+                        onClick: () => setShowCollaboratorsModal(true),
+                      },
+                    ]
+                  : []),
+              ]}
+            />
+          </div>
         </div>
       </form>
 
+      {/* Collaborators Modal */}
+      <CollaboratorsModal
+        mode="draft"
+        isOpen={showCollaboratorsModal}
+        onClose={() => setShowCollaboratorsModal(false)}
+        pendingCollaborators={pendingCollaborators}
+        onPendingChange={setPendingCollaborators}
+      />
+
       {/* Loading overlay */}
-      <AnimatePresence>
-        {isSubmitting && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          >
-            <div className="bg-bg-card border-2 border-accent-gold rounded-[var(--radius-lg)] p-6 text-center">
-              <ProfessionSpinner className="mx-auto mb-3" />
-              <p className="text-text-primary font-medium">
-                Creating your build...
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <SubmitOverlay isVisible={isSubmitting} message="Creating your build..." />
 
       {/* Unsaved changes warning */}
       {typeof window !== 'undefined' && (

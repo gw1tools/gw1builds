@@ -31,6 +31,8 @@ import { HeroBuildCard } from '@/components/build/hero-build-card'
 import { TeamOverview } from '@/components/build/team-overview'
 import { VariantTabs } from '@/components/ui/variant-tabs'
 import { ReportModal } from '@/components/build/report-modal'
+import { EquipmentDisplay, hasEquipment } from '@/components/build/equipment-display'
+import { getAttributeBonusBreakdown } from '@/lib/gw/equipment/armor'
 import type { BuildWithAuthor } from '@/types/database'
 import type { ProfessionKey } from '@/types/gw1'
 
@@ -434,11 +436,14 @@ function SingleBuildView({
           </div>
 
           {/* Skill Bar */}
-          <SkillBar skills={skills} size="lg" />
+          <SkillBar skills={skills} size="lg" attributes={currentVariant.attributes} />
 
           {/* Attributes */}
           <div className="mt-5">
-            <AttributeBar attributes={currentVariant.attributes} />
+            <AttributeBar
+              attributes={currentVariant.attributes}
+              bonusBreakdown={bar.equipment?.armor ? getAttributeBonusBreakdown(bar.equipment.armor) : undefined}
+            />
           </div>
 
           {/* Divider */}
@@ -486,6 +491,11 @@ function SingleBuildView({
               )}
             </span>
           </button>
+
+          {/* Equipment Display */}
+          {bar.equipment && hasEquipment(bar.equipment) && (
+            <EquipmentDisplay equipment={bar.equipment} className="mt-4" />
+          )}
         </div>
       </div>
 

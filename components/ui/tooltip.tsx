@@ -16,6 +16,8 @@ export interface TooltipProps {
   delay?: number
   /** Disable the tooltip */
   disabled?: boolean
+  /** Extra offset/margin from the trigger element (e.g., 'mb-4' for top position) */
+  offsetClass?: string
 }
 
 /**
@@ -32,6 +34,7 @@ export function Tooltip({
   position = 'top',
   delay = 200,
   disabled = false,
+  offsetClass,
 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false)
   const timeoutRef = useRef<NodeJS.Timeout>(null)
@@ -90,7 +93,8 @@ export function Tooltip({
             exit="exit"
             className={cn(
               'absolute z-50 pointer-events-none',
-              positionClasses[position]
+              positionClasses[position],
+              offsetClass
             )}
           >
             <div className="relative">

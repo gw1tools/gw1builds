@@ -22,6 +22,8 @@ export interface SkillBarProps {
   emptyVariant?: 'viewer' | 'editor'
   /** Additional class names */
   className?: string
+  /** Current attribute values for scaling skill descriptions */
+  attributes?: Record<string, number>
 }
 
 /**
@@ -34,7 +36,7 @@ export interface SkillBarProps {
  * <SkillBar skills={skills} editable onSkillClick={handleClick} />
  */
 export const SkillBar = forwardRef<HTMLDivElement, SkillBarProps>(
-  ({ className, skills, size = 'md', editable = false, onSkillClick, activeSlot, invalidSlots = [], emptyVariant = 'viewer' }, ref) => {
+  ({ className, skills, size = 'md', editable = false, onSkillClick, activeSlot, invalidSlots = [], emptyVariant = 'viewer', attributes }, ref) => {
     // Ensure we always have 8 slots
     const normalizedSkills = useMemo(() => {
       const result = [...skills]
@@ -71,6 +73,7 @@ export const SkillBar = forwardRef<HTMLDivElement, SkillBarProps>(
             active={activeSlot === index}
             invalid={invalidSlots.includes(index)}
             emptyVariant={emptyVariant}
+            attributes={attributes}
             onSlotClick={
               editable ? () => onSkillClick?.(index, skill) : undefined
             }

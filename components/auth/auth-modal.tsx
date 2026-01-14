@@ -378,7 +378,7 @@ function SignInStep() {
           id="auth-modal-title"
           className="text-lg font-bold text-text-primary mb-1"
         >
-          Sign in to Create
+          Sign In
         </h2>
       </motion.div>
 

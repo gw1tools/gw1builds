@@ -8,26 +8,28 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Trash2, Lock } from 'lucide-react'
+import { Plus, Trash2, Users } from 'lucide-react'
 import { trackBuildEdited } from '@/lib/analytics'
 import { useAuth } from '@/components/providers/auth-provider'
 import { useAuthModal } from '@/components/auth/auth-modal'
 import { SkillBarEditor } from '@/components/editor/skill-bar-editor'
 import { NotesEditor } from '@/components/editor/notes-editor'
-import { BuildTagsSelector } from '@/components/editor/build-tags-selector'
+import { TagsSection } from '@/components/editor/tags-section'
 import { TeamSummary } from '@/components/editor/team-summary'
-import { CollaboratorsSection } from '@/components/build/collaborators-section'
+import { PrivacyToggle } from '@/components/editor/privacy-toggle'
+import { CollaboratorsModal } from '@/components/editor/collaborators-modal'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Toggle } from '@/components/ui/toggle'
+import { OverflowMenu } from '@/components/ui/overflow-menu'
+import { SubmitOverlay } from '@/components/ui/submit-overlay'
 import { ProfessionSpinner } from '@/components/ui/profession-spinner'
 import { pageTransitionVariants, listContainerVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import {
   MAX_BARS,
   MIN_BARS,
-  MAX_NAME_LENGTH,
   MIN_NAME_LENGTH,
+  MAX_NAME_LENGTH,
+  MAX_BAR_NAME_LENGTH,
   MAX_TEAM_PLAYERS,
 } from '@/lib/constants'
 import type {
@@ -76,8 +78,14 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<{
+    teamName?: boolean
+    barNames?: number[] // indices of bars with missing/invalid names
+  }>({})
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [showCollaboratorsModal, setShowCollaboratorsModal] = useState(false)
+  const [barsWithInvalidSkills, setBarsWithInvalidSkills] = useState<Set<number>>(new Set())
 
   // Collaborator state
   const [collaborators, setCollaborators] = useState<CollaboratorWithUser[]>([])
@@ -193,6 +201,25 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
   const removeBar = (index: number) => {
     if (bars.length > MIN_BARS) {
       setBars(bars.filter((_, i) => i !== index))
+      // Adjust fieldErrors.barNames indices after removal
+      if (fieldErrors.barNames?.length) {
+        setFieldErrors(prev => ({
+          ...prev,
+          barNames: prev.barNames
+            ?.filter(i => i !== index) // Remove the deleted bar's error
+            .map(i => (i > index ? i - 1 : i)), // Shift indices down
+        }))
+      }
+      // Adjust barsWithInvalidSkills indices after removal
+      setBarsWithInvalidSkills(prev => {
+        const next = new Set<number>()
+        for (const i of prev) {
+          if (i < index) next.add(i)
+          else if (i > index) next.add(i - 1)
+          // Skip i === index (removed bar)
+        }
+        return next
+      })
     }
   }
 
@@ -225,6 +252,9 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
   }
 
   const validateForm = (): string | null => {
+    const newFieldErrors: typeof fieldErrors = {}
+    let errorMessage: string | null = null
+
     if (bars.length < MIN_BARS) {
       return 'At least one skill bar is required'
     }
@@ -236,27 +266,48 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
 
     // For single builds, the first bar needs a name
     if (!isTeamBuild) {
-      if (!bars[0].name.trim()) {
-        return 'Build name is required'
-      }
-      if (bars[0].name.trim().length < MIN_NAME_LENGTH) {
-        return `Build name must be at least ${MIN_NAME_LENGTH} characters`
+      const barName = bars[0].name.trim()
+      if (!barName) {
+        newFieldErrors.barNames = [0]
+        errorMessage = 'Build name is required'
+      } else if (barName.length < MIN_NAME_LENGTH) {
+        newFieldErrors.barNames = [0]
+        errorMessage = `Build name must be at least ${MIN_NAME_LENGTH} characters`
+      } else if (barName.length > MAX_BAR_NAME_LENGTH) {
+        newFieldErrors.barNames = [0]
+        errorMessage = `Build name must be at most ${MAX_BAR_NAME_LENGTH} characters`
       }
     } else {
       // For team builds, need team name and all bars need names
-      if (!teamName.trim()) {
-        return 'Team build name is required'
-      }
-      if (teamName.trim().length < MIN_NAME_LENGTH) {
-        return `Team build name must be at least ${MIN_NAME_LENGTH} characters`
-      }
-      // Check each bar has a name
-      for (let i = 0; i < bars.length; i++) {
-        if (!bars[i].name.trim()) {
-          return `Build ${i + 1} needs a name`
-        }
+      const trimmedTeamName = teamName.trim()
+      if (!trimmedTeamName) {
+        newFieldErrors.teamName = true
+        errorMessage = 'Team build name is required'
+      } else if (trimmedTeamName.length < MIN_NAME_LENGTH) {
+        newFieldErrors.teamName = true
+        errorMessage = `Team build name must be at least ${MIN_NAME_LENGTH} characters`
+      } else if (trimmedTeamName.length > MAX_NAME_LENGTH) {
+        newFieldErrors.teamName = true
+        errorMessage = `Team build name must be at most ${MAX_NAME_LENGTH} characters`
       }
 
+      // Check each bar has a valid name
+      const barsWithInvalidNames: number[] = []
+      for (let i = 0; i < bars.length; i++) {
+        const barName = bars[i].name.trim()
+        if (!barName || barName.length < MIN_NAME_LENGTH) {
+          barsWithInvalidNames.push(i)
+        }
+      }
+      if (barsWithInvalidNames.length > 0) {
+        newFieldErrors.barNames = barsWithInvalidNames
+        if (!errorMessage) {
+          const barName = bars[barsWithInvalidNames[0]].name.trim()
+          errorMessage = !barName
+            ? `Build ${barsWithInvalidNames[0] + 1} needs a name`
+            : `Build ${barsWithInvalidNames[0] + 1} name must be at least ${MIN_NAME_LENGTH} characters`
+        }
+      }
     }
 
     // Validate total player count (applies to all builds)
@@ -265,10 +316,17 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
       0
     )
     if (totalPlayers > MAX_TEAM_PLAYERS) {
-      return `Total players (${totalPlayers}) exceeds maximum of ${MAX_TEAM_PLAYERS}`
+      errorMessage = `Total players (${totalPlayers}) exceeds maximum of ${MAX_TEAM_PLAYERS}`
     }
 
-    return null
+    // Check for invalid skills (skills that don't match profession)
+    if (barsWithInvalidSkills.size > 0) {
+      const firstInvalidBar = Math.min(...barsWithInvalidSkills)
+      errorMessage = errorMessage || `Build ${firstInvalidBar + 1} has skills that don't match its professions`
+    }
+
+    setFieldErrors(newFieldErrors)
+    return errorMessage
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -394,139 +452,118 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
 
   return (
     <motion.div
-      className="min-h-[calc(100dvh-3.5rem)] w-full max-w-4xl mx-auto px-4 py-6 sm:py-8"
+      className="min-h-[calc(100dvh-3.5rem)] w-full max-w-3xl mx-auto px-4 py-6 sm:py-8"
       variants={pageTransitionVariants}
       initial="initial"
       animate="animate"
     >
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-text-primary mb-2">
-          Edit Build
-        </h1>
-        <p className="text-sm sm:text-base text-text-secondary">
-          Update your build details
-        </p>
-      </div>
+      <h1 className="text-2xl font-bold text-text-primary mb-6">Edit Build</h1>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Tags - what is this build for? */}
-        <BuildTagsSelector value={tags} onChange={setTags} />
-
-        {/* Team build name - only shown for 2+ builds */}
-        <AnimatePresence>
-          {isTeamBuild && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Input
-                label="Team Build Name"
-                placeholder="e.g., 7-Hero Mesmerway"
-                value={teamName}
-                onChange={e => setTeamName(e.target.value)}
-                maxLength={MAX_NAME_LENGTH}
-                hint="Give your team composition a name"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Team summary - overview for collaborators */}
-        <TeamSummary bars={bars} />
-
-        {/* Skill bars */}
-        <div>
-          <label className="block text-sm font-medium text-text-secondary mb-3">
-            {isTeamBuild
-              ? `Team Builds (${totalTeamPlayers} players)`
-              : 'Your Build'}
-          </label>
-
-          <motion.div
-            className="space-y-4"
-            variants={listContainerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {bars.map((bar, index) => (
-              <div key={index} id={`skill-bar-${index}`}>
-                <SkillBarEditor
-                  index={index}
-                  totalBars={bars.length}
-                  data={bar}
-                  onChange={bar => updateBar(index, bar)}
-                  onRemove={
-                    bars.length > MIN_BARS ? () => removeBar(index) : undefined
+      <form
+        onSubmit={handleSubmit}
+        onKeyDown={e => {
+          // Never submit form via Enter - only via submit button click
+          if (e.key === 'Enter') {
+            e.preventDefault()
+          }
+        }}
+        className="space-y-5"
+      >
+        {/* Skill bars - primary content */}
+        <motion.div
+          className="space-y-4"
+          variants={listContainerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {bars.map((bar, index) => (
+            <div key={index} id={`skill-bar-${index}`}>
+              <SkillBarEditor
+                index={index}
+                totalBars={bars.length}
+                data={bar}
+                onChange={updatedBar => {
+                  updateBar(index, updatedBar)
+                  // Clear bar name error when user starts typing
+                  if (fieldErrors.barNames?.includes(index) && updatedBar.name !== bar.name) {
+                    setFieldErrors(prev => ({
+                      ...prev,
+                      barNames: prev.barNames?.filter(i => i !== index),
+                    }))
                   }
-                  onMoveUp={() => moveBarUp(index)}
-                  onMoveDown={() => moveBarDown(index)}
-                  canRemove={bars.length > MIN_BARS}
-                  totalTeamPlayers={totalTeamPlayers}
-                  maxTeamPlayers={MAX_TEAM_PLAYERS}
-                />
-              </div>
-            ))}
-          </motion.div>
+                  // Clear template error when a template is added
+                  if (updatedBar.template && updatedBar.template !== bar.template && error) {
+                    setError(null)
+                  }
+                }}
+                onRemove={
+                  bars.length > MIN_BARS ? () => removeBar(index) : undefined
+                }
+                onMoveUp={() => moveBarUp(index)}
+                onMoveDown={() => moveBarDown(index)}
+                canRemove={bars.length > MIN_BARS}
+                totalTeamPlayers={totalTeamPlayers}
+                maxTeamPlayers={MAX_TEAM_PLAYERS}
+                nameError={fieldErrors.barNames?.includes(index)}
+                onValidationChange={(hasErrors) => {
+                  setBarsWithInvalidSkills(prev => {
+                    const next = new Set(prev)
+                    if (hasErrors) {
+                      next.add(index)
+                    } else {
+                      next.delete(index)
+                    }
+                    return next
+                  })
+                }}
+              />
+            </div>
+          ))}
+        </motion.div>
 
-          {/* Add bar button */}
-          {bars.length < MAX_BARS && (
+        {/* Add bar button */}
+        {bars.length < MAX_BARS && (
+          <div className="flex justify-center">
             <Button
               type="button"
-              variant="ghost"
+              variant="secondary"
               size="md"
               onClick={addBar}
               leftIcon={<Plus className="w-4 h-4" />}
-              className="mt-4"
-              noLift
             >
-              Add another build
+              Add Team Member
             </Button>
-          )}
+          </div>
+        )}
+
+        {/* Team summary - name input + overview (appears for team builds) */}
+        <TeamSummary
+          bars={bars}
+          teamName={teamName}
+          onTeamNameChange={name => {
+            setTeamName(name)
+            // Clear team name error when user starts typing
+            if (fieldErrors.teamName) {
+              setFieldErrors(prev => ({ ...prev, teamName: false }))
+            }
+          }}
+          hasError={fieldErrors.teamName}
+        />
+
+        {/* Notes Editor */}
+        <div>
+          <h3 className="text-sm font-medium text-text-secondary mb-2">Notes</h3>
+          <NotesEditor value={notes} onChange={setNotes} />
         </div>
 
-        {/* Notes */}
-        <NotesEditor value={notes} onChange={setNotes} />
-
-        {/* Collaborators */}
-        <CollaboratorsSection
-          buildId={buildId}
-          isOwner={isOwner}
-          ownerUsername={ownerUsername}
-          collaborators={collaborators}
-          onCollaboratorAdded={handleCollaboratorAdded}
-          onCollaboratorRemoved={handleCollaboratorRemoved}
-        />
+        {/* Tags Section - collapsible */}
+        <TagsSection value={tags} onChange={setTags} />
 
         {/* Privacy Toggle - only owner can change */}
         {isOwner && (
-          <div
-            role="group"
-            onClick={(e) => {
-              // Only toggle if clicking the container, not the toggle itself
-              if ((e.target as HTMLElement).closest('button[role="switch"]')) return
-              setIsPrivate(!isPrivate)
-            }}
-            className="flex items-center justify-between py-3 px-4 bg-bg-secondary rounded-lg border border-border hover:border-border-hover transition-colors cursor-pointer"
-          >
-            <div className="flex items-center gap-3">
-              <Lock className="w-4 h-4 text-text-muted" />
-              <div>
-                <span className="text-sm font-medium text-text-primary">Private Build</span>
-                <p className="text-xs text-text-muted mt-0.5">
-                  Only visible to you and people with the link
-                </p>
-              </div>
-            </div>
-            <Toggle
-              checked={isPrivate}
-              onChange={setIsPrivate}
-              label="Toggle private build"
-            />
-          </div>
+          <PrivacyToggle isPrivate={isPrivate} onChange={setIsPrivate} />
         )}
 
         {/* Error message */}
@@ -537,41 +574,54 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
         )}
 
         {/* Action buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+        {/* Mobile: Save full-width, then Cancel + ... row */}
+        {/* Desktop: All three in one row, right-aligned */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 pt-4">
           <Button
             type="submit"
             variant="primary"
             size="lg"
             isLoading={isSubmitting}
             disabled={isSubmitting || !hasChanges()}
-            className="flex-1 sm:flex-initial sm:min-w-[200px]"
+            className="w-full sm:w-auto sm:min-w-[200px]"
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </Button>
 
-          <Button
-            type="button"
-            variant="secondary"
-            size="lg"
-            onClick={() => router.push(`/b/${buildId}`)}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-
-          {isOwner && (
+          {/* Secondary actions - row on mobile, inline on desktop */}
+          <div className="flex items-center gap-3">
             <Button
               type="button"
-              variant="danger"
+              variant="ghost"
               size="lg"
-              onClick={() => setShowDeleteConfirm(true)}
+              onClick={() => router.push(`/b/${buildId}`)}
               disabled={isSubmitting}
-              leftIcon={<Trash2 className="w-4 h-4" />}
-              className="sm:ml-auto"
+              className="flex-1 sm:flex-none"
             >
-              Delete
+              Cancel
             </Button>
-          )}
+
+            {isOwner && (
+              <OverflowMenu
+                disabled={isSubmitting}
+                items={[
+                  {
+                    label: collaborators.length > 0
+                      ? `Collaborators (${collaborators.length})`
+                      : 'Add Collaborators...',
+                    icon: <Users className="w-4 h-4" />,
+                    onClick: () => setShowCollaboratorsModal(true),
+                  },
+                  {
+                    label: 'Delete Build',
+                    icon: <Trash2 className="w-4 h-4" />,
+                    onClick: () => setShowDeleteConfirm(true),
+                    variant: 'danger' as const,
+                  },
+                ]}
+              />
+            )}
+          </div>
         </div>
       </form>
 
@@ -629,22 +679,21 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
         )}
       </AnimatePresence>
 
+      {/* Collaborators Modal */}
+      <CollaboratorsModal
+        mode="edit"
+        isOpen={showCollaboratorsModal}
+        onClose={() => setShowCollaboratorsModal(false)}
+        buildId={buildId}
+        isOwner={isOwner}
+        ownerUsername={ownerUsername}
+        collaborators={collaborators}
+        onCollaboratorAdded={handleCollaboratorAdded}
+        onCollaboratorRemoved={handleCollaboratorRemoved}
+      />
+
       {/* Loading overlay */}
-      <AnimatePresence>
-        {isSubmitting && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          >
-            <div className="bg-bg-card border-2 border-accent-gold rounded-[var(--radius-lg)] p-6 text-center">
-              <ProfessionSpinner className="mx-auto mb-3" />
-              <p className="text-text-primary font-medium">Saving changes...</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <SubmitOverlay isVisible={isSubmitting} message="Saving changes..." />
 
       {/* Unsaved changes warning */}
       {typeof window !== 'undefined' && (

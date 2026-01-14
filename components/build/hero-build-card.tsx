@@ -19,6 +19,8 @@ import { AttributeBar } from '@/components/ui/attribute-bar'
 import { ProfessionBadge } from '@/components/ui/profession-badge'
 import { Badge } from '@/components/ui/badge'
 import { VariantTabs } from '@/components/ui/variant-tabs'
+import { EquipmentDisplay, hasEquipment } from '@/components/build/equipment-display'
+import { getAttributeBonusBreakdown } from '@/lib/gw/equipment/armor'
 import type { ProfessionKey } from '@/types/gw1'
 import type { SkillBar as SkillBarType } from '@/types/database'
 
@@ -118,11 +120,14 @@ export function HeroBuildCard({
         </div>
 
         {/* Skill Bar */}
-        <SkillBar skills={skills} size="md" />
+        <SkillBar skills={skills} size="md" attributes={currentVariant.attributes} />
 
         {/* Attributes */}
         <div className="mt-4">
-          <AttributeBar attributes={currentVariant.attributes} />
+          <AttributeBar
+            attributes={currentVariant.attributes}
+            bonusBreakdown={bar.equipment?.armor ? getAttributeBonusBreakdown(bar.equipment.armor) : undefined}
+          />
         </div>
 
         {/* Template Code - integrated clickable row */}
@@ -168,6 +173,15 @@ export function HeroBuildCard({
             )}
           </span>
         </button>
+
+        {/* Equipment Display */}
+        {bar.equipment && hasEquipment(bar.equipment) && (
+          <EquipmentDisplay
+            equipment={bar.equipment}
+            equipmentId={`equipment-${index}`}
+            className="mt-3"
+          />
+        )}
       </div>
     </div>
   )

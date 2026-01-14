@@ -129,9 +129,6 @@ export async function PATCH(
     if (Array.isArray(updateData.bars)) {
       buildUpdate.bars = updateData.bars
     }
-    if (typeof updateData.is_private === 'boolean') {
-      buildUpdate.is_private = updateData.is_private
-    }
 
     // 4. Check if user can edit (owner or collaborator)
     const canEdit = await canUserEditBuild(user.id, id)
@@ -142,7 +139,16 @@ export async function PATCH(
       )
     }
 
-    // 5. Update build (validation happens in service layer)
+    // 5. Handle is_private (owner-only setting)
+    if (typeof updateData.is_private === 'boolean') {
+      const build = await getBuildById(id)
+      if (build?.author_id === user.id) {
+        buildUpdate.is_private = updateData.is_private
+      }
+      // Silently ignore is_private from collaborators
+    }
+
+    // 6. Update build (validation happens in service layer)
     await updateBuild(id, buildUpdate)
 
     return NextResponse.json({ success: true })

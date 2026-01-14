@@ -15,6 +15,7 @@ interface TeamSummaryProps {
   bars: SkillBar[]
   teamName?: string
   onTeamNameChange?: (name: string) => void
+  hasError?: boolean
   className?: string
 }
 
@@ -26,6 +27,7 @@ export function TeamSummary({
   bars,
   teamName,
   onTeamNameChange,
+  hasError,
   className,
 }: TeamSummaryProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -46,13 +48,14 @@ export function TeamSummary({
   return (
     <div
       className={cn(
-        'rounded-xl border border-border bg-bg-card overflow-hidden',
+        'rounded-xl border bg-bg-card overflow-hidden transition-colors',
+        hasError ? 'border-accent-red' : 'border-border',
         className
       )}
     >
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="flex items-stretch">
+        <div className="flex items-center gap-3 flex-1 min-w-0 px-4 py-3">
           <Users className="w-4 h-4 text-accent-gold shrink-0" />
           {isEditable ? (
             <input
@@ -70,18 +73,19 @@ export function TeamSummary({
           )}
         </div>
 
-        {/* Toggle button */}
+        {/* Toggle button - full height clickable area */}
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
-            'flex items-center gap-2 shrink-0',
-            'px-2 py-1 -mr-2 rounded-lg',
-            'hover:bg-bg-hover transition-colors cursor-pointer'
+            'flex items-center gap-2 shrink-0 px-4',
+            'hover:bg-bg-hover active:bg-bg-hover/80',
+            'transition-colors duration-150 cursor-pointer',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-gold'
           )}
         >
           <Badge variant="gold" size="sm">
-            {totalPlayers} players
+            {totalPlayers} player{totalPlayers !== 1 ? 's' : ''}
           </Badge>
           {heroCount > 0 && (
             <span className="text-xs text-text-muted">

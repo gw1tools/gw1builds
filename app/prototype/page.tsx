@@ -47,7 +47,7 @@ import { SpotlightBuildPicker } from '@/components/build/spotlight-build-picker'
 import { SpotlightSkillPicker } from '@/components/editor/skill-picker'
 import { EquipmentEditor, type EquipmentSetConfig } from '@/components/equipment/equipment-editor'
 import { calculateAttributeBonuses } from '@/lib/gw/equipment/armor'
-import { EquipmentTemplateInput } from '@/components/editor/equipment-template-input'
+import { TemplateInput } from '@/components/editor/template-input'
 import { type DecodedEquipment, toWeaponConfig } from '@/lib/gw/equipment/template'
 import { EMPTY_ARMOR_SET } from '@/types/database'
 import Image from 'next/image'
@@ -255,10 +255,11 @@ export default function PrototypePage() {
           <div className="mb-2">
             <span className="text-xs font-medium text-accent-gold uppercase tracking-wider">Equipment Code</span>
           </div>
-          <EquipmentTemplateInput
+          <TemplateInput
             value={equipmentCode}
             onChange={setEquipmentCode}
-            onDecode={handleEquipmentDecode}
+            variant="equipment"
+            onDecodeEquipment={handleEquipmentDecode}
           />
         </section>
 

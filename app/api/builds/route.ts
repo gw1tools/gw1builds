@@ -13,7 +13,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getBuilds, type BuildSortType } from '@/lib/supabase/queries'
-import { createBuild, ValidationError } from '@/lib/services/builds'
+import { createBuild, addCollaborator, ValidationError } from '@/lib/services/builds'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json()
-    const { name, bars, notes, tags, is_private } = body
+    const { name, bars, notes, tags, is_private, collaborators } = body
 
     // Create build
     const build = await createBuild({
@@ -69,6 +69,24 @@ export async function POST(request: NextRequest) {
       tags,
       is_private: is_private ?? false,
     })
+
+    // Add collaborators if provided (best-effort, don't fail the whole request)
+    if (collaborators && Array.isArray(collaborators) && collaborators.length > 0) {
+      const collaboratorResults = await Promise.allSettled(
+        collaborators.map((username: string) =>
+          addCollaborator(build.id, username, user.id)
+        )
+      )
+
+      // Log any failures but don't fail the request
+      const failures = collaboratorResults.filter(r => r.status === 'rejected')
+      if (failures.length > 0) {
+        console.warn(
+          `[POST /api/builds] ${failures.length} collaborator(s) failed to add:`,
+          failures.map(f => (f as PromiseRejectedResult).reason?.message)
+        )
+      }
+    }
 
     return NextResponse.json({ id: build.id }, { status: 201 })
   } catch (error) {

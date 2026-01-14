@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils'
 import { getAllSkills, type Skill } from '@/lib/gw/skills'
 import { SkillIcon } from '@/components/ui/skill-icon'
 import { CostStat } from '@/components/ui/cost-stat'
+import { ScaledDescription } from '@/components/ui/scaled-description'
 import { ATTRIBUTES_BY_PROFESSION, PROFESSION_TO_ID, PROFESSION_BY_ID, ATTRIBUTE_BY_ID } from '@/lib/constants'
 import { PROFESSIONS, professionToKey } from '@/types/gw1'
 import type { Profession } from '@/types/gw1'
@@ -88,6 +89,8 @@ export interface SpotlightSkillPickerProps {
   onClose: () => void
   onSelect: (skill: Skill) => void
   currentSkills: Skill[]
+  /** Current attribute values for scaling skill descriptions */
+  attributes?: Record<string, number>
 }
 
 export function SpotlightSkillPicker({
@@ -95,6 +98,7 @@ export function SpotlightSkillPicker({
   onClose,
   onSelect,
   currentSkills,
+  attributes,
 }: SpotlightSkillPickerProps) {
   const [query, setQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -317,6 +321,7 @@ export function SpotlightSkillPicker({
 
                 {activeFilter && (
                   <button
+                    type="button"
                     onClick={clearFilter}
                     className={cn(
                       'ml-12 flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer',
@@ -353,11 +358,12 @@ export function SpotlightSkillPicker({
                   )}
                 />
                 {query && (
-                  <button onClick={() => setQuery('')} className="absolute right-12 sm:right-4 text-text-muted hover:text-text-primary cursor-pointer">
+                  <button type="button" onClick={() => setQuery('')} className="absolute right-12 sm:right-4 text-text-muted hover:text-text-primary cursor-pointer">
                     <X className="w-5 h-5" />
                   </button>
                 )}
                 <button
+                  type="button"
                   onClick={onClose}
                   className="sm:hidden absolute right-3 p-1 text-text-muted hover:text-text-primary cursor-pointer"
                 >
@@ -373,6 +379,7 @@ export function SpotlightSkillPicker({
                 ) : query.trim() === '' && !activeFilter ? (
                   <div className="p-4">
                     <button
+                      type="button"
                       onClick={() => onSelect(EMPTY_SKILL)}
                       className={cn(
                         'w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all cursor-pointer',
@@ -397,6 +404,7 @@ export function SpotlightSkillPicker({
                         { label: 'Fire Magic', type: 'attribute' as const },
                       ].map(hint => (
                         <button
+                          type="button"
                           key={hint.label}
                           onClick={() => {
                             setActiveFilter({ type: hint.type, value: hint.label })
@@ -421,6 +429,7 @@ export function SpotlightSkillPicker({
                         onSelectSkill={onSelect}
                         isSkillInBar={isSkillInBar}
                         hasEliteInBar={hasEliteInBar}
+                        attributes={attributes}
                       />
                     ))}
                   </div>
@@ -432,6 +441,7 @@ export function SpotlightSkillPicker({
                       <div className="mb-2">
                         {smartSearchResults.categories.map((cat, idx) => (
                           <button
+                            type="button"
                             key={`${cat.type}-${cat.name}`}
                             data-index={idx}
                             onClick={() => handleCategoryClick(cat)}
@@ -478,6 +488,7 @@ export function SpotlightSkillPicker({
                         isInBar={isSkillInBar(skill)}
                         eliteBlocked={skill.elite && hasEliteInBar && !isSkillInBar(skill)}
                         onSelect={() => onSelect(skill)}
+                        attributes={attributes}
                       />
                     ))}
                   </div>
@@ -512,7 +523,17 @@ export function SpotlightSkillPicker({
   )
 }
 
-function SkillRowContent({ skill, isInBar }: { skill: Skill; isInBar: boolean }) {
+function SkillRowContent({
+  skill,
+  isInBar,
+  attributes,
+}: {
+  skill: Skill
+  isInBar: boolean
+  attributes?: Record<string, number>
+}) {
+  const attributeLevel = attributes?.[skill.attribute] ?? 0
+
   return (
     <>
       <div className="flex items-start gap-3 w-full">
@@ -553,7 +574,10 @@ function SkillRowContent({ skill, isInBar }: { skill: Skill; isInBar: boolean })
 
       {skill.description && (
         <p className="text-sm text-text-secondary leading-relaxed mt-2 w-full line-clamp-3">
-          {skill.description}
+          <ScaledDescription
+            description={skill.description}
+            attributeLevel={attributeLevel}
+          />
         </p>
       )}
     </>
@@ -578,18 +602,21 @@ function AttributeGroupSection({
   onSelectSkill,
   isSkillInBar,
   hasEliteInBar,
+  attributes,
 }: {
   group: AttributeGroup
   onToggleCollapse: () => void
   onSelectSkill: (skill: Skill) => void
   isSkillInBar: (skill: Skill) => boolean
   hasEliteInBar: boolean
+  attributes?: Record<string, number>
 }) {
   return (
     <div className="relative">
       <div className="sticky top-0 z-10">
         <div className="bg-gradient-to-r from-bg-card via-bg-elevated to-bg-card border-y border-border/50">
           <button
+            type="button"
             onClick={onToggleCollapse}
             className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-white/5 transition-colors w-full text-left group cursor-pointer"
           >
@@ -627,6 +654,7 @@ function AttributeGroupSection({
                     isInBar={isSkillInBar(skill)}
                     eliteBlocked={skill.elite && hasEliteInBar && !isSkillInBar(skill)}
                     onSelect={() => onSelectSkill(skill)}
+                    attributes={attributes}
                   />
                 </motion.div>
               ))}
@@ -643,16 +671,19 @@ function GroupedSkillRow({
   isInBar,
   eliteBlocked,
   onSelect,
+  attributes,
 }: {
   skill: Skill
   isInBar: boolean
   eliteBlocked: boolean
   onSelect: () => void
+  attributes?: Record<string, number>
 }) {
   const disabled = isInBar || eliteBlocked
 
   return (
     <button
+      type="button"
       onClick={() => !disabled && onSelect()}
       disabled={disabled}
       className={cn(
@@ -663,7 +694,7 @@ function GroupedSkillRow({
           : 'hover:bg-bg-hover/80 hover:border-border/50'
       )}
     >
-      <SkillRowContent skill={skill} isInBar={isInBar} />
+      <SkillRowContent skill={skill} isInBar={isInBar} attributes={attributes} />
     </button>
   )
 }
@@ -674,17 +705,20 @@ function SkillResultRow({
   isInBar,
   eliteBlocked,
   onSelect,
+  attributes,
 }: {
   skill: Skill
   isSelected: boolean
   isInBar: boolean
   eliteBlocked: boolean
   onSelect: () => void
+  attributes?: Record<string, number>
 }) {
   const disabled = isInBar || eliteBlocked
 
   return (
     <button
+      type="button"
       onClick={() => !disabled && onSelect()}
       disabled={disabled}
       className={cn(
@@ -694,7 +728,7 @@ function SkillResultRow({
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:bg-bg-hover/60'
       )}
     >
-      <SkillRowContent skill={skill} isInBar={isInBar} />
+      <SkillRowContent skill={skill} isInBar={isInBar} attributes={attributes} />
     </button>
   )
 }

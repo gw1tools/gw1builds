@@ -4,11 +4,15 @@
  * @fileoverview Build collaborators management section
  * @module components/build/collaborators-section
  *
+ * Supports two modes:
+ * - 'edit': For existing builds - makes API calls to add/remove collaborators
+ * - 'draft': For new builds - stores pending collaborators locally
+ *
  * Allows build owners to add/remove collaborators who can edit the build.
- * Shows "Shared with you by @owner" for collaborators viewing.
+ * Shows "Shared with you by @owner" for collaborators viewing (edit mode only).
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { Users, X, Loader2, Search } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -24,31 +28,65 @@ interface SearchUser {
   avatar_url: string | null
 }
 
-interface CollaboratorsSectionProps {
+/** Pending collaborator for draft mode (before build is created) */
+export interface PendingCollaborator {
+  id: string
+  username: string
+  avatar_url: string | null
+}
+
+// Edit mode props - for existing builds
+interface EditModeProps {
+  mode: 'edit'
   buildId: string
   isOwner: boolean
   ownerUsername?: string
   collaborators: CollaboratorWithUser[]
   onCollaboratorAdded: (collaborator: CollaboratorWithUser) => void
   onCollaboratorRemoved: (collaboratorId: string) => void
+}
+
+// Draft mode props - for new builds (no API calls)
+interface DraftModeProps {
+  mode: 'draft'
+  pendingCollaborators: PendingCollaborator[]
+  onPendingChange: (collaborators: PendingCollaborator[]) => void
+}
+
+type CollaboratorsSectionProps = (EditModeProps | DraftModeProps) & {
   className?: string
 }
 
 /**
- * Collaborators management section for build edit page
- *
- * - Owners see: list of collaborators + search to add
- * - Collaborators see: "Shared with you by @owner"
+ * Check if props are for edit mode
  */
-export function CollaboratorsSection({
-  buildId,
-  isOwner,
-  ownerUsername,
-  collaborators,
-  onCollaboratorAdded,
-  onCollaboratorRemoved,
-  className,
-}: CollaboratorsSectionProps) {
+function isEditMode(props: CollaboratorsSectionProps): props is EditModeProps & { className?: string } {
+  return props.mode === 'edit'
+}
+
+/**
+ * Collaborators management section for build forms
+ *
+ * @example Edit mode (existing build)
+ * <CollaboratorsSection
+ *   mode="edit"
+ *   buildId={buildId}
+ *   isOwner={true}
+ *   collaborators={collaborators}
+ *   onCollaboratorAdded={handleAdd}
+ *   onCollaboratorRemoved={handleRemove}
+ * />
+ *
+ * @example Draft mode (new build)
+ * <CollaboratorsSection
+ *   mode="draft"
+ *   pendingCollaborators={pending}
+ *   onPendingChange={setPending}
+ * />
+ */
+export function CollaboratorsSection(props: CollaboratorsSectionProps) {
+  const { className } = props
+
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchUser[]>([])
   const [isSearching, setIsSearching] = useState(false)
@@ -58,6 +96,19 @@ export function CollaboratorsSection({
   const [focusedIndex, setFocusedIndex] = useState(-1)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Get existing usernames/ids to filter from search results
+  const existingIds = useMemo(
+    () =>
+      isEditMode(props)
+        ? new Set(props.collaborators.map(c => c.user_id))
+        : new Set(props.pendingCollaborators.map(c => c.id)),
+    [props]
+  )
+
+  const currentCount = isEditMode(props)
+    ? props.collaborators.length
+    : props.pendingCollaborators.length
 
   // Search users as they type
   useEffect(() => {
@@ -73,8 +124,7 @@ export function CollaboratorsSection({
         const response = await fetch(`/api/users/search?q=${encodeURIComponent(query)}`)
         const data = await response.json()
 
-        // Filter out users already added as collaborators
-        const existingIds = new Set(collaborators.map(c => c.user_id))
+        // Filter out users already added
         const filtered = (data.users || []).filter(
           (u: SearchUser) => !existingIds.has(u.id)
         )
@@ -90,7 +140,7 @@ export function CollaboratorsSection({
     }, 300)
 
     return () => clearTimeout(timer)
-  }, [query, collaborators])
+  }, [query, existingIds])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -130,71 +180,107 @@ export function CollaboratorsSection({
   }
 
   async function handleAddUser(user: SearchUser) {
-    setIsAdding(user.id)
-    try {
-      const response = await fetch(`/api/builds/${buildId}/collaborators`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: user.username }),
-      })
+    if (isEditMode(props)) {
+      // Edit mode: make API call
+      setIsAdding(user.id)
+      try {
+        const response = await fetch(`/api/builds/${props.buildId}/collaborators`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user.username }),
+        })
 
-      const data = await response.json()
+        const data = await response.json()
 
-      if (!response.ok) {
-        toast.error(data.error || 'Failed to add collaborator')
-        return
+        if (!response.ok) {
+          toast.error(data.error || 'Failed to add collaborator')
+          return
+        }
+
+        props.onCollaboratorAdded(data.collaborator)
+        setQuery('')
+        setShowDropdown(false)
+        toast.success(`Added ${user.username} as collaborator`)
+      } catch {
+        toast.error('Failed to add collaborator')
+      } finally {
+        setIsAdding(null)
       }
-
-      onCollaboratorAdded(data.collaborator)
+    } else {
+      // Draft mode: update local state
+      const newPending: PendingCollaborator = {
+        id: user.id,
+        username: user.username,
+        avatar_url: user.avatar_url,
+      }
+      props.onPendingChange([...props.pendingCollaborators, newPending])
       setQuery('')
       setShowDropdown(false)
-      toast.success(`Added ${user.username} as collaborator`)
-    } catch {
-      toast.error('Failed to add collaborator')
-    } finally {
-      setIsAdding(null)
+      toast.success(`Added ${user.username}`)
     }
   }
 
-  async function handleRemoveCollaborator(collaboratorId: string, collabUsername: string) {
-    setRemovingId(collaboratorId)
-    try {
-      const response = await fetch(
-        `/api/builds/${buildId}/collaborators/${collaboratorId}`,
-        { method: 'DELETE' }
-      )
+  async function handleRemove(id: string, username: string) {
+    if (isEditMode(props)) {
+      // Edit mode: make API call
+      setRemovingId(id)
+      try {
+        const response = await fetch(
+          `/api/builds/${props.buildId}/collaborators/${id}`,
+          { method: 'DELETE' }
+        )
 
-      if (!response.ok) {
-        const data = await response.json()
-        toast.error(data.error || 'Failed to remove collaborator')
-        return
+        if (!response.ok) {
+          const data = await response.json()
+          toast.error(data.error || 'Failed to remove collaborator')
+          return
+        }
+
+        props.onCollaboratorRemoved(id)
+        toast.success(`Removed ${username}`)
+      } catch {
+        toast.error('Failed to remove collaborator')
+      } finally {
+        setRemovingId(null)
       }
-
-      onCollaboratorRemoved(collaboratorId)
-      toast.success(`Removed ${collabUsername}`)
-    } catch {
-      toast.error('Failed to remove collaborator')
-    } finally {
-      setRemovingId(null)
+    } else {
+      // Draft mode: update local state
+      props.onPendingChange(props.pendingCollaborators.filter(c => c.id !== id))
+      toast.success(`Removed ${username}`)
     }
   }
 
-  // Collaborator view - just show who shared it
-  if (!isOwner) {
+  // Edit mode: Collaborator view (not owner) - just show who shared it
+  if (isEditMode(props) && !props.isOwner) {
     return (
       <div className={cn('bg-bg-card border border-border rounded-xl p-4', className)}>
         <div className="flex items-center gap-2 text-sm text-text-secondary">
           <Users className="w-4 h-4 text-accent-gold" />
           <span>
             Shared with you by{' '}
-            <span className="text-text-primary font-medium">@{ownerUsername}</span>
+            <span className="text-text-primary font-medium">@{props.ownerUsername}</span>
           </span>
         </div>
       </div>
     )
   }
 
-  // Owner view - full management UI
+  // Get the list of collaborators to display
+  const displayList = isEditMode(props)
+    ? props.collaborators.map(c => ({
+        id: c.id,
+        user_id: c.user_id,
+        username: c.username,
+        avatar_url: c.avatar_url,
+      }))
+    : props.pendingCollaborators.map(c => ({
+        id: c.id,
+        user_id: c.id,
+        username: c.username,
+        avatar_url: c.avatar_url,
+      }))
+
+  // Owner view (edit mode) or draft view - full management UI
   return (
     <div className={cn('bg-bg-card border border-border rounded-xl overflow-hidden', className)}>
       {/* Header */}
@@ -203,16 +289,16 @@ export function CollaboratorsSection({
           <Users className="w-4 h-4 text-accent-gold" />
           <span className="text-sm font-medium text-text-primary">Collaborators</span>
           <span className="text-xs text-text-muted">
-            ({collaborators.length}/{MAX_COLLABORATORS})
+            ({currentCount}/{MAX_COLLABORATORS})
           </span>
         </div>
       </div>
 
       <div className="p-4 space-y-4">
         {/* Current collaborators */}
-        {collaborators.length > 0 && (
+        {displayList.length > 0 && (
           <div className="space-y-2">
-            {collaborators.map((collab) => {
+            {displayList.map((collab) => {
               const isRemoving = removingId === collab.id
               return (
                 <div
@@ -230,7 +316,7 @@ export function CollaboratorsSection({
                   </span>
                   <button
                     type="button"
-                    onClick={() => handleRemoveCollaborator(collab.id, collab.username)}
+                    onClick={() => handleRemove(collab.id, collab.username)}
                     disabled={isRemoving}
                     className={cn(
                       'p-1.5 rounded-md transition-colors',
@@ -253,7 +339,7 @@ export function CollaboratorsSection({
         )}
 
         {/* Add collaborator search */}
-        {collaborators.length < MAX_COLLABORATORS && (
+        {currentCount < MAX_COLLABORATORS && (
           <div className="relative" ref={dropdownRef}>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
@@ -327,7 +413,9 @@ export function CollaboratorsSection({
 
         {/* Helper text */}
         <p className="text-xs text-text-muted">
-          Collaborators can edit this build but cannot delete it or manage collaborators.
+          {props.mode === 'draft'
+            ? 'Collaborators will be added after you publish the build.'
+            : 'Collaborators can edit this build but cannot delete it or manage collaborators.'}
         </p>
       </div>
     </div>

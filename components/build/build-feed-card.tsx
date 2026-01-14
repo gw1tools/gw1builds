@@ -9,7 +9,7 @@
 
 import { memo } from 'react'
 import Link from 'next/link'
-import { Star, Eye, Users, AlertTriangle, ExternalLink, Lock } from 'lucide-react'
+import { Star, Eye, Users, AlertTriangle, ExternalLink, Lock, UserPlus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ProfessionBadge } from '@/components/ui/profession-badge'
 import { Badge } from '@/components/ui/badge'
@@ -185,6 +185,11 @@ export const BuildFeedCard = memo(function BuildFeedCard({
           {isPrivate && (
             <Badge variant="default" size="sm" icon={<Lock className="w-3 h-3" />}>
               Private
+            </Badge>
+          )}
+          {build.collaborator_count && (
+            <Badge variant="default" size="sm" icon={<UserPlus className="w-3 h-3" />}>
+              +{build.collaborator_count}
             </Badge>
           )}
           {isDelisted && (
