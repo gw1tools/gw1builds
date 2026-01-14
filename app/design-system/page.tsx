@@ -19,6 +19,8 @@ import {
   StarButton,
   PlayerCountControl,
   VariantTabs,
+  SkillIcon,
+  CostStat,
   SkillSlot,
   SkillBar,
   SkillBarCompact,
@@ -693,7 +695,54 @@ export default function DesignSystemPage() {
             <div className="space-y-6">
               <div>
                 <h3 className="text-sm font-medium text-text-muted mb-3">
-                  Individual Skill Slots
+                  Skill Icon (standalone, no tooltip)
+                </h3>
+                <div className="flex items-end gap-4">
+                  <div className="flex flex-col items-center gap-1">
+                    <SkillIcon skillId={946} size="lg" name="Energy Surge" elite />
+                    <span className="text-xs text-text-muted">lg (64px)</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <SkillIcon skillId={946} size="md" name="Energy Surge" elite />
+                    <span className="text-xs text-text-muted">md (56px)</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <SkillIcon skillId={946} size="sm" name="Energy Surge" />
+                    <span className="text-xs text-text-muted">sm (44px)</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <SkillIcon skillId={946} size="xs" name="Energy Surge" />
+                    <span className="text-xs text-text-muted">xs (24px)</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <SkillIcon skillId={0} size="sm" showEmptyGhost emptyVariant="viewer" />
+                    <span className="text-xs text-text-muted">empty</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <SkillIcon skillId={0} size="sm" showEmptyGhost emptyVariant="editor" />
+                    <span className="text-xs text-text-muted">editor</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-medium text-text-muted mb-3">
+                  Cost Stats
+                </h3>
+                <div className="flex items-center gap-6 text-sm">
+                  <CostStat type="energy" value={10} />
+                  <CostStat type="adrenaline" value={4} />
+                  <CostStat type="activation" value={1.5} showUnit />
+                  <CostStat type="recharge" value={20} showUnit />
+                  <CostStat type="sacrifice" value={10} showUnit />
+                  <CostStat type="upkeep" value={-1} />
+                  <CostStat type="overcast" value={2} />
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-medium text-text-muted mb-3">
+                  Individual Skill Slots (with tooltip)
                 </h3>
                 <div className="flex gap-2">
                   <SkillSlot skill={sampleSkills[0]} size="lg" />

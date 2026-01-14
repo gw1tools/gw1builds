@@ -20,6 +20,7 @@ import {
 import { cn } from '@/lib/utils'
 import { getSkillIconUrlById } from '@/lib/gw/icons'
 import { getSkillWikiUrl } from '@/lib/gw/wiki'
+import { CostStat } from '@/components/ui/cost-stat'
 
 const slotSizes = {
   xs: 'w-6 h-6',
@@ -55,6 +56,12 @@ export interface SkillSlotProps {
   empty?: boolean
   /** Click handler */
   onSlotClick?: () => void
+  /** Highlight slot as actively selected (e.g., in editor) */
+  active?: boolean
+  /** Mark skill as invalid (wrong profession) with red border */
+  invalid?: boolean
+  /** Empty slot style: 'viewer' for dark diamond, 'editor' for bright plus */
+  emptyVariant?: 'viewer' | 'editor'
   /** Additional class names */
   className?: string
 }
@@ -81,6 +88,9 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
       disabled = false,
       empty = false,
       onSlotClick,
+      active = false,
+      invalid = false,
+      emptyVariant = 'viewer',
     },
     forwardedRef
   ) => {
@@ -163,14 +173,20 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
       'hover:translate-y-0.5',
       elite ? 'shadow-sticky-gold' : 'shadow-sticky',
       isEmpty && 'border-2 border-black',
-      isEmpty ? 'bg-black/60' : 'bg-bg-card',
+      isEmpty
+        ? emptyVariant === 'editor'
+          ? 'bg-bg-card/80'
+          : 'bg-black/60'
+        : 'bg-bg-card',
       disabled && 'opacity-50 cursor-not-allowed hover:translate-y-0',
+      active && 'ring-2 ring-accent-gold ring-offset-1 ring-offset-bg-primary',
+      invalid && 'ring-2 ring-accent-red ring-offset-1 ring-offset-bg-primary',
       className
     )
 
     // Shared content
     const slotContent = isEmpty ? (
-      <EmptySlotGhost />
+      emptyVariant === 'editor' ? <EditorEmptySlotGhost /> : <EmptySlotGhost />
     ) : iconUrl && !imgError ? (
       <Image
         src={iconUrl}
@@ -274,7 +290,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
 SkillSlot.displayName = 'SkillSlot'
 
 /**
- * Ghost placeholder for empty skill slots
+ * Ghost placeholder for empty skill slots (viewer mode - dark diamond)
  */
 function EmptySlotGhost() {
   return (
@@ -285,6 +301,26 @@ function EmptySlotGhost() {
         fill="currentColor"
       >
         <path d="M12 2L2 12l10 10 10-10L12 2zm0 3.5L18.5 12 12 18.5 5.5 12 12 5.5z" />
+      </svg>
+    </div>
+  )
+}
+
+/**
+ * Ghost placeholder for empty skill slots (editor mode - bright plus)
+ */
+function EditorEmptySlotGhost() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center">
+      <svg
+        viewBox="0 0 24 24"
+        className="w-6 h-6 text-text-muted/50"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+      >
+        <path d="M12 5v14M5 12h14" />
       </svg>
     </div>
   )
@@ -382,61 +418,16 @@ function SkillTooltipContent({
           {/* Basic costs row */}
           {hasBasicCosts && (
             <div className="flex gap-3 text-xs text-text-secondary">
-              {/* Energy OR Adrenaline (mutually exclusive) */}
               {skill.adrenaline !== undefined && skill.adrenaline > 0 ? (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-adrenaline.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.adrenaline}
-                </span>
+                <CostStat type="adrenaline" value={skill.adrenaline} />
               ) : skill.energy !== undefined && skill.energy > 0 ? (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-energy.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.energy}
-                </span>
+                <CostStat type="energy" value={skill.energy} />
               ) : null}
-
-              {/* Activation */}
               {skill.activation !== undefined && skill.activation > 0 && (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-activation.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.activation}s
-                </span>
+                <CostStat type="activation" value={skill.activation} showUnit />
               )}
-
-              {/* Recharge */}
               {skill.recharge !== undefined && skill.recharge > 0 && (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-recharge.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.recharge}s
-                </span>
+                <CostStat type="recharge" value={skill.recharge} showUnit />
               )}
             </div>
           )}
@@ -444,49 +435,14 @@ function SkillTooltipContent({
           {/* Additional costs row */}
           {hasAdditionalCosts && (
             <div className="flex gap-3 text-xs text-text-secondary">
-              {/* Sacrifice */}
               {skill.sacrifice !== undefined && skill.sacrifice > 0 && (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-sacrifice.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.sacrifice}%
-                </span>
+                <CostStat type="sacrifice" value={skill.sacrifice} showUnit />
               )}
-
-              {/* Upkeep */}
               {skill.upkeep !== undefined && skill.upkeep !== 0 && (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-upkeep.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.upkeep}
-                </span>
+                <CostStat type="upkeep" value={skill.upkeep} />
               )}
-
-              {/* Overcast */}
               {skill.overcast !== undefined && skill.overcast > 0 && (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-overcast.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.overcast}
-                </span>
+                <CostStat type="overcast" value={skill.overcast} />
               )}
             </div>
           )}

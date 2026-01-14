@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils'
 import { getSkillById, type Skill } from '@/lib/gw/skills'
 import { getSkillIconUrlById } from '@/lib/gw/icons'
 import { getSkillWikiUrl } from '@/lib/gw/wiki'
+import { CostStat } from '@/components/ui/cost-stat'
 
 interface SkillMentionTooltipProps {
   skillId: string
@@ -273,57 +274,15 @@ function SkillTooltipContent({
           {hasBasicCosts && (
             <div className="flex gap-3 text-xs text-text-secondary">
               {skill.adrenaline !== undefined && skill.adrenaline > 0 ? (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-adrenaline.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.adrenaline}
-                </span>
+                <CostStat type="adrenaline" value={skill.adrenaline} />
               ) : skill.energy !== undefined && skill.energy > 0 ? (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-energy.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.energy}
-                </span>
+                <CostStat type="energy" value={skill.energy} />
               ) : null}
-
               {skill.activation !== undefined && skill.activation > 0 && (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-activation.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.activation}s
-                </span>
+                <CostStat type="activation" value={skill.activation} showUnit />
               )}
-
               {skill.recharge !== undefined && skill.recharge > 0 && (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-recharge.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.recharge}s
-                </span>
+                <CostStat type="recharge" value={skill.recharge} showUnit />
               )}
             </div>
           )}
@@ -331,45 +290,13 @@ function SkillTooltipContent({
           {hasAdditionalCosts && (
             <div className="flex gap-3 text-xs text-text-secondary">
               {skill.sacrifice !== undefined && skill.sacrifice > 0 && (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-sacrifice.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.sacrifice}%
-                </span>
+                <CostStat type="sacrifice" value={skill.sacrifice} showUnit />
               )}
-
               {skill.upkeep !== undefined && skill.upkeep !== 0 && (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-upkeep.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.upkeep}
-                </span>
+                <CostStat type="upkeep" value={skill.upkeep} />
               )}
-
               {skill.overcast !== undefined && skill.overcast > 0 && (
-                <span className="flex items-center gap-1">
-                  <Image
-                    src="/icons/tango-overcast.png"
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="shrink-0"
-                    unoptimized
-                  />
-                  {skill.overcast}
-                </span>
+                <CostStat type="overcast" value={skill.overcast} />
               )}
             </div>
           )}

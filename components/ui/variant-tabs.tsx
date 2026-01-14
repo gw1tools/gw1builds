@@ -87,19 +87,23 @@ export function VariantTabs({
               {label}
             </button>
 
-            {/* Delete button (shown on hover for non-default variants in edit mode) */}
+            {/* Delete button (shown when active or on hover for non-default variants in edit mode) */}
             {canDelete && (
               <button
                 type="button"
-                onClick={() => onDelete?.(index)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete?.(index)
+                }}
                 className={cn(
-                  'absolute right-1.5 p-0.5 rounded transition-colors cursor-pointer',
-                  'opacity-0 group-hover:opacity-100',
+                  'absolute right-1.5 p-1 rounded transition-colors cursor-pointer',
+                  // Show when active (for mobile) or on hover (for desktop)
+                  isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
                   'text-text-muted hover:text-accent-red hover:bg-accent-red/10'
                 )}
                 aria-label={`Delete ${label}`}
               >
-                <X className="w-3 h-3" />
+                <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
@@ -118,7 +122,7 @@ export function VariantTabs({
           )}
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>Add</span>
+          <span>Add Variant</span>
         </button>
       )}
     </div>

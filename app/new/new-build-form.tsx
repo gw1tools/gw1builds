@@ -25,7 +25,6 @@ import { cn } from '@/lib/utils'
 import {
   MAX_BARS,
   MIN_BARS,
-  MAX_NAME_LENGTH,
   MIN_NAME_LENGTH,
   MIN_MEANINGFUL_TEMPLATE_LENGTH,
   MIN_MEANINGFUL_NAME_LENGTH,
@@ -313,7 +312,6 @@ export function NewBuildForm() {
           return `Build ${i + 1} needs a name`
         }
       }
-
     }
 
     // Validate total player count (applies to all builds)
@@ -399,7 +397,7 @@ export function NewBuildForm() {
 
   return (
     <motion.div
-      className="min-h-[calc(100dvh-3.5rem)] w-full max-w-4xl mx-auto px-4 py-6 sm:py-8"
+      className="min-h-[calc(100dvh-3.5rem)] w-full max-w-3xl mx-auto px-4 py-6 sm:py-8"
       variants={pageTransitionVariants}
       initial="initial"
       animate="animate"
@@ -435,7 +433,18 @@ export function NewBuildForm() {
       </AnimatePresence>
 
       {/* Form */}
-      <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        onKeyDown={e => {
+          // Prevent Enter from submitting form (too easy to do accidentally)
+          // Only allow submission via the submit button click
+          if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+            e.preventDefault()
+          }
+        }}
+        className="space-y-5"
+      >
         {/* Tags - what is this build for? */}
         <BuildTagsSelector value={tags} onChange={setTags} />
 
@@ -464,41 +473,6 @@ export function NewBuildForm() {
             label="Toggle private build"
           />
         </div>
-
-        {/* Team build name - only shown for 2+ builds */}
-        <AnimatePresence>
-          {isTeamBuild && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="flex items-center gap-3 pt-2"
-            >
-              <input
-                type="text"
-                placeholder="Team build name..."
-                value={teamName}
-                onChange={e => setTeamName(e.target.value)}
-                maxLength={MAX_NAME_LENGTH}
-                className={cn(
-                  'flex-1 h-10 px-3 rounded-lg',
-                  'bg-bg-primary border border-border',
-                  'text-text-primary placeholder:text-text-muted',
-                  'transition-colors duration-150',
-                  'hover:border-border-hover',
-                  'focus:outline-none focus:border-accent-gold'
-                )}
-              />
-              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-accent-gold/15 text-accent-gold whitespace-nowrap">
-                {totalTeamPlayers} players
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Team summary - overview for collaborators */}
-        <TeamSummary bars={bars} />
 
         {/* Skill bars */}
         <motion.div
@@ -540,6 +514,13 @@ export function NewBuildForm() {
             Add Team Member
           </Button>
         )}
+
+        {/* Team summary - name input + overview (appears after adding team members) */}
+        <TeamSummary
+          bars={bars}
+          teamName={teamName}
+          onTeamNameChange={setTeamName}
+        />
 
         {/* Notes Editor */}
         <NotesEditor value={notes} onChange={setNotes} />

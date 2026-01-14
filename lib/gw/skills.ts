@@ -169,11 +169,15 @@ async function loadSkillData(): Promise<void> {
       // Skip skills without descriptions (invalid/removed skills)
       if (!desc) continue
 
+      // Strip <sic/> tags from descriptions (marks preserved errors in original data)
+      const cleanDescription = desc.description.replace(/<sic\/>/g, '')
+      const cleanConcise = desc.concise.replace(/<sic\/>/g, '')
+
       const skill: Skill = {
         id,
         name: desc.name,
-        description: desc.description,
-        concise: desc.concise,
+        description: cleanDescription,
+        concise: cleanConcise,
         profession: PROFESSION_BY_ID[data.profession] || 'Unknown',
         attributeId: data.attribute,
         attribute: ATTRIBUTE_BY_ID[data.attribute] || 'No Attribute',

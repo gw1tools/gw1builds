@@ -33,6 +33,8 @@ export {
 export { VariantTabs, type VariantTabsProps } from './variant-tabs'
 
 // Build-specific
+export { SkillIcon, type SkillIconProps } from './skill-icon'
+export { CostStat, type CostStatProps, type CostType } from './cost-stat'
 export { SkillSlot, type SkillSlotProps } from './skill-slot'
 export {
   SkillBar,

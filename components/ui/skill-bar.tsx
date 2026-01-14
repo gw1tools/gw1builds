@@ -14,6 +14,12 @@ export interface SkillBarProps {
   editable?: boolean
   /** Click handler for individual skills */
   onSkillClick?: (index: number, skill: SkillData | null) => void
+  /** Index of currently active/selected slot (0-7) */
+  activeSlot?: number | null
+  /** Indices of invalid skills (wrong profession) */
+  invalidSlots?: number[]
+  /** Empty slot style: 'viewer' for dark diamond, 'editor' for bright plus */
+  emptyVariant?: 'viewer' | 'editor'
   /** Additional class names */
   className?: string
 }
@@ -28,7 +34,7 @@ export interface SkillBarProps {
  * <SkillBar skills={skills} editable onSkillClick={handleClick} />
  */
 export const SkillBar = forwardRef<HTMLDivElement, SkillBarProps>(
-  ({ className, skills, size = 'md', editable = false, onSkillClick }, ref) => {
+  ({ className, skills, size = 'md', editable = false, onSkillClick, activeSlot, invalidSlots = [], emptyVariant = 'viewer' }, ref) => {
     // Ensure we always have 8 slots
     const normalizedSkills = useMemo(() => {
       const result = [...skills]
@@ -62,6 +68,9 @@ export const SkillBar = forwardRef<HTMLDivElement, SkillBarProps>(
             size={size}
             position={index + 1}
             empty={!skill}
+            active={activeSlot === index}
+            invalid={invalidSlots.includes(index)}
+            emptyVariant={emptyVariant}
             onSlotClick={
               editable ? () => onSkillClick?.(index, skill) : undefined
             }
