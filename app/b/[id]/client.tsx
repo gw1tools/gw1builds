@@ -9,13 +9,14 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Eye, Clock, Copy, Link2, Pencil, Check, Flag } from 'lucide-react'
+import { Eye, Clock, Copy, Link2, Pencil, Check, Flag, Lock } from 'lucide-react'
 import { useState, useMemo, useEffect } from 'react'
 import {
   trackBuildViewed,
   trackTemplateCopied,
   trackBuildShared,
 } from '@/lib/analytics'
+import { extractTextFromTiptap } from '@/lib/search/text-utils'
 import { cn } from '@/lib/utils'
 import { useVariantData } from '@/hooks'
 import { mapSkillsFromIds, type Skill } from '@/lib/gw/skills'
@@ -75,6 +76,7 @@ export function BuildPageClient({
   // Track active variant for each bar in team builds { barIndex: variantIndex }
   const [activeVariants, setActiveVariants] = useState<Record<number, number>>({})
   const isDelisted = build.moderation_status === 'delisted'
+  const isPrivate = build.is_private === true
   const [isScrolled, setIsScrolled] = useState(false)
   const { openModal } = useAuthModal()
 
@@ -127,6 +129,24 @@ export function BuildPageClient({
           </div>
         </div>
       )}
+
+      {/* Private build banner */}
+      {isPrivate && (
+        <div className="mb-6 p-4 rounded-xl border border-text-muted/30 bg-bg-secondary/50">
+          <div className="flex items-center gap-3">
+            <Lock className="w-5 h-5 text-text-muted shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-text-secondary">
+                Private Build
+              </p>
+              <p className="text-xs text-text-muted mt-0.5">
+                Only you and collaborators can see this build
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Sticky Breadcrumb + Actions Row - click to scroll to top */}
       <nav
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -229,8 +249,8 @@ export function BuildPageClient({
         </>
       )}
 
-      {/* Notes */}
-      {build.notes && build.notes.content && build.notes.content.length > 0 && (
+      {/* Notes - only show if there's actual text content */}
+      {build.notes && extractTextFromTiptap(build.notes).length > 0 && (
         <section className="mt-4">
           <div className="bg-bg-card border border-border rounded-xl p-5 shadow-sticky">
             <h2 className="text-[10px] font-semibold uppercase tracking-widest text-text-muted mb-3">

@@ -15,11 +15,12 @@ const dotVariants = {
     },
   }),
 }
-import { Plus, LogOut, Loader2, FileText } from 'lucide-react'
+import { Plus, LogOut, Loader2, FileText, Megaphone } from 'lucide-react'
 import { useAuth } from '@/components/providers/auth-provider'
 import { useAuthModal } from '@/components/auth/auth-modal'
 import { UserAvatar } from '@/components/ui/user-avatar'
 import { Button } from '@/components/ui/button'
+import { FeedbackModal } from '@/components/feedback/feedback-modal'
 import { dropdownVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -29,6 +30,7 @@ export function Header() {
   const { openModal } = useAuthModal()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false)
 
   // Close dropdown on Escape key
   useEffect(() => {
@@ -53,6 +55,15 @@ export function Header() {
       console.error('Sign out error:', error)
       toast.error('Failed to sign out. Please try again.')
       setSigningOut(false)
+    }
+  }
+
+  const handleFeedbackClick = () => {
+    if (user) {
+      setFeedbackModalOpen(true)
+    } else {
+      openModal()
+      toast.info('Sign in to send feedback')
     }
   }
 
@@ -105,6 +116,16 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
+            {/* Feedback Button - icon only on mobile, with text on desktop */}
+            <button
+              onClick={handleFeedbackClick}
+              className="flex items-center gap-1.5 h-7 px-2.5 sm:h-8 sm:px-3 rounded-full bg-bg-card border border-border text-text-secondary hover:text-text-primary hover:bg-bg-hover hover:border-border-hover shadow-sticky transition-all cursor-pointer"
+              aria-label="Send feedback"
+            >
+              <Megaphone className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline text-xs font-medium">Feedback</span>
+            </button>
+
             {/* Auth Section */}
             {user && profile ? (
               <div className="relative">
@@ -216,6 +237,12 @@ export function Header() {
           </div>
         </div>
       </div>
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={feedbackModalOpen}
+        onClose={() => setFeedbackModalOpen(false)}
+      />
     </header>
   )
 }
