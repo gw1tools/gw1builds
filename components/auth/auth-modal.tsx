@@ -31,7 +31,6 @@ import {
 import {
   modalOverlayVariants,
   modalContentVariants,
-  listItemVariants,
   MOTION_DURATION,
   MOTION_EASE,
 } from '@/lib/motion'
@@ -253,7 +252,7 @@ function AuthModal({
                 className={cn(
                   'absolute top-3 right-3 p-2 rounded-[var(--radius-md)]',
                   'text-text-muted hover:text-text-primary',
-                  'hover:bg-bg-hover transition-colors z-10'
+                  'hover:bg-bg-hover transition-colors z-10 cursor-pointer'
                 )}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -369,39 +368,32 @@ function SignInStep() {
     <div className="p-6 pt-8">
       {/* Header */}
       <motion.div
-        className="text-center mb-5"
+        className="text-center mb-6"
         initial={reducedMotion ? undefined : { opacity: 0, y: 10 }}
         animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
         transition={{ duration: MOTION_DURATION.normal, ease: MOTION_EASE.out }}
       >
         <h2
           id="auth-modal-title"
-          className="text-lg font-bold text-text-primary mb-1"
+          className="text-xl font-bold text-text-primary"
         >
           Sign In
         </h2>
       </motion.div>
 
-      {/* Simple bullet points */}
-      <motion.div
-        className="space-y-2 mb-6"
-        initial="hidden"
-        animate="visible"
-        variants={{
-          hidden: { opacity: 0 },
-          visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.05, delayChildren: 0.1 },
-          },
-        }}
+      {/* Value proposition */}
+      <motion.p
+        className="text-sm text-text-secondary text-center mb-6 leading-relaxed"
+        initial={reducedMotion ? undefined : { opacity: 0 }}
+        animate={reducedMotion ? undefined : { opacity: 1 }}
+        transition={{ delay: 0.05 }}
       >
-        <Benefit>Create, edit and delete your builds anytime</Benefit>
-        <Benefit>Star builds to store them, report builds to flag them</Benefit>
-        <Benefit>
-          We don&apos;t store your email, we&apos;ll never spam you
-        </Benefit>
-        <Benefit>No paywalls, no ads, no tracking</Benefit>
-      </motion.div>
+        Create, share, and discover Guild Wars builds.
+        <br />
+        <span className="text-text-muted">
+          Free forever. No ads, no tracking, no spam.
+        </span>
+      </motion.p>
 
       {error && (
         <motion.p
@@ -418,53 +410,23 @@ function SignInStep() {
         </motion.p>
       )}
 
-      {/* OAuth buttons */}
-      <div className="space-y-3 mb-4">
-        <Button
-          onClick={() => handleOAuthSignIn('discord', signInWithDiscord)}
-          isLoading={loadingProvider === 'discord'}
-          disabled={loadingProvider !== null}
-          className="w-full"
-          variant="secondary"
-          size="lg"
-          leftIcon={loadingProvider !== 'discord' && <DiscordIcon />}
-        >
-          Continue with Discord
-        </Button>
-
-        <Button
-          onClick={() => handleOAuthSignIn('google', signInWithGoogle)}
-          isLoading={loadingProvider === 'google'}
-          disabled={loadingProvider !== null}
-          className="w-full"
-          variant="secondary"
-          size="lg"
-          leftIcon={
-            loadingProvider !== 'google' && <GoogleIconWithBackground />
-          }
-        >
-          Continue with Google
-        </Button>
-      </div>
-
-      {/* Divider */}
-      <div className="flex items-center gap-3 my-4">
-        <div className="flex-1 h-px bg-border" />
-        <span className="text-xs text-text-muted">or</span>
-        <div className="flex-1 h-px bg-border" />
-      </div>
-
-      {/* Email magic link */}
-      <form onSubmit={handleEmailSignIn} className="space-y-3">
+      {/* Email magic link - inline layout */}
+      <motion.form
+        onSubmit={handleEmailSignIn}
+        className="flex items-stretch gap-3"
+        initial={reducedMotion ? undefined : { opacity: 0, y: 10 }}
+        animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+      >
         <input
           type="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
           placeholder="Enter your email"
           className={cn(
-            'w-full px-4 py-3',
+            'flex-1 min-w-0 px-4 py-3',
             'bg-bg-primary border border-border rounded-[var(--radius-md)]',
-            'text-text-primary placeholder:text-text-muted text-sm',
+            'text-text-primary placeholder:text-text-muted text-base',
             'focus:outline-none focus:border-accent-gold transition-colors'
           )}
           disabled={loadingProvider !== null}
@@ -473,16 +435,57 @@ function SignInStep() {
           type="submit"
           isLoading={loadingProvider === 'email'}
           disabled={loadingProvider !== null || !email.trim()}
+          variant="primary"
+          size="lg"
+          className="shrink-0 px-6"
+        >
+          Continue
+        </Button>
+      </motion.form>
+
+      {/* Divider */}
+      <div className="flex items-center gap-3 my-5">
+        <div className="flex-1 h-px bg-border" />
+        <span className="text-xs text-text-muted">or continue with</span>
+        <div className="flex-1 h-px bg-border" />
+      </div>
+
+      {/* OAuth buttons - Google first, Discord second */}
+      <motion.div
+        className="flex flex-col sm:flex-row gap-3"
+        initial={reducedMotion ? undefined : { opacity: 0, y: 10 }}
+        animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <Button
+          onClick={() => handleOAuthSignIn('google', signInWithGoogle)}
+          isLoading={loadingProvider === 'google'}
+          disabled={loadingProvider !== null}
+          className="w-full sm:flex-1"
           variant="secondary"
           size="lg"
-          className="w-full"
+          leftIcon={
+            loadingProvider !== 'google' && <GoogleIconWithBackground />
+          }
         >
-          Continue with Email
+          Google
         </Button>
-      </form>
 
-      {/* Privacy policy link */}
-      <p className="text-[11px] text-text-muted text-center mt-4">
+        <Button
+          onClick={() => handleOAuthSignIn('discord', signInWithDiscord)}
+          isLoading={loadingProvider === 'discord'}
+          disabled={loadingProvider !== null}
+          className="w-full sm:flex-1"
+          variant="secondary"
+          size="lg"
+          leftIcon={loadingProvider !== 'discord' && <DiscordIcon />}
+        >
+          Discord
+        </Button>
+      </motion.div>
+
+      {/* Privacy policy footer */}
+      <p className="text-[11px] text-text-muted text-center mt-6">
         By signing in, you agree to the{' '}
         <a
           href="/privacy"
@@ -787,19 +790,6 @@ function UsernameStep({
 // HELPER COMPONENTS
 // ============================================================================
 
-function Benefit({ children }: { children: React.ReactNode }) {
-  const reducedMotion = useReducedMotion()
-
-  return (
-    <motion.div
-      className="flex items-center gap-2.5 text-sm text-text-secondary"
-      variants={reducedMotion ? undefined : listItemVariants}
-    >
-      <div className="w-1.5 h-1.5 rounded-full bg-accent-gold shrink-0" />
-      <span>{children}</span>
-    </motion.div>
-  )
-}
 
 function GoogleIconWithBackground() {
   return (
