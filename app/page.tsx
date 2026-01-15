@@ -32,8 +32,8 @@ export default async function HomePage({
             <span className="text-accent-gold">GW1</span> Builds
           </h1>
           <p className="text-text-muted text-lg mb-18">
-            A <span className="text-accent-gold italic">lightweight</span> build
-            sharing tool for the Reforged era
+            Create, search, and share builds for the{' '}
+            <span className="text-accent-gold italic">Reforged</span> era
           </p>
 
           {/* Search + Create - always in one row */}

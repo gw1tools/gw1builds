@@ -13,48 +13,47 @@
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License">
   </a>
-  <a href="https://nextjs.org">
-    <img src="https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js" alt="Next.js">
-  </a>
-  <a href="https://www.typescriptlang.org">
-    <img src="https://img.shields.io/badge/TypeScript-5.7-3178c6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
-  </a>
-  <a href="https://tailwindcss.com">
-    <img src="https://img.shields.io/badge/Tailwind-v4-38bdf8?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS">
-  </a>
-</p>
-
-<p align="center">
-  <a href="#features">Features</a> •
-  <a href="#tech-stack">Tech Stack</a> •
-  <a href="#getting-started">Getting Started</a> •
-  <a href="#project-structure">Project Structure</a> •
-  <a href="#contributing">Contributing</a> •
-  <a href="#credits">Credits</a>
 </p>
 
 ---
 
 ## What is this?
 
-**GW1 Builds** is a modern build sharing tool for a timeless legend. No downloads, no clunky UIs. Just builds you can share with a link. 
+**GW1 Builds** is a modern build sharing tool for a timeless legend. No downloads, no clunky UIs. Just builds you can share with a link.
 
 Create your build in-game, paste the template code, add some notes, and share it with the world. That's it!
 
 **[Check it out live →](https://gw1builds.com)**
 
----
-
 ## Features
 
-- **Zero friction** - Browse builds without creating an account or downloads
-- **One-click copy** - Template codes ready to paste in-game
-- **Solo or teams** - Support for solo builds, full 8-player builds, and anything in between
-- **Rich notes** - Feature-rich editor with tool-tip skill mentions in your build descriptions
-- **Dark theme** - Because it's nice and we're all getting older
-- **Mobile friendly** - Check builds on your phone, no more "let me check when I'm on my PC"
+**Builder**
+- Paste skill template codes or pick skills manually with search
+- Paste equipment template codes or configure armor, weapons, runes, and insignias individually
+- Attribute-scaled skill descriptions show actual damage/duration at your build's level
+- Build variants for alternative setups (anti-caster, budget, etc.)
+- One-click copy for both skill and equipment codes
 
----
+**Team Builds**
+- Support for solo builds up to 12-player teams
+- Duplicate slots for flexible team compositions
+
+**Sharing & Collaboration**
+- Private builds (hidden from search, shareable via direct link)
+- Share drafts before publishing
+- Collaborators can edit your builds with you
+- Create new builds from existing ones as templates
+
+**Search**
+- Spotlight search (Cmd+K / Ctrl+K) for quick access
+- Searches both user builds and 26,000+ PvX Wiki archives
+
+**Quality of Life**
+- Browse and copy builds without an account
+- Create builds as a guest, sign up when ready to save
+- Discord and email login options
+- Dark theme and mobile friendly
+- Feedback button for bugs and suggestions
 
 ## Tech Stack
 
@@ -67,8 +66,6 @@ Create your build in-game, paste the template code, add some notes, and share it
 | [TipTap](https://tiptap.dev) | Rich text editor for build notes |
 | [Vercel](https://vercel.com) | Hosting and deployment |
 | [Claude Code](https://claude.ai) | AI-powered code companion |
-
----
 
 ## Getting Started
 
@@ -88,8 +85,6 @@ npm run dev
 ```
 
 Open [localhost:3000](http://localhost:3000) to run it locally. You need to create your Supabase project and update the `.env.local` file with your Supabase credentials.
-
----
 
 ## Project Structure
 
@@ -115,13 +110,9 @@ docs/PRD/     → Product requirement documents (some might be outdated, but I l
 
 </details>
 
----
-
 ## Contributing
 
 Found a bug or have an idea? [Open an issue](https://github.com/gw1tools/gw1builds/issues) on GitHub. The more detail you provide, the easier it is to implement. Want to contribute code? Reach out via an issue first and we'll go from there.
-
----
 
 ## Credits
 
@@ -134,8 +125,6 @@ A special thanks to:
 - **[paw·ned²](https://memorial.redeemer.biz/pawned2/)** - For continuing the TeamBuilder legacy and for the profession icon font.
 - **[build-wars](https://github.com/build-wars)** - For the template decoder and skill data.
 - **[Claude Code](https://claude.ai)** - For making this project possible. Without AI-assisted development, we wouldn't have had the time or resources to build this.
-
----
 
 ## License
 
