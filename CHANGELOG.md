@@ -15,6 +15,7 @@
 - Create builds without logging in first - sign up when you're ready to save
 - Discord and email login options added
 - Spotlight search (Cmd+K / Ctrl+K) searches both user builds and 26,000+ PvX Wiki archives
+- Submit feedback, bug reports and feature suggestions via the feedback button
 
 ## January 12, 2026
 
