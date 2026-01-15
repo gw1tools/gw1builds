@@ -12,6 +12,8 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Modal, ModalBody, ModalFooter } from '@/components/ui/modal'
+import { Button } from '@/components/ui/button'
 import {
   type ArmorSlot,
   type Rune,
@@ -26,6 +28,7 @@ import {
 } from '@/lib/gw/equipment/armor'
 import type { ArmorSetConfig, ArmorSlotConfig } from '@/types/database'
 import type { ProfessionKey } from '@/types/gw1'
+import { validateArmorForProfession, type InvalidEquipmentItem } from '@/lib/gw/equipment/validation'
 import { PROFESSION_TO_ID, ATTRIBUTES_BY_PROFESSION } from '@/lib/constants'
 
 // ============================================================================
@@ -38,6 +41,8 @@ export interface ArmorPickerModalProps {
   value: ArmorSetConfig
   onChange: (config: ArmorSetConfig) => void
   profession?: ProfessionKey
+  /** Invalid equipment items for highlighting */
+  invalidItems?: InvalidEquipmentItem[]
 }
 
 const SLOTS: { key: ArmorSlot; label: string }[] = [
@@ -54,14 +59,6 @@ type SlotTab = 'headpiece' | 'rune' | 'insignia'
 // LABEL FORMATTING HELPERS
 // ============================================================================
 
-function getTierAbbreviation(tier: string | null | undefined): string {
-  switch (tier) {
-    case 'superior': return 'Sup'
-    case 'major': return 'Maj'
-    default: return 'Min'
-  }
-}
-
 function getTierLabel(tier: string | null | undefined): string {
   switch (tier) {
     case 'superior': return 'Superior'
@@ -70,21 +67,21 @@ function getTierLabel(tier: string | null | undefined): string {
   }
 }
 
-/** Format rune name for display (abbreviated tier + category/attribute) */
+/** Format rune name for display (tier + category/attribute) */
 export function formatRuneLabel(rune: Rune): string {
-  const tierAbbr = getTierAbbreviation(rune.tier)
+  const tier = getTierLabel(rune.tier)
 
   switch (rune.category) {
     case 'vigor':
-      return `${tierAbbr} Vigor`
+      return `${tier} Vigor`
     case 'vitae':
       return 'Vitae'
     case 'attunement':
       return 'Attunement'
     case 'absorption':
-      return `${tierAbbr} Absorption`
+      return `${tier} Absorption`
     case 'attribute':
-      return rune.attribute ? `${tierAbbr} ${rune.attribute}` : rune.name.replace('Rune of ', '')
+      return rune.attribute ? `${tier} ${rune.attribute}` : rune.name.replace('Rune of ', '')
     default:
       return rune.name.replace('Rune of ', '')
   }
@@ -118,17 +115,25 @@ function ClearButton({ label, onClick }: { label: string; onClick: () => void })
 function SelectionChip({
   label,
   onClear,
+  invalid = false,
 }: {
   label: string
   onClear: () => void
+  invalid?: boolean
 }) {
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-accent-gold/15 text-accent-gold border border-accent-gold/30">
+    <span className={cn(
+      'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium border',
+      invalid
+        ? 'bg-accent-red/15 text-accent-red border-accent-red/30'
+        : 'bg-accent-gold/15 text-accent-gold border-accent-gold/30'
+    )}>
       <span className="truncate max-w-[100px]">{label}</span>
       {/* Using span instead of button to avoid nested button hydration error */}
       <span
         role="button"
         tabIndex={0}
+        aria-label={`Remove ${label}`}
         onClick={(e) => {
           e.stopPropagation()
           onClear()
@@ -142,7 +147,7 @@ function SelectionChip({
         }}
         className="p-0.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
       >
-        <X className="w-3 h-3" />
+        <X className="w-3 h-3" aria-hidden="true" />
       </span>
     </span>
   )
@@ -407,6 +412,7 @@ function SlotRow({
   onHeadAttributeChange,
   onAdvanceToNextSlot,
   profession,
+  invalidItems = [],
 }: {
   slot: ArmorSlot
   label: string
@@ -419,7 +425,12 @@ function SlotRow({
   onHeadAttributeChange?: (attr: string | null) => void
   onAdvanceToNextSlot?: () => void
   profession?: ProfessionKey
+  invalidItems?: InvalidEquipmentItem[]
 }) {
+  // Check if this slot has invalid rune, insignia, or headpiece
+  const hasInvalidRune = invalidItems.some(item => item.slot === slot && item.type === 'rune')
+  const hasInvalidInsignia = invalidItems.some(item => item.slot === slot && item.type === 'insignia')
+  const hasInvalidHeadpiece = invalidItems.some(item => item.type === 'headpiece')
   const isHeadSlot = slot === 'head'
   const [activeTab, setActiveTab] = useState<SlotTab>(isHeadSlot ? 'headpiece' : 'rune')
   const wasExpandedRef = useRef(expanded)
@@ -587,18 +598,21 @@ function SlotRow({
             <SelectionChip
               label={`+1 ${headAttribute}`}
               onClear={() => onHeadAttributeChange?.(null)}
+              invalid={hasInvalidHeadpiece}
             />
           )}
           {rune && (
             <SelectionChip
               label={formatRuneLabel(rune)}
               onClear={() => onRuneChange(null)}
+              invalid={hasInvalidRune}
             />
           )}
           {insignia && (
             <SelectionChip
               label={formatInsigniaLabel(insignia)}
               onClear={() => onInsigniaChange(null)}
+              invalid={hasInvalidInsignia}
             />
           )}
           {!rune && !insignia && !(isHeadSlot && headAttribute) && (
@@ -882,6 +896,7 @@ export function ArmorPickerModal({
   value,
   onChange,
   profession,
+  invalidItems: _parentInvalidItems = [], // Unused - we compute locally
 }: ArmorPickerModalProps) {
   const [localConfig, setLocalConfig] = useState<ArmorSetConfig>(value)
   const [expandedSlot, setExpandedSlot] = useState<ArmorSlot | null>('head')
@@ -895,11 +910,11 @@ export function ArmorPickerModal({
     }
   }, [isOpen, value])
 
-  // Lock body scroll
-  useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = '' }
-  }, [isOpen])
+  // Validate local config against profession (updates as user makes changes)
+  const localInvalidItems = useMemo(() => {
+    if (!profession) return []
+    return validateArmorForProfession(localConfig, profession)
+  }, [localConfig, profession])
 
   const handleRuneChange = useCallback((slot: ArmorSlot, runeId: number | null) => {
     setLocalConfig(prev => ({
@@ -937,73 +952,51 @@ export function ArmorPickerModal({
     return null // No next slot (we're on feet)
   }, [])
 
-  if (!isOpen) return null
-
   return (
-    <>
-      <div className="fixed inset-0 bg-black/70 z-50" onClick={onClose} />
-
-      <div className="fixed inset-x-4 top-[5%] mx-auto max-w-lg z-50">
-        <div className="bg-bg-elevated rounded-xl border border-border shadow-xl max-h-[90vh] flex flex-col">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border flex-shrink-0">
-            <h2 className="text-base font-semibold text-text-primary">Armor</h2>
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-1 rounded hover:bg-bg-hover text-text-muted hover:text-text-primary transition-colors cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Summary Section */}
-          <div className="border-b border-border bg-bg-secondary/50">
-            <ArmorSummary config={localConfig} />
-          </div>
-
-          {/* Slot Rows */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
-            {SLOTS.map(({ key, label }) => (
-              <SlotRow
-                key={key}
-                slot={key}
-                label={label}
-                config={localConfig[key]}
-                allSlots={localConfig}
-                expanded={expandedSlot === key}
-                onToggle={() => setExpandedSlot(expandedSlot === key ? null : key)}
-                onRuneChange={(runeId) => handleRuneChange(key, runeId)}
-                onInsigniaChange={(insigniaId) => handleInsigniaChange(key, insigniaId)}
-                onHeadAttributeChange={key === 'head' ? handleHeadAttributeChange : undefined}
-                onAdvanceToNextSlot={() => {
-                  const nextSlot = getNextSlot(key)
-                  setExpandedSlot(nextSlot)
-                }}
-                profession={profession}
-              />
-            ))}
-          </div>
-
-          {/* Footer */}
-          <div className="flex justify-end gap-2 px-4 py-3 border-t border-border flex-shrink-0">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-1.5 text-sm rounded-lg border border-border hover:bg-bg-hover transition-colors cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              className="px-4 py-1.5 text-sm rounded-lg bg-accent-gold text-black font-medium hover:bg-accent-gold/90 transition-colors cursor-pointer"
-            >
-              Save
-            </button>
-          </div>
-        </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Armor"
+      maxWidth="max-w-lg"
+      footerContent={
+        <ModalFooter>
+          <Button variant="secondary" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleSave}>
+            Save
+          </Button>
+        </ModalFooter>
+      }
+    >
+      {/* Summary Section */}
+      <div className="border-b border-border bg-bg-secondary/50">
+        <ArmorSummary config={localConfig} />
       </div>
-    </>
+
+      {/* Slot Rows */}
+      <ModalBody className="space-y-1.5">
+        {SLOTS.map(({ key, label }) => (
+          <SlotRow
+            key={key}
+            slot={key}
+            label={label}
+            config={localConfig[key]}
+            allSlots={localConfig}
+            expanded={expandedSlot === key}
+            onToggle={() => setExpandedSlot(expandedSlot === key ? null : key)}
+            onRuneChange={(runeId) => handleRuneChange(key, runeId)}
+            onInsigniaChange={(insigniaId) => handleInsigniaChange(key, insigniaId)}
+            onHeadAttributeChange={key === 'head' ? handleHeadAttributeChange : undefined}
+            onAdvanceToNextSlot={() => {
+              const nextSlot = getNextSlot(key)
+              setExpandedSlot(nextSlot)
+            }}
+            profession={profession}
+            invalidItems={localInvalidItems}
+          />
+        ))}
+      </ModalBody>
+    </Modal>
   )
 }

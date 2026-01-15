@@ -98,3 +98,10 @@ export {
   type CollaboratorListProps,
 } from './collaborator-list'
 export { UserAvatar, type UserAvatarProps } from './user-avatar'
+
+// Tooltips
+export {
+  SkillTooltipContent,
+  type SkillTooltipContentProps,
+  type SkillTooltipSkill,
+} from './skill-tooltip'

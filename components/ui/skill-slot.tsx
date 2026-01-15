@@ -20,8 +20,7 @@ import {
 import { cn } from '@/lib/utils'
 import { getSkillIconUrlById } from '@/lib/gw/icons'
 import { getSkillWikiUrl } from '@/lib/gw/wiki'
-import { CostStat } from '@/components/ui/cost-stat'
-import { ScaledDescription } from '@/components/ui/scaled-description'
+import { SkillTooltipContent } from '@/components/ui/skill-tooltip'
 
 const slotSizes = {
   xs: 'w-6 h-6',
@@ -184,7 +183,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
         : 'bg-bg-card',
       disabled && 'opacity-50 cursor-not-allowed hover:translate-y-0',
       active && 'ring-2 ring-accent-gold ring-offset-1 ring-offset-bg-primary',
-      invalid && 'ring-2 ring-accent-red ring-offset-1 ring-offset-bg-primary',
+      invalid && 'border-2 border-accent-red',
       className
     )
 
@@ -231,6 +230,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
               className={cn(slotClassName, 'block')}
             >
               {slotContent}
+              {invalid && <InvalidIndicator />}
             </a>
           ) : (
             // Div for empty slots or when custom handler is provided
@@ -247,6 +247,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
               className={slotClassName}
             >
               {slotContent}
+              {invalid && <InvalidIndicator />}
             </div>
           )}
         </div>
@@ -270,7 +271,21 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
                 <EmptySlotTooltip position={position} />
               ) : (
                 <SkillTooltipContent
-                  skill={skill!}
+                  skill={{
+                    id: typeof skill!.id === 'number' ? skill!.id : parseInt(String(skill!.id), 10),
+                    name: skill!.name,
+                    description: skill!.description,
+                    profession: skill!.profession,
+                    attribute: skill!.attribute,
+                    elite: skill!.elite,
+                    energy: skill!.energy,
+                    activation: skill!.activation,
+                    recharge: skill!.recharge,
+                    adrenaline: skill!.adrenaline,
+                    sacrifice: skill!.sacrifice,
+                    upkeep: skill!.upkeep,
+                    overcast: skill!.overcast,
+                  }}
                   elite={elite}
                   wikiUrl={wikiUrl}
                   showWikiLink={!canHover}
@@ -349,128 +364,23 @@ function EmptySlotTooltip({ position }: { position?: number }) {
 }
 
 /**
- * Skill tooltip content
+ * Warning indicator for invalid skills (wrong profession)
  */
-interface SkillTooltipContentProps {
-  skill: NonNullable<SkillSlotProps['skill']>
-  elite?: boolean
-  /** Wiki URL for the skill */
-  wikiUrl?: string
-  /** Show wiki link inside tooltip (for touch devices) */
-  showWikiLink?: boolean
-  /** Current attribute values for scaling skill descriptions */
-  attributes?: Record<string, number>
-}
-
-function SkillTooltipContent({
-  skill,
-  elite,
-  wikiUrl,
-  showWikiLink,
-  attributes,
-}: SkillTooltipContentProps) {
-  const hasBasicCosts =
-    (skill.energy !== undefined && skill.energy >= 0) ||
-    (skill.adrenaline !== undefined && skill.adrenaline > 0) ||
-    (skill.activation !== undefined && skill.activation > 0) ||
-    (skill.recharge !== undefined && skill.recharge > 0)
-
-  const hasAdditionalCosts =
-    (skill.sacrifice !== undefined && skill.sacrifice > 0) ||
-    (skill.upkeep !== undefined && skill.upkeep !== 0) ||
-    (skill.overcast !== undefined && skill.overcast > 0)
-
-  // Filter out "No Attribute" from display
-  const displayAttribute =
-    skill.attribute && skill.attribute !== 'No Attribute'
-      ? skill.attribute
-      : null
-  // Filter out "None" profession (used for universal PvE skills)
-  const displayProfession =
-    skill.profession && skill.profession !== 'None' ? skill.profession : null
-
+function InvalidIndicator() {
   return (
-    <div className="bg-bg-primary border border-border rounded-lg p-3.5 shadow-xl min-w-[220px] max-w-[300px]">
-      {/* Name */}
-      <div
-        className={cn(
-          'font-semibold text-base mb-1',
-          elite ? 'text-accent-gold' : 'text-text-primary'
-        )}
-      >
-        {skill.name}
-        {elite && (
-          <span className="ml-1.5 text-xs font-medium opacity-80">[Elite]</span>
-        )}
-      </div>
-
-      {/* Profession/Attribute */}
-      {(displayProfession || displayAttribute) && (
-        <div className="text-xs text-text-muted uppercase tracking-wide mb-2">
-          {displayProfession}
-          {displayProfession && displayAttribute && ' • '}
-          {displayAttribute}
-        </div>
-      )}
-
-      {/* Description */}
-      {skill.description && (
-        <div className="text-sm text-text-secondary leading-relaxed mb-2">
-          <ScaledDescription
-            description={skill.description}
-            attributeLevel={attributes?.[skill.attribute ?? ''] ?? 0}
-          />
-        </div>
-      )}
-
-      {/* Stats */}
-      {(hasBasicCosts || hasAdditionalCosts) && (
-        <div className="border-t border-border pt-2 mt-2 space-y-1.5">
-          {/* Basic costs row */}
-          {hasBasicCosts && (
-            <div className="flex gap-3 text-xs text-text-secondary">
-              {skill.adrenaline !== undefined && skill.adrenaline > 0 ? (
-                <CostStat type="adrenaline" value={skill.adrenaline} />
-              ) : skill.energy !== undefined && skill.energy > 0 ? (
-                <CostStat type="energy" value={skill.energy} />
-              ) : null}
-              {skill.activation !== undefined && skill.activation > 0 && (
-                <CostStat type="activation" value={skill.activation} showUnit />
-              )}
-              {skill.recharge !== undefined && skill.recharge > 0 && (
-                <CostStat type="recharge" value={skill.recharge} showUnit />
-              )}
-            </div>
-          )}
-
-          {/* Additional costs row */}
-          {hasAdditionalCosts && (
-            <div className="flex gap-3 text-xs text-text-secondary">
-              {skill.sacrifice !== undefined && skill.sacrifice > 0 && (
-                <CostStat type="sacrifice" value={skill.sacrifice} showUnit />
-              )}
-              {skill.upkeep !== undefined && skill.upkeep !== 0 && (
-                <CostStat type="upkeep" value={skill.upkeep} />
-              )}
-              {skill.overcast !== undefined && skill.overcast > 0 && (
-                <CostStat type="overcast" value={skill.overcast} />
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Wiki link for touch devices */}
-      {showWikiLink && wikiUrl && (
-        <a
-          href={wikiUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block text-xs text-accent-blue hover:text-accent-blue/80 mt-2 pt-2 border-t border-border"
-        >
-          Read more →
-        </a>
-      )}
+    <div
+      className="absolute -top-1 -right-1 z-10 w-4 h-4 rounded-full bg-accent-red flex items-center justify-center"
+      role="img"
+      aria-label="Invalid skill - wrong profession"
+    >
+      <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path
+          fillRule="evenodd"
+          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+          clipRule="evenodd"
+        />
+      </svg>
     </div>
   )
 }
+

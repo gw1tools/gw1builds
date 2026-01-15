@@ -219,7 +219,12 @@ export function encodeEquipmentTemplate(
 
     for (const item of items) {
       const colorId = item.color ? DYE_COLOR_IDS[item.color] : 0
-      encoder.addItem(item.itemId, colorId, item.modifierIds || [])
+      // Filter out PvE-only mods (internal IDs that aren't valid in game templates)
+      const modIds = (item.modifierIds || []).filter(id => {
+        const mod = getModifierById(id)
+        return !mod?.pveOnly
+      })
+      encoder.addItem(item.itemId, colorId, modIds)
     }
 
     return encoder.encode()

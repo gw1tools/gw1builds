@@ -1161,7 +1161,7 @@ function SpotlightSkillPicker({
                   value={query}
                   onChange={e => { setQuery(e.target.value); setSelectedIndex(0) }}
                   onKeyDown={handleKeyDown}
-                  placeholder={activeFilter ? `Search ${activeFilter.value} skills...` : 'Search skills, professions, attributes...'}
+                  placeholder={activeFilter ? 'Search...' : 'Search skills, professions, attributes...'}
                   className={cn(
                     'flex-1 bg-transparent text-text-primary py-4 pr-10 text-lg placeholder:text-text-muted focus:outline-none',
                     activeFilter ? 'pl-2' : 'pl-12'

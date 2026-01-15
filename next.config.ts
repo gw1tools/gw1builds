@@ -19,6 +19,16 @@ const nextConfig: NextConfig = {
   // Security headers
   async headers() {
     return [
+      // Cache skill icons for 1 year (immutable assets)
+      {
+        source: '/skills/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
       {
         source: '/:path*',
         headers: [

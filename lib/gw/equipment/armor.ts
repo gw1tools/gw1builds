@@ -329,6 +329,7 @@ export const ATTRIBUTE_RUNES_BY_PROFESSION: Record<ProfessionKey, Rune[]> = {
 
 // ============================================================================
 // UNIVERSAL INSIGNIAS
+// Source: https://wiki.guildwars.com/wiki/Insignia
 // ============================================================================
 
 export const UNIVERSAL_INSIGNIAS: Insignia[] = [
@@ -359,8 +360,8 @@ export const UNIVERSAL_INSIGNIAS: Insignia[] = [
   {
     id: 292,
     name: 'Stalwart Insignia',
-    effect: 'Armor +10 while using a stance',
-    condition: 'while using a stance',
+    effect: 'Armor +10 (vs. physical damage)',
+    condition: 'vs physical',
   },
   {
     id: 293,
@@ -371,8 +372,8 @@ export const UNIVERSAL_INSIGNIAS: Insignia[] = [
   {
     id: 294,
     name: 'Blessed Insignia',
-    effect: 'Armor +10 vs elemental damage',
-    condition: 'vs elemental',
+    effect: 'Armor +10 (while affected by an Enchantment)',
+    condition: 'while enchanted',
   },
   {
     id: 295,
@@ -383,8 +384,8 @@ export const UNIVERSAL_INSIGNIAS: Insignia[] = [
   {
     id: 296,
     name: "Sentry's Insignia",
-    effect: 'Armor +10 vs physical while in a defensive stance',
-    condition: 'in defensive stance',
+    effect: 'Armor +10 (while in a stance)',
+    condition: 'while in stance',
   },
 ]
 
@@ -397,34 +398,32 @@ export const WARRIOR_INSIGNIAS: Insignia[] = [
   {
     id: 313,
     name: "Knight's Insignia",
-    effect: 'Armor +10 while using a skill',
+    effect: 'Received physical damage -3',
     profession: 'warrior',
-    condition: 'while using skill',
   },
   {
     id: 314,
     name: "Lieutenant's Insignia",
-    effect: 'Armor +10 while affected by a shout or chant',
+    effect: 'Reduces Hex durations 20%, -5% damage dealt, Armor -20',
     profession: 'warrior',
-    condition: 'affected by shout/chant',
   },
   {
     id: 315,
     name: 'Stonefist Insignia',
-    effect: '+1 second knockdown duration',
+    effect: 'Knockdown duration +1 second (max 3 seconds)',
     profession: 'warrior',
   },
   {
     id: 316,
     name: 'Dreadnought Insignia',
-    effect: 'Armor +10 while suffering from Deep Wound',
+    effect: 'Armor +10 (vs. elemental damage)',
     profession: 'warrior',
-    condition: 'while Deep Wounded',
+    condition: 'vs elemental',
   },
   {
     id: 317,
     name: "Sentinel's Insignia",
-    effect: 'Armor +20 vs elemental damage',
+    effect: 'Armor +20 (requires 13 Strength, vs. elemental damage)',
     profession: 'warrior',
     condition: 'vs elemental',
   },
@@ -435,30 +434,44 @@ export const RANGER_INSIGNIAS: Insignia[] = [
   {
     id: 318,
     name: 'Frostbound Insignia',
-    effect: 'Armor +15 vs cold damage',
+    effect: 'Armor +15 (vs. Cold damage)',
     profession: 'ranger',
     condition: 'vs cold',
   },
   {
     id: 319,
     name: 'Pyrebound Insignia',
-    effect: 'Armor +15 vs fire damage',
+    effect: 'Armor +15 (vs. Fire damage)',
     profession: 'ranger',
     condition: 'vs fire',
   },
   {
     id: 320,
     name: 'Stormbound Insignia',
-    effect: 'Armor +15 vs lightning damage',
+    effect: 'Armor +15 (vs. Lightning damage)',
     profession: 'ranger',
     condition: 'vs lightning',
   },
   {
+    id: 363,
+    name: 'Earthbound Insignia',
+    effect: 'Armor +15 (vs. Earth damage)',
+    profession: 'ranger',
+    condition: 'vs earth',
+  },
+  {
     id: 321,
     name: "Scout's Insignia",
-    effect: 'Armor +10 while affected by a preparation',
+    effect: 'Armor +10 (while using a Preparation)',
     profession: 'ranger',
     condition: 'while using preparation',
+  },
+  {
+    id: 364,
+    name: "Beastmaster's Insignia",
+    effect: 'Armor +10 (while pet alive)',
+    profession: 'ranger',
+    condition: 'while pet alive',
   },
 ]
 
@@ -467,16 +480,23 @@ export const MONK_INSIGNIAS: Insignia[] = [
   {
     id: 311,
     name: "Wanderer's Insignia",
-    effect: 'Armor +15 vs elemental while affected by an enchantment',
+    effect: 'Armor +10 (vs. elemental damage)',
     profession: 'monk',
-    condition: 'vs elemental, enchanted',
+    condition: 'vs elemental',
   },
   {
     id: 312,
     name: "Disciple's Insignia",
-    effect: 'Armor +15 while affected by a condition',
+    effect: 'Armor +15 (while affected by a Condition)',
     profession: 'monk',
     condition: 'while conditioned',
+  },
+  {
+    id: 362,
+    name: "Anchorite's Insignia",
+    effect: 'Armor +5/+5/+5 (while recharging 1/3/5+ skills, max +15)',
+    profession: 'monk',
+    condition: 'while skills recharging',
   },
 ]
 
@@ -485,37 +505,42 @@ export const NECROMANCER_INSIGNIAS: Insignia[] = [
   {
     id: 302,
     name: 'Bloodstained Insignia',
-    effect: 'Armor +15 while sacrificing health',
+    effect: 'Reduces corpse spell casting time by 25%',
     profession: 'necromancer',
-    condition: 'while sacrificing',
   },
   {
     id: 303,
     name: "Tormentor's Insignia",
-    effect: 'Armor +10 while casting hexes',
+    effect: 'Armor +10; Holy damage received +6/+4/+2 (chest/legs/other)',
     profession: 'necromancer',
-    condition: 'while casting hex',
   },
   {
     id: 304,
     name: 'Bonelace Insignia',
-    effect: 'Armor +15 vs physical while affected by a condition',
+    effect: 'Armor +15 (vs. Piercing damage)',
     profession: 'necromancer',
-    condition: 'vs physical, conditioned',
+    condition: 'vs piercing',
   },
   {
     id: 305,
     name: "Minion Master's Insignia",
-    effect: 'Armor +15 vs physical while controlling minion',
+    effect: 'Armor +5/+5/+5 (while controlling 1/3/5+ minions, max +15)',
     profession: 'necromancer',
-    condition: 'vs physical, minion',
+    condition: 'while controlling minions',
   },
   {
     id: 306,
     name: "Blighter's Insignia",
-    effect: 'Armor +10 vs physical for each condition on you (max +30)',
+    effect: 'Armor +20 (while affected by a Hex)',
     profession: 'necromancer',
-    condition: 'vs physical, per condition',
+    condition: 'while hexed',
+  },
+  {
+    id: 360,
+    name: "Undertaker's Insignia",
+    effect: 'Armor +5/+5/+5/+5 (below 80%/60%/40%/20% health, max +20)',
+    profession: 'necromancer',
+    condition: 'while low health',
   },
 ]
 
@@ -524,23 +549,23 @@ export const MESMER_INSIGNIAS: Insignia[] = [
   {
     id: 301,
     name: "Virtuoso's Insignia",
-    effect: 'Armor +15 vs physical while casting spells',
+    effect: 'Armor +15 (while activating skills)',
     profession: 'mesmer',
-    condition: 'vs physical, casting',
+    condition: 'while activating skills',
   },
   {
     id: 325,
     name: "Artificer's Insignia",
-    effect: 'Armor +10 while affected by your enchantments',
+    effect: 'Armor +3 (per equipped Signet)',
     profession: 'mesmer',
-    condition: 'while self-enchanted',
+    condition: 'per signet equipped',
   },
   {
     id: 326,
     name: "Prodigy's Insignia",
-    effect: 'Armor +10 vs physical while activating skills',
+    effect: 'Armor +5/+5/+5 (while recharging 1/3/5+ skills, max +15)',
     profession: 'mesmer',
-    condition: 'vs physical, activating',
+    condition: 'while skills recharging',
   },
 ]
 
@@ -548,38 +573,38 @@ export const MESMER_INSIGNIAS: Insignia[] = [
 export const ELEMENTALIST_INSIGNIAS: Insignia[] = [
   {
     id: 307,
-    name: "Hydromancer's Insignia",
-    effect: 'Armor +10 while affected by a Water Magic spell',
+    name: 'Hydromancer Insignia',
+    effect: 'Armor +10 (vs. elemental), +10 (vs. Cold)',
     profession: 'elementalist',
-    condition: 'affected by Water Magic',
+    condition: 'vs elemental/cold',
   },
   {
     id: 308,
-    name: "Geomancer's Insignia",
-    effect: 'Armor +10 while affected by an Earth Magic spell',
+    name: 'Geomancer Insignia',
+    effect: 'Armor +10 (vs. elemental), +10 (vs. Earth)',
     profession: 'elementalist',
-    condition: 'affected by Earth Magic',
+    condition: 'vs elemental/earth',
   },
   {
     id: 309,
-    name: "Pyromancer's Insignia",
-    effect: 'Armor +10 while affected by a Fire Magic spell',
+    name: 'Pyromancer Insignia',
+    effect: 'Armor +10 (vs. elemental), +10 (vs. Fire)',
     profession: 'elementalist',
-    condition: 'affected by Fire Magic',
+    condition: 'vs elemental/fire',
   },
   {
     id: 310,
-    name: "Aeromancer's Insignia",
-    effect: 'Armor +10 while affected by an Air Magic spell',
+    name: 'Aeromancer Insignia',
+    effect: 'Armor +10 (vs. elemental), +10 (vs. Lightning)',
     profession: 'elementalist',
-    condition: 'affected by Air Magic',
+    condition: 'vs elemental/lightning',
   },
   {
     id: 327,
     name: 'Prismatic Insignia',
-    effect: 'Armor +10 vs elemental while affected by any attunement',
+    effect: 'Armor +5 per 9+ in Air/Earth/Fire/Water (max +20)',
     profession: 'elementalist',
-    condition: 'vs elemental, attuned',
+    condition: 'requires 9+ attributes',
   },
 ]
 
@@ -588,30 +613,30 @@ export const ASSASSIN_INSIGNIAS: Insignia[] = [
   {
     id: 297,
     name: "Vanguard's Insignia",
-    effect: 'Armor +10 vs physical while attacking',
+    effect: 'Armor +10 (vs. physical), +10 (vs. Blunt)',
     profession: 'assassin',
-    condition: 'vs physical, attacking',
+    condition: 'vs physical/blunt',
   },
   {
     id: 298,
     name: "Infiltrator's Insignia",
-    effect: 'Armor +10 vs physical while affected by an enchantment',
+    effect: 'Armor +10 (vs. physical), +10 (vs. Piercing)',
     profession: 'assassin',
-    condition: 'vs physical, enchanted',
+    condition: 'vs physical/piercing',
   },
   {
     id: 299,
     name: "Saboteur's Insignia",
-    effect: 'Armor +10 vs elemental while affected by a hex',
+    effect: 'Armor +10 (vs. physical), +10 (vs. Slashing)',
     profession: 'assassin',
-    condition: 'vs elemental, hexed',
+    condition: 'vs physical/slashing',
   },
   {
     id: 300,
     name: "Nightstalker's Insignia",
-    effect: 'Armor +15 vs elemental in combat',
+    effect: 'Armor +15 (while attacking)',
     profession: 'assassin',
-    condition: 'vs elemental, in combat',
+    condition: 'while attacking',
   },
 ]
 
@@ -620,23 +645,23 @@ export const RITUALIST_INSIGNIAS: Insignia[] = [
   {
     id: 322,
     name: "Shaman's Insignia",
-    effect: 'Armor +15 vs physical while holding an item',
+    effect: 'Armor +5/+5/+5 (while controlling 1/2/3+ spirits, max +15)',
     profession: 'ritualist',
-    condition: 'vs physical, holding item',
+    condition: 'while controlling spirits',
   },
   {
     id: 323,
     name: 'Ghost Forge Insignia',
-    effect: 'Armor +10 while casting binding rituals',
+    effect: 'Armor +15 (while affected by a Weapon Spell)',
     profession: 'ritualist',
-    condition: 'casting ritual',
+    condition: 'while affected by weapon spell',
   },
   {
     id: 324,
     name: "Mystic's Insignia",
-    effect: 'Armor +10 while affected by a weapon spell',
+    effect: 'Armor +15 (while activating skills)',
     profession: 'ritualist',
-    condition: 'affected by weapon spell',
+    condition: 'while activating skills',
   },
 ]
 
@@ -645,9 +670,9 @@ export const PARAGON_INSIGNIAS: Insignia[] = [
   {
     id: 367,
     name: "Centurion's Insignia",
-    effect: 'Armor +10 vs physical while affected by a shout or chant',
+    effect: 'Armor +10 (while affected by a Shout, Echo, or Chant)',
     profession: 'paragon',
-    condition: 'vs physical, shout/chant',
+    condition: 'while affected by shout/chant',
   },
 ]
 
@@ -656,14 +681,14 @@ export const DERVISH_INSIGNIAS: Insignia[] = [
   {
     id: 365,
     name: 'Windwalker Insignia',
-    effect: 'Armor +10 while affected by one of your enchantments',
+    effect: 'Armor +5/+5/+5/+5 (while affected by 1/2/3/4+ enchantments, max +20)',
     profession: 'dervish',
-    condition: 'while self-enchanted',
+    condition: 'while enchanted',
   },
   {
     id: 366,
     name: 'Forsaken Insignia',
-    effect: 'Armor +10 while not affected by an enchantment',
+    effect: 'Armor +10 (while not affected by an Enchantment)',
     profession: 'dervish',
     condition: 'while not enchanted',
   },

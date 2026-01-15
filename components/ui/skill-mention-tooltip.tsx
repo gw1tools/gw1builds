@@ -9,7 +9,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
 import {
   useFloating,
   offset,
@@ -27,9 +26,8 @@ import {
 } from '@floating-ui/react'
 import { cn } from '@/lib/utils'
 import { getSkillById, type Skill } from '@/lib/gw/skills'
-import { getSkillIconUrlById } from '@/lib/gw/icons'
 import { getSkillWikiUrl } from '@/lib/gw/wiki'
-import { CostStat } from '@/components/ui/cost-stat'
+import { SkillTooltipContent } from '@/components/ui/skill-tooltip'
 
 interface SkillMentionTooltipProps {
   skillId: string
@@ -127,9 +125,10 @@ export function SkillMentionTooltip({
           >
             <SkillTooltipContent
               skill={skill}
-              label={label}
               elite={elite}
+              showIcon
               loading={loading}
+              fallbackLabel={label}
             />
             <FloatingArrow
               ref={arrowRef}
@@ -145,163 +144,3 @@ export function SkillMentionTooltip({
   )
 }
 
-/**
- * Tooltip content with skill icon and details
- */
-function SkillTooltipContent({
-  skill,
-  label,
-  elite,
-  loading,
-}: {
-  skill: Skill | null
-  label: string
-  elite: boolean
-  loading: boolean
-}) {
-  const [imgError, setImgError] = useState(false)
-  const iconUrl = skill ? getSkillIconUrlById(skill.id) : null
-
-  if (loading) {
-    return (
-      <div className="bg-bg-primary border border-border rounded-lg p-3 shadow-xl min-w-[200px]">
-        <div className="animate-pulse flex gap-3">
-          <div className="w-12 h-12 bg-bg-hover rounded" />
-          <div className="flex-1 space-y-2">
-            <div className="h-4 bg-bg-hover rounded w-3/4" />
-            <div className="h-3 bg-bg-hover rounded w-1/2" />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (!skill) {
-    return (
-      <div className="bg-bg-primary border border-border rounded-lg p-3 shadow-xl min-w-[180px]">
-        <div
-          className={cn(
-            'font-semibold text-sm',
-            elite ? 'text-accent-gold' : 'text-text-primary'
-          )}
-        >
-          {label}
-        </div>
-        <div className="text-xs text-text-muted mt-1">
-          Skill details unavailable
-        </div>
-      </div>
-    )
-  }
-
-  const hasBasicCosts =
-    (skill.energy !== undefined && skill.energy >= 0) ||
-    (skill.adrenaline !== undefined && skill.adrenaline > 0) ||
-    (skill.activation !== undefined && skill.activation > 0) ||
-    (skill.recharge !== undefined && skill.recharge > 0)
-
-  const hasAdditionalCosts =
-    (skill.sacrifice !== undefined && skill.sacrifice > 0) ||
-    (skill.upkeep !== undefined && skill.upkeep !== 0) ||
-    (skill.overcast !== undefined && skill.overcast > 0)
-
-  return (
-    <div className="bg-bg-primary border border-border rounded-lg p-3.5 shadow-xl min-w-[260px] max-w-[320px]">
-      {/* Header with icon */}
-      <div className="flex gap-3">
-        {/* Skill Icon */}
-        <div
-          className={cn(
-            'w-12 h-12 flex-shrink-0 rounded overflow-hidden',
-            elite ? 'shadow-sticky-gold' : 'shadow-sticky'
-          )}
-        >
-          {iconUrl && !imgError ? (
-            <Image
-              src={iconUrl}
-              alt={skill.name}
-              width={48}
-              height={48}
-              className="object-cover"
-              onError={() => setImgError(true)}
-              unoptimized
-            />
-          ) : (
-            <div className="w-full h-full bg-bg-card flex items-center justify-center">
-              <span className="text-xs font-bold text-text-muted">
-                {skill.name.slice(0, 2).toUpperCase()}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Name and type */}
-        <div className="flex-1 min-w-0">
-          <div
-            className={cn(
-              'font-semibold text-base leading-tight',
-              elite ? 'text-accent-gold' : 'text-text-primary'
-            )}
-          >
-            {skill.name}
-            {elite && (
-              <span className="ml-1.5 text-xs font-medium opacity-80">
-                [Elite]
-              </span>
-            )}
-          </div>
-          {((skill.profession && skill.profession !== 'None') ||
-            (skill.attribute && skill.attribute !== 'No Attribute')) && (
-            <div className="text-xs text-text-muted uppercase tracking-wide mt-0.5">
-              {skill.profession !== 'None' && skill.profession}
-              {skill.profession !== 'None' && skill.attribute && skill.attribute !== 'No Attribute' && ' • '}
-              {skill.attribute && skill.attribute !== 'No Attribute' && skill.attribute}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Description */}
-      {skill.description && (
-        <div className="text-sm text-text-secondary leading-relaxed mt-3">
-          {skill.description}
-        </div>
-      )}
-
-      {/* Stats */}
-      {(hasBasicCosts || hasAdditionalCosts) && (
-        <div className="border-t border-border pt-2 mt-3 space-y-1.5">
-          {hasBasicCosts && (
-            <div className="flex gap-3 text-xs text-text-secondary">
-              {skill.adrenaline !== undefined && skill.adrenaline > 0 ? (
-                <CostStat type="adrenaline" value={skill.adrenaline} />
-              ) : skill.energy !== undefined && skill.energy > 0 ? (
-                <CostStat type="energy" value={skill.energy} />
-              ) : null}
-              {skill.activation !== undefined && skill.activation > 0 && (
-                <CostStat type="activation" value={skill.activation} showUnit />
-              )}
-              {skill.recharge !== undefined && skill.recharge > 0 && (
-                <CostStat type="recharge" value={skill.recharge} showUnit />
-              )}
-            </div>
-          )}
-
-          {hasAdditionalCosts && (
-            <div className="flex gap-3 text-xs text-text-secondary">
-              {skill.sacrifice !== undefined && skill.sacrifice > 0 && (
-                <CostStat type="sacrifice" value={skill.sacrifice} showUnit />
-              )}
-              {skill.upkeep !== undefined && skill.upkeep !== 0 && (
-                <CostStat type="upkeep" value={skill.upkeep} />
-              )}
-              {skill.overcast !== undefined && skill.overcast > 0 && (
-                <CostStat type="overcast" value={skill.overcast} />
-              )}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}

@@ -15,7 +15,7 @@ import {
   type BowType,
   BOW_TYPE_LABELS,
 } from '@/lib/gw/equipment/items'
-import { formatEffectMaxValue } from '@/lib/gw/equipment/modifiers'
+import { formatEffectMaxValue, type Modifier } from '@/lib/gw/equipment/modifiers'
 import { getProfessionForAttribute } from '@/lib/gw/attributes'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
 import {
@@ -63,6 +63,13 @@ const WEAPON_SLOTS: SlotType[] = ['mainHand', 'offHand']
 
 // GW1 PvP item text color (the blue used for PvP weapons)
 const PVP_BLUE = '#AAD9FF'
+
+/**
+ * Check if a weapon config has any PvE-only mods equipped
+ */
+function hasPveOnlyMods(weapon: WeaponConfig): boolean {
+  return [weapon.prefix, weapon.suffix, weapon.inscription].some(mod => mod?.pveOnly)
+}
 
 /**
  * Build full weapon name: [Prefix] [Item] [Suffix]
@@ -277,6 +284,11 @@ export function EquipmentEditor({ value, onChange, profession, className }: Equi
     return [runeSummary, insigniaSummary].filter(Boolean).join(' · ')
   }, [])
 
+  // Detect if any PvE-only mods are equipped
+  const hasPveEquipment = useMemo(() => {
+    return hasPveOnlyMods(config.mainHand) || hasPveOnlyMods(config.offHand)
+  }, [config.mainHand, config.offHand])
+
   // Generate template code
   const templateCode = useMemo(() => {
     if (!config.mainHand.item) return null
@@ -381,23 +393,31 @@ export function EquipmentEditor({ value, onChange, profession, className }: Equi
       </div>
 
       {/* Template Code (only if weapon selected) */}
-      {templateCode && (
+      {config.mainHand.item && (
         <div className="flex items-center gap-2 px-2.5 py-2 bg-bg-card border border-border rounded">
-          <code className="flex-1 text-[11px] font-mono text-text-muted truncate">
-            {templateCode}
-          </code>
-          <button
-            type="button"
-            onClick={handleCopy}
-            className={cn(
-              'flex-shrink-0 p-1 rounded transition-colors cursor-pointer',
-              copied
-                ? 'bg-accent-green/20 text-accent-green'
-                : 'bg-bg-hover text-text-muted hover:text-text-primary'
-            )}
-          >
-            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-          </button>
+          {hasPveEquipment ? (
+            <span className="flex-1 text-[11px] text-text-muted italic">
+              PvE-only equipment (no template code)
+            </span>
+          ) : templateCode ? (
+            <>
+              <code className="flex-1 text-[11px] font-mono text-text-muted truncate">
+                {templateCode}
+              </code>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className={cn(
+                  'flex-shrink-0 p-1 rounded transition-colors cursor-pointer',
+                  copied
+                    ? 'bg-accent-green/20 text-accent-green'
+                    : 'bg-bg-hover text-text-muted hover:text-text-primary'
+                )}
+              >
+                {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              </button>
+            </>
+          ) : null}
         </div>
       )}
 

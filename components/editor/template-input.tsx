@@ -8,7 +8,7 @@
 
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, AlertCircle, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -44,41 +44,31 @@ export function TemplateInput({
   const [decodeState, setDecodeState] = useState<DecodeState>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const [showSuccessToast, setShowSuccessToast] = useState(false)
-  const lastDecodedRef = useRef('')
-
-  const defaultPlaceholder = 'Paste template code...'
 
   const successMessage = variant === 'equipment'
     ? 'Equipment decoded'
     : 'Template decoded'
 
   // Sync decode state when value changes externally (e.g., generated equipment code)
-  // This is intentional "sync props to state" pattern - we need to update UI when
-  // the parent component changes the value prop (like when equipment is configured)
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional sync from prop
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- intentional prop-to-state sync */
     const trimmed = value.trim()
-    if (trimmed && trimmed !== lastDecodedRef.current) {
+    if (trimmed) {
       const isValid = variant === 'equipment'
         ? decodeEquipmentTemplate(trimmed) !== null
         : decodeTemplate(trimmed).success
 
-      if (isValid) {
-        lastDecodedRef.current = trimmed
-        setDecodeState('success')
-        setErrorMessage('')
-      }
-    } else if (!trimmed) {
-      lastDecodedRef.current = ''
+      setDecodeState(isValid ? 'success' : 'idle')
+      setErrorMessage('')
+    } else {
       setDecodeState('idle')
       setErrorMessage('')
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [value, variant])
 
   /**
-   * Attempt to decode the template code
-   * @param code - The template code to decode
-   * @param showToast - Whether to show success toast (true for paste, false for blur)
+   * Attempt to decode the template code and fire callback
    */
   const tryDecode = useCallback(
     (code: string, showToast: boolean) => {
@@ -90,15 +80,11 @@ export function TemplateInput({
         return
       }
 
-      // Skip if already decoded this exact value
-      if (trimmed === lastDecodedRef.current) return
-
       if (variant === 'equipment') {
         const result = decodeEquipmentTemplate(trimmed)
         if (result) {
           setDecodeState('success')
           setErrorMessage('')
-          lastDecodedRef.current = trimmed
 
           if (showToast) {
             setShowSuccessToast(true)
@@ -115,7 +101,6 @@ export function TemplateInput({
         if (result.success) {
           setDecodeState('success')
           setErrorMessage('')
-          lastDecodedRef.current = trimmed
 
           if (showToast) {
             setShowSuccessToast(true)
@@ -143,11 +128,20 @@ export function TemplateInput({
   }
 
   const handleBlur = () => {
-    // Validate on blur but don't show toast (silent decode)
-    // This handles manual typing without annoying toasts
+    // Decode on blur if there's a value
     const trimmed = value.trim()
-    if (trimmed && trimmed !== lastDecodedRef.current) {
+    if (trimmed) {
       tryDecode(value, false)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const trimmed = value.trim()
+      if (trimmed) {
+        tryDecode(value, true)
+      }
     }
   }
 
@@ -165,7 +159,8 @@ export function TemplateInput({
           value={value}
           onChange={handleChange}
           onBlur={handleBlur}
-          placeholder={placeholder || defaultPlaceholder}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder ?? 'Paste template code...'}
           className={cn(
             'w-full h-10 px-3 pr-10 rounded-lg font-mono text-sm',
             'bg-bg-primary border border-border',

@@ -39,6 +39,7 @@ import { getWeaponEffects } from '@/components/equipment/weapon-summary'
 import { ArmorPickerModal } from '@/components/equipment/armor-picker-modal'
 import { buildWeaponName } from '@/components/equipment/equipment-editor'
 import { getRuneById, getInsigniaById } from '@/lib/gw/equipment/armor'
+import type { InvalidEquipmentItem } from '@/lib/gw/equipment/validation'
 import { formatRuneLabel, formatInsigniaLabel } from '@/components/equipment/armor-picker-modal'
 import { TemplateInput } from '@/components/editor/template-input'
 
@@ -46,6 +47,8 @@ export interface EquipmentSectionProps {
   value?: Equipment
   onChange: (equipment: Equipment | undefined) => void
   profession?: ProfessionKey
+  /** Invalid equipment items (runes/insignias that don't match profession) */
+  invalidItems?: InvalidEquipmentItem[]
   className?: string
 }
 
@@ -104,6 +107,7 @@ function EquipmentSlot({
   icon: Icon,
   label,
   isConfigured,
+  hasError = false,
   title,
   subtitle,
   effects,
@@ -114,6 +118,7 @@ function EquipmentSlot({
   icon: typeof Sword
   label: string
   isConfigured: boolean
+  hasError?: boolean
   title?: string
   /** Subtitle shown above title (e.g., weapon attribute like "Earth Magic") */
   subtitle?: string
@@ -131,9 +136,11 @@ function EquipmentSlot({
         'w-full text-left rounded-xl border transition-colors duration-150',
         disabled && 'opacity-40 cursor-not-allowed',
         !disabled && 'cursor-pointer',
-        isConfigured
-          ? 'bg-bg-elevated border-border-hover hover:border-accent-gold/50'
-          : 'bg-bg-secondary border-border/40 hover:border-border-hover'
+        hasError
+          ? 'bg-accent-red/5 border-accent-red/50 hover:border-accent-red'
+          : isConfigured
+            ? 'bg-bg-elevated border-border-hover hover:border-accent-gold/50'
+            : 'bg-bg-secondary border-border/40 hover:border-border-hover'
       )}
     >
       {/* Header row with icon and label */}
@@ -143,9 +150,11 @@ function EquipmentSlot({
       )}>
         <div className={cn(
           'flex items-center justify-center w-7 h-7 rounded-lg',
-          isConfigured
-            ? 'bg-accent-gold/15 text-accent-gold'
-            : 'bg-bg-card text-text-muted'
+          hasError
+            ? 'bg-accent-red/15 text-accent-red'
+            : isConfigured
+              ? 'bg-accent-gold/15 text-accent-gold'
+              : 'bg-bg-card text-text-muted'
         )}>
           <Icon className="w-4 h-4" />
         </div>
@@ -290,6 +299,7 @@ export function EquipmentSection({
   value,
   onChange,
   profession,
+  invalidItems = [],
   className,
 }: EquipmentSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -557,6 +567,7 @@ export function EquipmentSection({
                   icon={Shield}
                   label="Armor"
                   isConfigured={hasArmor}
+                  hasError={invalidItems.length > 0}
                   title={runeSummary ?? undefined}
                   subtitle={insigniaSummary ?? undefined}
                   emptyText="Configure runes & insignias"
@@ -585,6 +596,7 @@ export function EquipmentSection({
           value={value?.armor || EMPTY_ARMOR_SET}
           onChange={handleArmorChange}
           profession={profession}
+          invalidItems={invalidItems}
         />
       )}
     </div>
