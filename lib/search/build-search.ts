@@ -156,6 +156,67 @@ const MATCH_SCORES = {
 } as const
 
 // ============================================================================
+// FILTERED FUSE INDEX CACHE
+// ============================================================================
+
+/** LRU cache for Fuse indexes filtered by active filters */
+interface CachedFuseIndex {
+  fuse: Fuse<SearchableBuild>
+  buildIds: Set<string>
+}
+
+const filteredFuseCache = new Map<string, CachedFuseIndex>()
+const MAX_FUSE_CACHE_SIZE = 5
+
+/** Generate a stable cache key for a filter combination */
+function getFilterCacheKey(filters: BuildFilter[], filterMode: FilterMode): string {
+  const sortedFilters = filters
+    .map(f => f.type === 'profession'
+      ? `${f.type}:${f.value.toLowerCase()}:${f.role ?? 'any'}`
+      : `${f.type}:${f.value.toLowerCase()}`
+    )
+    .sort()
+    .join('|')
+  return `${sortedFilters}-${filterMode}`
+}
+
+/** Get or create a Fuse index for filtered builds (LRU cached) */
+function getFilteredFuse(
+  filteredBuilds: SearchableBuild[],
+  filters: BuildFilter[],
+  filterMode: FilterMode
+): Fuse<SearchableBuild> {
+  const cacheKey = getFilterCacheKey(filters, filterMode)
+  const cached = filteredFuseCache.get(cacheKey)
+
+  if (cached) {
+    const currentBuildIds = new Set(filteredBuilds.map(b => b.id))
+    const isValid = cached.buildIds.size === currentBuildIds.size &&
+      [...cached.buildIds].every(id => currentBuildIds.has(id))
+
+    if (isValid) return cached.fuse
+    filteredFuseCache.delete(cacheKey)
+  }
+
+  const newFuse = new Fuse(filteredBuilds, FUSE_NAME_OPTIONS)
+  const buildIds = new Set(filteredBuilds.map(b => b.id))
+
+  // LRU eviction
+  if (filteredFuseCache.size >= MAX_FUSE_CACHE_SIZE) {
+    const oldestKey = filteredFuseCache.keys().next().value
+    if (oldestKey) filteredFuseCache.delete(oldestKey)
+  }
+
+  filteredFuseCache.set(cacheKey, { fuse: newFuse, buildIds })
+  return newFuse
+}
+
+/** Clear the filtered Fuse cache (call when build list reloads) */
+export function clearFilteredFuseCache(): void {
+  filteredFuseCache.clear()
+}
+
+// ============================================================================
 // FUSE.JS CONFIGURATION - NAME ONLY
 // ============================================================================
 
@@ -891,8 +952,9 @@ export function searchBuilds(
   const hasCategoricalMatch = primaryMatchType === 'tag' || primaryMatchType === 'profession'
 
   if (!hasCategoricalMatch) {
+    // Use cached Fuse index for filtered builds to avoid expensive recreation
     const searchFuse = filters && filters.length > 0
-      ? new Fuse(searchableBuilds, FUSE_NAME_OPTIONS)
+      ? getFilteredFuse(searchableBuilds, filters, filterMode)
       : fuse
 
     const fuseResults = searchFuse.search(trimmedQuery, { limit: MAX_RESULTS })
