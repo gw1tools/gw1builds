@@ -84,6 +84,7 @@ export function NotesEditor({ value, onChange, footer }: NotesEditorProps) {
 
   // Detect touch device on mount
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- window only available client-side
     setIsTouchDevice(!window.matchMedia('(hover: hover)').matches)
   }, [])
 
@@ -490,7 +491,7 @@ export function NotesEditor({ value, onChange, footer }: NotesEditorProps) {
       </div>
 
       {/* Helper text and character count */}
-      <div className="flex items-center justify-between mt-1.5 text-xs text-text-muted">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mt-1.5 text-xs text-text-muted">
         <p>
           <span className="text-text-secondary">Tip:</span>{' '}
           {isTouchDevice ? (
@@ -507,7 +508,7 @@ export function NotesEditor({ value, onChange, footer }: NotesEditorProps) {
             </>
           )}
         </p>
-        <span className={cn(isOverLimit && 'text-accent-red font-medium')}>
+        <span className={cn('self-end sm:self-auto', isOverLimit && 'text-accent-red font-medium')}>
           {charCount.toLocaleString()} / {MAX_NOTES_LENGTH.toLocaleString()}
         </span>
       </div>

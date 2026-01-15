@@ -7,3 +7,5 @@ export { useBuildDraft } from './use-build-draft'
 export type { UseBuildDraftReturn } from './use-build-draft'
 
 export { useSearchAnalytics } from './use-search-analytics'
+
+export { useVariantData } from './use-variant-data'

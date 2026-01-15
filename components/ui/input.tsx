@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   /** Label text */
   label?: string
-  /** Error message */
-  error?: string
+  /** Error message (string) or just error state (boolean) */
+  error?: string | boolean
   /** Helper text below input */
   hint?: string
   /** Left icon or element */
@@ -64,6 +64,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             type={type}
+            aria-invalid={!!error}
             className={cn(
               'w-full h-10 px-3 rounded-lg',
               'bg-bg-primary border border-border',
@@ -86,7 +87,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             </div>
           )}
         </div>
-        {error && <p className="mt-1.5 text-sm text-accent-red">{error}</p>}
+        {typeof error === 'string' && (
+          <p className="mt-1.5 text-sm text-accent-red">{error}</p>
+        )}
         {hint && !error && (
           <p className="mt-1.5 text-sm text-text-muted">{hint}</p>
         )}

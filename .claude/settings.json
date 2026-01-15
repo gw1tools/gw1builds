@@ -1,7 +1,8 @@
 {
   "permissions": {
     "deny": [
-      "Read(docs/PRD/archived/**)"
+      "Read(docs/PRD/archived/**)",
+      "mcp__plugin_supabase_supabase__apply_migration"
     ]
   },
   "enabledPlugins": {

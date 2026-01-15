@@ -17,6 +17,7 @@ import {
   getBuildById,
   updateBuild,
   deleteBuild,
+  canUserEditBuild,
   NotFoundError,
   ValidationError,
 } from '@/lib/services/builds'
@@ -50,15 +51,18 @@ export async function GET(
       return NextResponse.json({ error: 'Build not found' }, { status: 404 })
     }
 
-    // Check ownership
-    if (build.author_id !== user.id) {
+    // Check if user can edit (owner or collaborator)
+    const canEdit = await canUserEditBuild(user.id, id)
+    if (!canEdit) {
       return NextResponse.json(
-        { error: 'You do not own this build' },
+        { error: 'You do not have permission to edit this build' },
         { status: 403 }
       )
     }
 
-    return NextResponse.json({ data: build })
+    // Include ownership info in response
+    const isOwner = build.author_id === user.id
+    return NextResponse.json({ data: build, isOwner })
   } catch (error) {
     console.error('[GET /api/builds/[id]] Error:', error)
     return NextResponse.json(
@@ -126,20 +130,25 @@ export async function PATCH(
       buildUpdate.bars = updateData.bars
     }
 
-    // 4. Check ownership before update
-    const existingBuild = await getBuildById(id)
-    if (!existingBuild) {
-      return NextResponse.json({ error: 'Build not found' }, { status: 404 })
-    }
-
-    if (existingBuild.author_id !== user.id) {
+    // 4. Check if user can edit (owner or collaborator)
+    const canEdit = await canUserEditBuild(user.id, id)
+    if (!canEdit) {
       return NextResponse.json(
-        { error: 'You do not own this build' },
+        { error: 'You do not have permission to edit this build' },
         { status: 403 }
       )
     }
 
-    // 5. Update build (validation happens in service layer)
+    // 5. Handle is_private (owner-only setting)
+    if (typeof updateData.is_private === 'boolean') {
+      const build = await getBuildById(id)
+      if (build?.author_id === user.id) {
+        buildUpdate.is_private = updateData.is_private
+      }
+      // Silently ignore is_private from collaborators
+    }
+
+    // 6. Update build (validation happens in service layer)
     await updateBuild(id, buildUpdate)
 
     return NextResponse.json({ success: true })

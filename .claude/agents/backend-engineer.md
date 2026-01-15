@@ -551,7 +551,7 @@ export async function POST(request: Request) {
   if (!input) {
     return NextResponse.json({
       error: 'Invalid input',
-      message: 'Name must be 3-100 characters. 1-8 skill bars required.'
+      message: 'Name must be 3-100 characters. 1-12 skill bars required.'
     }, { status: 400 })
   }
 

@@ -15,7 +15,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Tag as TagIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ALL_TAGS, type Tag } from '@/lib/constants'
+import { ALL_TAGS } from '@/lib/constants'
 import { dropdownVariants } from '@/lib/motion'
 
 export interface TagSelectorProps {
@@ -75,6 +75,7 @@ export function TagSelector({
 
   // Reset focused index when available tags change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset on list change
     setFocusedIndex(0)
   }, [availableTags.length])
 

@@ -1,10 +1,12 @@
 'use client'
 
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
 interface UserAvatarProps {
   userId: string
   username: string | null
+  avatarUrl?: string | null
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }
@@ -27,6 +29,12 @@ const SIZE_CLASSES = {
   sm: 'h-7 w-7 text-xs',
   md: 'h-9 w-9 text-sm',
   lg: 'h-12 w-12 text-base',
+}
+
+const IMAGE_SIZES = {
+  sm: 28,
+  md: 36,
+  lg: 48,
 }
 
 /**
@@ -52,22 +60,45 @@ function getAvatarColor(userId: string): string {
 }
 
 /**
- * User avatar showing first letter of username with colored background
+ * User avatar showing profile picture or initials fallback
  * Color is deterministically chosen from profession colors based on user ID
  */
 export function UserAvatar({
   userId,
   username,
+  avatarUrl,
   size = 'md',
   className,
 }: UserAvatarProps) {
   const backgroundColor = getAvatarColor(userId)
   const initial = username ? username[0].toUpperCase() : '?'
 
+  // Show profile picture if available
+  if (avatarUrl) {
+    return (
+      <div
+        className={cn(
+          'rounded-full overflow-hidden border border-border shrink-0',
+          SIZE_CLASSES[size],
+          className
+        )}
+      >
+        <Image
+          src={avatarUrl}
+          alt={username || 'User'}
+          width={IMAGE_SIZES[size]}
+          height={IMAGE_SIZES[size]}
+          className="w-full h-full object-cover"
+        />
+      </div>
+    )
+  }
+
+  // Fallback to colored initials
   return (
     <div
       className={cn(
-        'flex items-center justify-center rounded-full font-semibold text-bg-primary border border-border',
+        'flex items-center justify-center rounded-full font-semibold text-bg-primary border border-border shrink-0',
         'transition-all duration-150',
         'hover:scale-105 hover:border-border-hover hover:shadow-md',
         SIZE_CLASSES[size],
@@ -79,3 +110,5 @@ export function UserAvatar({
     </div>
   )
 }
+
+export type { UserAvatarProps }

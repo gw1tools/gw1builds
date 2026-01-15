@@ -14,6 +14,8 @@ export interface AttributeBarProps extends React.HTMLAttributes<HTMLDivElement> 
   direction?: 'row' | 'column'
   /** Compact display */
   compact?: boolean
+  /** Individual equipment bonuses per attribute (e.g., [1, 3] for headpiece + superior rune) */
+  bonusBreakdown?: Record<string, number[]>
 }
 
 /**
@@ -31,6 +33,7 @@ export const AttributeBar = forwardRef<HTMLDivElement, AttributeBarProps>(
       hideEmpty = true,
       direction = 'row',
       compact = false,
+      bonusBreakdown = {},
       ...props
     },
     ref
@@ -46,7 +49,9 @@ export const AttributeBar = forwardRef<HTMLDivElement, AttributeBarProps>(
         ref={ref}
         className={cn(
           'flex gap-3',
-          direction === 'column' ? 'flex-col' : 'flex-row flex-wrap',
+          direction === 'column'
+            ? 'flex-col'
+            : 'flex-row flex-nowrap overflow-x-auto scrollbar-hide',
           className
         )}
         role="list"
@@ -59,6 +64,7 @@ export const AttributeBar = forwardRef<HTMLDivElement, AttributeBarProps>(
             name={name}
             value={value}
             compact={compact}
+            bonuses={bonusBreakdown[name]}
           />
         ))}
       </div>
@@ -75,37 +81,41 @@ interface AttributeItemProps {
   name: string
   value: number
   compact?: boolean
+  /** Individual bonuses from equipment (e.g., [1, 3] for headpiece + superior rune) */
+  bonuses?: number[]
 }
 
-function AttributeItem({ name, value, compact }: AttributeItemProps) {
+function AttributeItem({ name, value, compact, bonuses = [] }: AttributeItemProps) {
   // Shorten common attribute names for compact view
   const shortName = compact ? getShortName(name) : name
 
-  // Value above 12 requires runes/headgear
-  const isEnhanced = value > 12
+  // Check if there are equipment bonuses
+  const hasBonuses = bonuses.length > 0
 
   // Get profession for attribute to show icon
   const profession = getProfessionForAttribute(name)
 
   return (
     <div
-      className={cn('flex items-center gap-2', compact ? 'text-xs' : 'text-sm')}
+      className={cn('flex items-center gap-2 shrink-0', compact ? 'text-xs' : 'text-sm')}
       role="listitem"
     >
-      <span className="flex items-center gap-1 text-text-secondary">
+      <span className="inline-flex items-center gap-1 text-text-secondary leading-none">
         {profession && <ProfessionIcon profession={profession} size="xs" />}
         {shortName}
       </span>
       <span
         className={cn(
           'font-mono font-semibold px-1.5 py-0.5 rounded',
-          'bg-bg-primary border border-border',
-          isEnhanced
-            ? 'text-accent-gold border-accent-gold/30'
-            : 'text-text-primary'
+          'bg-bg-primary border border-border text-text-primary'
         )}
       >
         {value}
+        {hasBonuses && (
+          <span className="ml-1 font-normal text-accent-blue">
+            {bonuses.map(b => `+${b}`).join('')}
+          </span>
+        )}
       </span>
     </div>
   )

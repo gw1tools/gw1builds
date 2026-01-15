@@ -81,8 +81,8 @@ export function Footer() {
             initial="initial"
             whileHover="hover"
           >
-            <span className="text-xs text-text-muted">since {LAUNCH_YEAR}</span>
-            <div className="flex items-center gap-1">
+            <span className="text-xs text-text-muted whitespace-nowrap">since {LAUNCH_YEAR}</span>
+            <div className="hidden sm:flex items-center gap-1">
               {professionColors.map((color, i) => (
                 <motion.span
                   key={i}

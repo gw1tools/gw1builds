@@ -20,7 +20,7 @@
   /* Text colors - warm whites */
   --color-text-primary: #fafaf9;
   --color-text-secondary: #a8a8a8;
-  --color-text-muted: #6b6b70;
+  --color-text-muted: #8a8a92;
 
   /* Border colors */
   --color-border: #3a3a42;
@@ -615,6 +615,19 @@ textarea:focus {
 
 .animate-profession-spin {
   animation: profession-spin 2s linear infinite;
+}
+
+/* ============================================
+   SCROLLBAR UTILITIES
+   ============================================ */
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* ============================================

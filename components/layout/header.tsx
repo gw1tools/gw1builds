@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
 export function Header() {
-  const { user, profile, loading, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const { openModal } = useAuthModal()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
@@ -106,9 +106,7 @@ export function Header() {
           {/* Actions */}
           <div className="flex items-center gap-3">
             {/* Auth Section */}
-            {loading ? (
-              <div className="h-9 w-9 rounded-full bg-bg-card animate-pulse" />
-            ) : user && profile ? (
+            {user && profile ? (
               <div className="relative">
                 <button
                   id="user-menu-button"

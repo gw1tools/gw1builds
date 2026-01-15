@@ -8,6 +8,7 @@
  */
 import { NextRequest } from 'next/server'
 import { ImageResponse } from 'next/og'
+import { MAX_BARS } from '@/lib/constants'
 
 export const runtime = 'nodejs'
 
@@ -183,7 +184,7 @@ export async function GET(
     const authorName = data.author?.username || null
 
     type Bar = { primary: string; secondary: string; skills: number[] }
-    const bars = ((data.bars as Bar[]) || []).slice(0, 8)
+    const bars = ((data.bars as Bar[]) || []).slice(0, MAX_BARS)
     const config = getLayoutConfig(bars.length)
 
     // Collect all skill IDs from all bars

@@ -144,6 +144,7 @@ function SkillItem({
       <FloatingPortal>
         {isTooltipOpen && (
           <div
+            // eslint-disable-next-line react-hooks/refs -- refs.setFloating is a callback ref from Floating UI, not a ref access
             ref={refs.setFloating}
             style={floatingStyles}
             className="z-[100] pointer-events-none"
@@ -299,6 +300,7 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
 
     // Reset selection when items change
     useEffect(() => {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional reset when items list changes
       setSelectedIndex(0)
     }, [items])
 

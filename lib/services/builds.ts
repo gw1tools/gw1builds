@@ -153,7 +153,13 @@ export const getBuildById = cache(async function getBuildById(
     return null
   }
 
-  return data as BuildWithAuthor
+  // Fetch collaborators for this build
+  const collaborators = await getCollaborators(id)
+
+  return {
+    ...data,
+    collaborators,
+  } as BuildWithAuthor
 })
 
 /**
@@ -178,6 +184,7 @@ export async function getPopularBuilds(limit = 20): Promise<BuildListItem[]> {
     )
     .is('deleted_at', null)
     .eq('moderation_status', 'published')
+    .eq('is_private', false)
     .order('star_count', { ascending: false })
     .limit(safeLimit)
 
@@ -211,6 +218,7 @@ export async function getRecentBuilds(limit = 20): Promise<BuildListItem[]> {
     )
     .is('deleted_at', null)
     .eq('moderation_status', 'published')
+    .eq('is_private', false)
     .order('created_at', { ascending: false })
     .limit(safeLimit)
 
@@ -243,6 +251,7 @@ export async function getAllPublishedBuildsForSearch(): Promise<BuildListItem[]>
     )
     .is('deleted_at', null)
     .eq('moderation_status', 'published')
+    .eq('is_private', false)
     .order('star_count', { ascending: false })
 
   if (error) {
@@ -272,8 +281,9 @@ export async function getUserBuilds(userId: string): Promise<BuildListItem[]> {
     .from('builds')
     .select(
       `
-      id, name, tags, bars, star_count, view_count, created_at, moderation_status,
-      author:users!builds_author_id_fkey(username, avatar_url)
+      id, name, tags, bars, star_count, view_count, created_at, moderation_status, is_private,
+      author:users!builds_author_id_fkey(username, avatar_url),
+      build_collaborators(count)
     `
     )
     .eq('author_id', userId)
@@ -282,6 +292,66 @@ export async function getUserBuilds(userId: string): Promise<BuildListItem[]> {
 
   if (error) {
     console.error(`[getUserBuilds] Database error for user "${userId}":`, error)
+    return []
+  }
+
+  return (data || []).map(row => {
+    const normalized = normalizeAuthor(row)
+    const collabCount = row.build_collaborators?.[0]?.count ?? 0
+    return {
+      ...normalized,
+      collaborator_count: collabCount > 0 ? collabCount : undefined,
+    }
+  }) as BuildListItem[]
+}
+
+/**
+ * Fetches builds where user is a collaborator (not owner)
+ *
+ * @param userId - User's UUID
+ * @returns Array of builds shared with user for list view
+ */
+export async function getCollaboratedBuilds(userId: string): Promise<BuildListItem[]> {
+  // Guard: Validate UUID format (basic check)
+  if (!userId || userId.length < 36) {
+    console.warn(`[getCollaboratedBuilds] Invalid user ID: "${userId}"`)
+    return []
+  }
+
+  const supabase = await createClient()
+
+  // First get build IDs where user is a collaborator
+  const { data: collabData, error: collabError } = await supabase
+    .from('build_collaborators')
+    .select('build_id')
+    .eq('user_id', userId)
+
+  if (collabError) {
+    console.error(`[getCollaboratedBuilds] Error fetching collaborations:`, collabError)
+    return []
+  }
+
+  if (!collabData || collabData.length === 0) {
+    return []
+  }
+
+  const buildIds = collabData.map(c => c.build_id)
+
+  // Fetch the actual builds
+  const { data, error } = await supabase
+    .from('builds')
+    .select(
+      `
+      id, name, tags, bars, star_count, view_count, created_at, moderation_status, is_private,
+      author:users!builds_author_id_fkey(username, avatar_url)
+    `
+    )
+    .in('id', buildIds)
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error(`[getCollaboratedBuilds] Database error:`, error)
     return []
   }
 
@@ -313,7 +383,7 @@ export async function getUserStarredBuilds(
       `
       created_at,
       builds (
-        id, name, tags, bars, star_count, view_count, created_at, deleted_at, moderation_status,
+        id, name, tags, bars, star_count, view_count, created_at, deleted_at, moderation_status, is_private,
         author:users!builds_author_id_fkey(username, avatar_url)
       )
     `
@@ -330,12 +400,15 @@ export async function getUserStarredBuilds(
   }
 
   // Flatten the nested structure, transform author, and filter out deleted/delisted
+  // Private builds are ALLOWED here since user has the link (they starred it)
   const results: BuildListItem[] = []
   for (const row of data || []) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const build = row.builds as any
-    // Filter out deleted and delisted builds (users shouldn't see other people's delisted builds)
-    if (!build || build.deleted_at || build.moderation_status !== 'published') continue
+    // Filter out deleted builds
+    if (!build || build.deleted_at) continue
+    // Filter out delisted builds (unless they're private - private builds can still be starred)
+    if (build.moderation_status !== 'published' && !build.is_private) continue
 
     const authorData = build.author
     results.push({
@@ -346,6 +419,7 @@ export async function getUserStarredBuilds(
       star_count: build.star_count,
       view_count: build.view_count,
       created_at: build.created_at,
+      is_private: build.is_private,
       author: Array.isArray(authorData) ? authorData[0] || null : authorData,
     })
   }
@@ -449,6 +523,7 @@ export async function createBuild(build: BuildInsert): Promise<Build> {
       bars: sanitized.bars,
       notes: sanitized.notes,
       tags: sanitized.tags,
+      is_private: build.is_private ?? false,
     })
     .select()
     .single()
@@ -521,8 +596,12 @@ export async function updateBuild(
   }
   if (updates.tags !== undefined) {
     sanitizedUpdates.tags = updates.tags.map(t =>
+      // eslint-disable-next-line no-control-regex -- intentionally stripping control characters for security
       t.replace(/[\x00-\x1F\x7F]/g, '').trim()
     )
+  }
+  if (updates.is_private !== undefined) {
+    sanitizedUpdates.is_private = updates.is_private
   }
 
   // Check for profanity in name, bar names, and notes
@@ -702,4 +781,216 @@ export async function toggleStar(
   }
 
   return data as boolean
+}
+
+// ============================================================================
+// COLLABORATOR OPERATIONS
+// ============================================================================
+
+/** Maximum number of collaborators per build */
+const MAX_COLLABORATORS = 4
+
+/**
+ * Get all collaborators for a build with user details
+ *
+ * @param buildId - Build ID
+ * @returns Array of collaborators with username and avatar
+ */
+export async function getCollaborators(
+  buildId: string
+): Promise<
+  Array<{
+    id: string
+    user_id: string
+    username: string
+    avatar_url: string | null
+    created_at: string
+  }>
+> {
+  if (!buildId) {
+    return []
+  }
+
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('build_collaborators')
+    .select(
+      `
+      id,
+      user_id,
+      created_at,
+      users!build_collaborators_user_id_fkey (
+        username,
+        avatar_url
+      )
+    `
+    )
+    .eq('build_id', buildId)
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error('[getCollaborators] Database error:', error)
+    return []
+  }
+
+  // Transform the nested user data
+  // Supabase types the join as array but it's actually a single object for many-to-one
+  return (data || []).map((row) => {
+    const user = row.users as unknown as { username: string; avatar_url: string | null } | null
+    return {
+      id: row.id,
+      user_id: row.user_id,
+      username: user?.username || '',
+      avatar_url: user?.avatar_url || null,
+      created_at: row.created_at,
+    }
+  })
+}
+
+/**
+ * Add a collaborator to a build by username
+ *
+ * @param buildId - Build ID
+ * @param username - Username to add
+ * @param addedBy - User ID of the person adding the collaborator
+ * @returns The new collaborator record with user details
+ * @throws ValidationError for invalid inputs or limit reached
+ * @throws NotFoundError if username doesn't exist
+ */
+export async function addCollaborator(
+  buildId: string,
+  username: string,
+  addedBy: string
+): Promise<{
+  id: string
+  user_id: string
+  username: string
+  avatar_url: string | null
+  created_at: string
+}> {
+  // Guard: Validate inputs
+  if (!buildId || !username || !addedBy) {
+    throw new ValidationError('buildId, username, and addedBy are required')
+  }
+
+  const supabase = await createClient()
+
+  // Find user by username
+  const { data: user, error: userError } = await supabase
+    .from('users')
+    .select('id, username, avatar_url')
+    .eq('username', username.toLowerCase())
+    .single()
+
+  if (userError || !user) {
+    throw new NotFoundError(`User not found: ${username}`)
+  }
+
+  // Check if user is trying to add themselves
+  if (user.id === addedBy) {
+    throw new ValidationError('Cannot add yourself as a collaborator')
+  }
+
+  // Check current collaborator count
+  const { count, error: countError } = await supabase
+    .from('build_collaborators')
+    .select('*', { count: 'exact', head: true })
+    .eq('build_id', buildId)
+
+  if (countError) {
+    console.error('[addCollaborator] Count error:', countError)
+    throw new BuildServiceError('Failed to check collaborator count', 'DB_ERROR')
+  }
+
+  if ((count || 0) >= MAX_COLLABORATORS) {
+    throw new ValidationError(`Maximum ${MAX_COLLABORATORS} collaborators allowed`)
+  }
+
+  // Add collaborator
+  const { data, error } = await supabase
+    .from('build_collaborators')
+    .insert({
+      build_id: buildId,
+      user_id: user.id,
+      added_by: addedBy,
+    })
+    .select('id, user_id, created_at')
+    .single()
+
+  if (error) {
+    // Handle duplicate constraint
+    if (error.code === '23505') {
+      throw new ValidationError('User is already a collaborator')
+    }
+    console.error('[addCollaborator] Database error:', error)
+    throw new BuildServiceError('Failed to add collaborator', 'DB_ERROR')
+  }
+
+  return {
+    id: data.id,
+    user_id: data.user_id,
+    username: user.username || '',
+    avatar_url: user.avatar_url,
+    created_at: data.created_at,
+  }
+}
+
+/**
+ * Remove a collaborator from a build
+ *
+ * @param buildId - Build ID
+ * @param collaboratorId - Collaborator record ID
+ */
+export async function removeCollaborator(
+  buildId: string,
+  collaboratorId: string
+): Promise<void> {
+  if (!buildId || !collaboratorId) {
+    throw new ValidationError('buildId and collaboratorId are required')
+  }
+
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('build_collaborators')
+    .delete()
+    .eq('id', collaboratorId)
+    .eq('build_id', buildId)
+
+  if (error) {
+    console.error('[removeCollaborator] Database error:', error)
+    throw new BuildServiceError('Failed to remove collaborator', 'DB_ERROR')
+  }
+}
+
+/**
+ * Check if a user can edit a build (is owner or collaborator)
+ *
+ * @param userId - User ID
+ * @param buildId - Build ID
+ * @returns true if user can edit, false otherwise
+ */
+export async function canUserEditBuild(
+  userId: string,
+  buildId: string
+): Promise<boolean> {
+  if (!userId || !buildId) {
+    return false
+  }
+
+  const supabase = await createClient()
+
+  // Check ownership and collaboration in parallel
+  const [{ data: build }, { data: collab }] = await Promise.all([
+    supabase.from('builds').select('author_id').eq('id', buildId).single(),
+    supabase
+      .from('build_collaborators')
+      .select('id')
+      .eq('build_id', buildId)
+      .eq('user_id', userId)
+      .maybeSingle(),
+  ])
+
+  return build?.author_id === userId || !!collab
 }

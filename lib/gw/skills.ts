@@ -169,11 +169,15 @@ async function loadSkillData(): Promise<void> {
       // Skip skills without descriptions (invalid/removed skills)
       if (!desc) continue
 
+      // Strip <sic/> tags from descriptions (marks preserved errors in original data)
+      const cleanDescription = desc.description.replace(/<sic\/>/g, '')
+      const cleanConcise = desc.concise.replace(/<sic\/>/g, '')
+
       const skill: Skill = {
         id,
         name: desc.name,
-        description: desc.description,
-        concise: desc.concise,
+        description: cleanDescription,
+        concise: cleanConcise,
         profession: PROFESSION_BY_ID[data.profession] || 'Unknown',
         attributeId: data.attribute,
         attribute: ATTRIBUTE_BY_ID[data.attribute] || 'No Attribute',
@@ -357,4 +361,62 @@ export async function getSkillCount(): Promise<number> {
  */
 export async function preloadSkills(): Promise<void> {
   await ensureInitialized()
+}
+
+// ============================================================================
+// UTILITIES
+// ============================================================================
+
+/** Skill data shape for SkillBar component */
+export interface SkillBarSkill {
+  id: number
+  name: string
+  description: string
+  profession: string
+  attribute: string
+  energy: number
+  activation: number
+  recharge: number
+  elite: boolean
+  adrenaline?: number
+  sacrifice?: number
+  upkeep?: number
+  overcast?: number
+}
+
+/**
+ * Maps skill IDs to skill data for SkillBar component
+ *
+ * @param skillIds - Array of skill IDs (0 = empty slot)
+ * @param skillMap - Pre-fetched skill map from server
+ * @returns Array of skill data (null for empty slots or missing skills)
+ *
+ * @example
+ * const skills = mapSkillsFromIds(bar.skills, skillMap)
+ * <SkillBar skills={skills} />
+ */
+export function mapSkillsFromIds(
+  skillIds: number[],
+  skillMap: Record<number, Skill>
+): (SkillBarSkill | null)[] {
+  return skillIds.map(id => {
+    if (id === 0) return null
+    const skill = skillMap[id]
+    if (!skill) return null
+    return {
+      id: skill.id,
+      name: skill.name,
+      description: skill.description,
+      profession: skill.profession,
+      attribute: skill.attribute,
+      energy: skill.energy,
+      activation: skill.activation,
+      recharge: skill.recharge,
+      elite: skill.elite,
+      adrenaline: skill.adrenaline,
+      sacrifice: skill.sacrifice,
+      upkeep: skill.upkeep,
+      overcast: skill.overcast,
+    }
+  })
 }

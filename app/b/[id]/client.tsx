@@ -7,6 +7,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Eye, Clock, Copy, Link2, Pencil, Check, Flag } from 'lucide-react'
 import { useState, useMemo, useEffect } from 'react'
@@ -16,19 +17,25 @@ import {
   trackBuildShared,
 } from '@/lib/analytics'
 import { cn } from '@/lib/utils'
+import { useVariantData } from '@/hooks'
+import { mapSkillsFromIds, type Skill } from '@/lib/gw/skills'
 import { useAuthModal } from '@/components/auth/auth-modal'
 import { SkillMentionTooltip } from '@/components/ui/skill-mention-tooltip'
 import { SkillBar } from '@/components/ui/skill-bar'
 import { AttributeBar } from '@/components/ui/attribute-bar'
 import { Button } from '@/components/ui/button'
 import { StarButton } from '@/components/ui/star-button'
+import { OverflowMenu } from '@/components/ui/overflow-menu'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
 import { Tag, TagGroup } from '@/components/ui/tag'
+import { CollaboratorList } from '@/components/ui/collaborator-list'
 import { HeroBuildCard } from '@/components/build/hero-build-card'
 import { TeamOverview } from '@/components/build/team-overview'
+import { VariantTabs } from '@/components/ui/variant-tabs'
 import { ReportModal } from '@/components/build/report-modal'
+import { EquipmentDisplay, hasEquipment } from '@/components/build/equipment-display'
+import { getAttributeBonusBreakdown } from '@/lib/gw/equipment/armor'
 import type { BuildWithAuthor } from '@/types/database'
-import type { Skill } from '@/lib/gw/skills'
 import type { ProfessionKey } from '@/types/gw1'
 
 interface BuildPageClientProps {
@@ -36,6 +43,8 @@ interface BuildPageClientProps {
   /** Pre-fetched skill data from server, keyed by skill ID */
   skillMap: Record<number, Skill>
   isOwner: boolean
+  /** Whether user can edit (owner or collaborator) */
+  canEdit: boolean
   professionColors: Record<string, string>
   /** Whether current user has starred this build */
   initialStarred: boolean
@@ -49,15 +58,34 @@ export function BuildPageClient({
   build,
   skillMap,
   isOwner,
+  canEdit,
   professionColors,
   initialStarred,
   starCount,
   isAuthenticated,
 }: BuildPageClientProps) {
-  const isSingleBuild = build.bars.length === 1
+  // Calculate total players to determine if this is a team build
+  const totalPlayers = build.bars.reduce(
+    (sum, bar) => sum + (bar.playerCount || 1),
+    0
+  )
+  // Single build only if one bar AND one player
+  const isSingleBuild = build.bars.length === 1 && totalPlayers === 1
   const [reportModalOpen, setReportModalOpen] = useState(false)
+  // Track active variant for each bar in team builds { barIndex: variantIndex }
+  const [activeVariants, setActiveVariants] = useState<Record<number, number>>({})
   const isDelisted = build.moderation_status === 'delisted'
+  const [isScrolled, setIsScrolled] = useState(false)
   const { openModal } = useAuthModal()
+
+  // Track scroll position for sticky header
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const handleReportClick = () => {
     if (!isAuthenticated) {
@@ -99,8 +127,42 @@ export function BuildPageClient({
           </div>
         </div>
       )}
-      {/* Breadcrumb + Actions Row - consistent for all builds */}
-      <nav className="flex items-center justify-between mb-6">
+      {/* Sticky Breadcrumb + Actions Row - click to scroll to top */}
+      <nav
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={cn(
+          'fixed top-16 left-0 right-0 z-30 cursor-pointer',
+          'bg-bg-primary/95 backdrop-blur-md border-b border-border shadow-lg',
+          'transition-opacity duration-200',
+          isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        )}
+      >
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <div className="text-sm font-mono">
+            <span className="text-text-secondary">builds</span>
+            {' / '}
+            <span className="text-text-muted">{build.id}</span>
+            <span className="text-text-muted mx-2">·</span>
+            <span className="text-text-primary truncate max-w-[200px] inline-block align-bottom">
+              {build.name}
+            </span>
+          </div>
+
+          {/* Stop propagation so button clicks don't trigger scroll */}
+          <div onClick={(e) => e.stopPropagation()}>
+            <PageActions
+              build={build}
+              canEdit={canEdit}
+              initialStarred={initialStarred}
+              starCount={starCount}
+              isAuthenticated={isAuthenticated}
+            />
+          </div>
+        </div>
+      </nav>
+
+      {/* Static Breadcrumb + Actions Row (visible before scroll) */}
+      <div className="flex items-center justify-between mb-6">
         <div className="text-sm text-text-muted font-mono">
           <Link
             href="/"
@@ -112,21 +174,21 @@ export function BuildPageClient({
           <span>{build.id}</span>
         </div>
 
-        {/* Actions always in breadcrumb row for consistency */}
         <PageActions
-          buildId={build.id}
-          isOwner={isOwner}
+          build={build}
+          canEdit={canEdit}
           initialStarred={initialStarred}
           starCount={starCount}
           isAuthenticated={isAuthenticated}
         />
-      </nav>
+      </div>
 
       {/* Single Build View - unified card with title */}
       {isSingleBuild && (
         <SingleBuildView
           buildName={build.name}
           authorName={build.author?.username ?? undefined}
+          collaborators={build.collaborators}
           bar={build.bars[0]}
           buildId={build.id}
           skillMap={skillMap}
@@ -142,6 +204,7 @@ export function BuildPageClient({
             buildId={build.id}
             buildName={build.name}
             authorName={build.author?.username ?? undefined}
+            collaborators={build.collaborators}
             bars={build.bars}
             skillMap={skillMap}
           />
@@ -149,13 +212,18 @@ export function BuildPageClient({
           {/* Detailed Stacked Cards */}
           <div className="space-y-3 mt-4">
             {build.bars.map((bar, index) => (
-              <HeroBuildCard
-                key={index}
-                bar={bar}
-                index={index}
-                buildId={build.id}
-                skillMap={skillMap}
-              />
+              <div key={index} id={`skill-bar-${index}`}>
+                <HeroBuildCard
+                  bar={bar}
+                  index={index}
+                  buildId={build.id}
+                  skillMap={skillMap}
+                  activeVariantIndex={activeVariants[index] || 0}
+                  onVariantChange={(variantIndex) =>
+                    setActiveVariants(prev => ({ ...prev, [index]: variantIndex }))
+                  }
+                />
+              </div>
             ))}
           </div>
         </>
@@ -232,26 +300,26 @@ export function BuildPageClient({
 }
 
 /**
- * Page-level actions: Star, Share, Edit
+ * Page-level actions: Star, Share, More (Edit + Use as Template)
  */
 function PageActions({
-  buildId,
-  isOwner,
+  build,
+  canEdit,
   initialStarred,
   starCount,
   isAuthenticated,
 }: {
-  buildId: string
-  isOwner: boolean
+  build: BuildWithAuthor
+  canEdit: boolean
   initialStarred: boolean
   starCount: number
   isAuthenticated: boolean
 }) {
-  const [linkCopied, setLinkCopied] = useState(false)
+  const router = useRouter()
   const { openModal } = useAuthModal()
 
   const handleStarChange = async () => {
-    const response = await fetch(`/api/builds/${buildId}/star`, {
+    const response = await fetch(`/api/builds/${build.id}/star`, {
       method: 'POST',
     })
 
@@ -263,11 +331,22 @@ function PageActions({
   }
 
   const handleCopyLink = async () => {
-    const url = `${window.location.origin}/b/${buildId}`
+    const url = `${window.location.origin}/b/${build.id}`
     await navigator.clipboard.writeText(url)
-    setLinkCopied(true)
-    trackBuildShared({ build_id: buildId, method: 'clipboard' })
-    setTimeout(() => setLinkCopied(false), 2000)
+    trackBuildShared({ build_id: build.id, method: 'clipboard' })
+  }
+
+  const handleUseAsTemplate = () => {
+    localStorage.setItem(
+      'build-template',
+      JSON.stringify({
+        name: `Copy: ${build.name}`,
+        bars: build.bars,
+        notes: build.notes,
+        tags: build.tags,
+      })
+    )
+    router.push('/new')
   }
 
   return (
@@ -280,37 +359,33 @@ function PageActions({
         size="sm"
       />
 
-      <Button
-        variant="secondary"
+      <OverflowMenu
         size="sm"
-        onClick={handleCopyLink}
-        leftIcon={
-          linkCopied ? (
-            <Check className="w-4 h-4" />
-          ) : (
-            <Link2 className="w-4 h-4" />
-          )
-        }
-        className={cn(
-          linkCopied &&
-            'bg-accent-green/20 text-accent-green border-accent-green/50'
-        )}
-        noLift
-      >
-        {linkCopied ? 'Copied!' : 'Copy Link'}
-      </Button>
-
-      {isOwner && (
-        <Button
-          variant="secondary"
-          size="sm"
-          href={`/b/${buildId}/edit`}
-          leftIcon={<Pencil className="w-4 h-4" />}
-          noLift
-        >
-          Edit
-        </Button>
-      )}
+        items={[
+          {
+            label: 'Copy Link',
+            icon: <Link2 className="w-4 h-4" />,
+            onClick: handleCopyLink,
+            successLabel: 'Copied!',
+          },
+          ...(canEdit
+            ? [
+                {
+                  label: 'Edit',
+                  icon: <Pencil className="w-4 h-4" />,
+                  onClick: () => router.push(`/b/${build.id}/edit`),
+                  successLabel: 'Opening...',
+                },
+              ]
+            : []),
+          {
+            label: 'Use as Template',
+            icon: <Copy className="w-4 h-4" />,
+            onClick: handleUseAsTemplate,
+            successLabel: 'Creating...',
+          },
+        ]}
+      />
     </div>
   )
 }
@@ -321,6 +396,7 @@ function PageActions({
 function SingleBuildView({
   buildName,
   authorName,
+  collaborators,
   bar,
   buildId,
   skillMap,
@@ -328,37 +404,22 @@ function SingleBuildView({
 }: {
   buildName: string
   authorName?: string
+  collaborators?: Array<{ username: string }>
   bar: BuildWithAuthor['bars'][0]
   buildId: string
   skillMap: Record<number, Skill>
   professionColors: Record<string, string>
 }) {
   const [copied, setCopied] = useState(false)
-
-  // Convert skill IDs to skill data using pre-fetched map (memoized)
+  const [activeVariantIndex, setActiveVariantIndex] = useState(0)
+  const { allVariants, currentVariant, hasVariants } = useVariantData(bar, activeVariantIndex)
   const skills = useMemo(
-    () =>
-      bar.skills.map(id => {
-        if (id === 0) return null
-        const skill = skillMap[id]
-        if (!skill) return null
-        return {
-          id: skill.id,
-          name: skill.name,
-          description: skill.description,
-          profession: skill.profession,
-          attribute: skill.attribute,
-          energy: skill.energy,
-          activation: skill.activation,
-          recharge: skill.recharge,
-          elite: skill.elite,
-        }
-      }),
-    [bar.skills, skillMap]
+    () => mapSkillsFromIds(currentVariant.skills, skillMap),
+    [currentVariant.skills, skillMap]
   )
 
   const handleCopyCode = async () => {
-    await navigator.clipboard.writeText(bar.template)
+    await navigator.clipboard.writeText(currentVariant.template)
     setCopied(true)
     trackTemplateCopied({ build_id: buildId, bar_count: 1 })
     setTimeout(() => setCopied(false), 2000)
@@ -376,9 +437,21 @@ function SingleBuildView({
           {authorName && (
             <p className="text-text-muted text-sm mt-1">
               by <span className="text-text-secondary">{authorName}</span>
+              <CollaboratorList collaborators={collaborators || []} />
             </p>
           )}
         </div>
+
+        {/* Variant tabs - only show if variants exist */}
+        {hasVariants && (
+          <div className="px-5 py-3 border-t border-border/50 bg-bg-secondary/30">
+            <VariantTabs
+              variants={allVariants}
+              activeIndex={activeVariantIndex}
+              onChange={setActiveVariantIndex}
+            />
+          </div>
+        )}
 
         {/* Divider */}
         <div className="border-t border-border" />
@@ -415,11 +488,14 @@ function SingleBuildView({
           </div>
 
           {/* Skill Bar */}
-          <SkillBar skills={skills} size="lg" />
+          <SkillBar skills={skills} size="lg" attributes={currentVariant.attributes} />
 
           {/* Attributes */}
           <div className="mt-5">
-            <AttributeBar attributes={bar.attributes} />
+            <AttributeBar
+              attributes={currentVariant.attributes}
+              bonusBreakdown={bar.equipment?.armor ? getAttributeBonusBreakdown(bar.equipment.armor) : undefined}
+            />
           </div>
 
           {/* Divider */}
@@ -443,7 +519,7 @@ function SingleBuildView({
                 copied ? 'text-accent-green' : 'text-text-primary'
               )}
             >
-              {bar.template}
+              {currentVariant.template}
             </code>
             <span
               className={cn(
@@ -467,6 +543,11 @@ function SingleBuildView({
               )}
             </span>
           </button>
+
+          {/* Equipment Display */}
+          {bar.equipment && hasEquipment(bar.equipment) && (
+            <EquipmentDisplay equipment={bar.equipment} className="mt-4" />
+          )}
         </div>
       </div>
 

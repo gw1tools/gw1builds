@@ -17,6 +17,8 @@ import {
   MAX_TAGS_PER_BUILD,
   MAX_TAG_LENGTH,
   SKILLS_PER_BAR,
+  MAX_VARIANTS,
+  MAX_VARIANT_NAME_LENGTH,
 } from './constants'
 import { extractTextFromTiptap } from './search/text-utils'
 import type { TipTapDocument } from '@/types/database'
@@ -216,6 +218,82 @@ export function validateNotes(notes: unknown): ValidationResult {
 }
 
 /**
+ * Validates a skill bar variant
+ */
+export function validateSkillBarVariant(
+  variant: unknown,
+  barIndex: number,
+  variantIndex: number
+): ValidationResult {
+  if (!variant || typeof variant !== 'object') {
+    return {
+      valid: false,
+      error: `Build ${barIndex + 1}, Variant ${variantIndex + 1}: must be an object`,
+    }
+  }
+
+  const v = variant as Record<string, unknown>
+
+  // Validate name (optional, max 30 chars)
+  if (v.name !== undefined && v.name !== null) {
+    if (typeof v.name !== 'string') {
+      return {
+        valid: false,
+        error: `Build ${barIndex + 1}, Variant ${variantIndex + 1}: name must be a string`,
+      }
+    }
+    if (v.name.length > MAX_VARIANT_NAME_LENGTH) {
+      return {
+        valid: false,
+        error: `Build ${barIndex + 1}, Variant ${variantIndex + 1}: name must be ${MAX_VARIANT_NAME_LENGTH} characters or less`,
+      }
+    }
+  }
+
+  // Validate template
+  if (typeof v.template !== 'string') {
+    return {
+      valid: false,
+      error: `Build ${barIndex + 1}, Variant ${variantIndex + 1}: must have a template`,
+    }
+  }
+  if (v.template.length > MAX_TEMPLATE_LENGTH) {
+    return {
+      valid: false,
+      error: `Build ${barIndex + 1}, Variant ${variantIndex + 1}: template too long`,
+    }
+  }
+
+  // Validate skills array
+  if (!Array.isArray(v.skills) || v.skills.length !== SKILLS_PER_BAR) {
+    return {
+      valid: false,
+      error: `Build ${barIndex + 1}, Variant ${variantIndex + 1}: must have exactly ${SKILLS_PER_BAR} skills`,
+    }
+  }
+
+  // Validate each skill is a number
+  for (let i = 0; i < v.skills.length; i++) {
+    if (typeof v.skills[i] !== 'number') {
+      return {
+        valid: false,
+        error: `Build ${barIndex + 1}, Variant ${variantIndex + 1}: skill ${i + 1} must be a number`,
+      }
+    }
+  }
+
+  // Validate attributes
+  if (!v.attributes || typeof v.attributes !== 'object') {
+    return {
+      valid: false,
+      error: `Build ${barIndex + 1}, Variant ${variantIndex + 1}: must have attributes`,
+    }
+  }
+
+  return { valid: true }
+}
+
+/**
  * Validates skill bar structure
  */
 export function validateSkillBar(bar: unknown, index: number): ValidationResult {
@@ -264,6 +342,30 @@ export function validateSkillBar(bar: unknown, index: number): ValidationResult 
     return {
       valid: false,
       error: `Build ${index + 1}: must have attributes`,
+    }
+  }
+
+  // Validate variants (optional)
+  if (b.variants !== undefined) {
+    if (!Array.isArray(b.variants)) {
+      return {
+        valid: false,
+        error: `Build ${index + 1}: variants must be an array`,
+      }
+    }
+
+    // Max 4 additional variants (5 total including base)
+    if (b.variants.length > MAX_VARIANTS - 1) {
+      return {
+        valid: false,
+        error: `Build ${index + 1}: maximum ${MAX_VARIANTS} variants allowed (including default)`,
+      }
+    }
+
+    // Validate each variant
+    for (let i = 0; i < b.variants.length; i++) {
+      const variantResult = validateSkillBarVariant(b.variants[i], index, i + 1)
+      if (!variantResult.valid) return variantResult
     }
   }
 
@@ -339,10 +441,30 @@ export function validateBuildInput(input: BuildInput): ValidationResult {
 // ============================================================================
 
 /**
+ * Sanitizes a skill bar variant for database storage
+ */
+export function sanitizeSkillBarVariant(
+  variant: Record<string, unknown>
+): Record<string, unknown> {
+  const sanitized: Record<string, unknown> = {
+    template: sanitizeSingleLine(String(variant.template || '')),
+    attributes: variant.attributes || {},
+    skills: Array.isArray(variant.skills) ? variant.skills.slice(0, SKILLS_PER_BAR) : [],
+  }
+
+  // Include name if present
+  if (variant.name && typeof variant.name === 'string') {
+    sanitized.name = sanitizeSingleLine(variant.name).slice(0, MAX_VARIANT_NAME_LENGTH)
+  }
+
+  return sanitized
+}
+
+/**
  * Sanitizes a skill bar for database storage
  */
 export function sanitizeSkillBar(bar: Record<string, unknown>): Record<string, unknown> {
-  return {
+  const sanitized: Record<string, unknown> = {
     name: sanitizeSingleLine(String(bar.name || '')),
     hero: bar.hero ? sanitizeSingleLine(String(bar.hero)) : null,
     template: sanitizeSingleLine(String(bar.template || '')),
@@ -351,6 +473,26 @@ export function sanitizeSkillBar(bar: Record<string, unknown>): Record<string, u
     attributes: bar.attributes || {},
     skills: Array.isArray(bar.skills) ? bar.skills : [],
   }
+
+  // Include playerCount if present and valid (1-12)
+  if (typeof bar.playerCount === 'number' && bar.playerCount >= 1 && bar.playerCount <= 12) {
+    sanitized.playerCount = bar.playerCount
+  }
+
+  // Include variants if present
+  if (Array.isArray(bar.variants) && bar.variants.length > 0) {
+    sanitized.variants = bar.variants
+      .slice(0, MAX_VARIANTS - 1) // Max 4 additional variants
+      .map((v: unknown) => sanitizeSkillBarVariant(v as Record<string, unknown>))
+  }
+
+  // Include equipment if present (weapon sets + armor)
+  // Equipment is stored as JSON - validated at display time via decoder
+  if (bar.equipment && typeof bar.equipment === 'object') {
+    sanitized.equipment = bar.equipment
+  }
+
+  return sanitized
 }
 
 /**

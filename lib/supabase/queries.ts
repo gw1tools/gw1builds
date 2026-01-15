@@ -60,6 +60,7 @@ export async function getBuilds(
     )
     .is('deleted_at', null)
     .eq('moderation_status', 'published')
+    .eq('is_private', false)
     .range(offset, offset + limit - 1)
 
   if (type === 'popular') {

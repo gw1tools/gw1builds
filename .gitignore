@@ -45,6 +45,7 @@ next-env.d.ts
 
 # Claude Code
 .claude/settings.local.json
+.workspaces/
 
 # MCP config (contains tokens - NEVER commit!)
 .mcp.json

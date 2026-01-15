@@ -14,8 +14,13 @@ import {
   CountBadge,
   Input,
   Textarea,
+  Toggle,
   IconButton,
   StarButton,
+  PlayerCountControl,
+  VariantTabs,
+  SkillIcon,
+  CostStat,
   SkillSlot,
   SkillBar,
   SkillBarCompact,
@@ -171,6 +176,81 @@ const sampleTeamBuild = {
     username: 'SpeedClear',
     avatar_url: null,
   },
+}
+
+/**
+ * Interactive demo for VariantTabs
+ */
+function VariantTabsDemo() {
+  const [activeIndex1, setActiveIndex1] = useState(0)
+  const [activeIndex2, setActiveIndex2] = useState(0)
+  const [variants, setVariants] = useState([
+    { name: undefined },
+    { name: 'Anti-Caster' },
+  ])
+
+  const handleAdd = () => {
+    if (variants.length < 5) {
+      setVariants([...variants, { name: undefined }])
+    }
+  }
+
+  const handleDelete = (index: number) => {
+    if (index > 0) {
+      const newVariants = [...variants]
+      newVariants.splice(index, 1)
+      setVariants(newVariants)
+      if (activeIndex2 >= index) {
+        setActiveIndex2(Math.max(0, activeIndex2 - 1))
+      }
+    }
+  }
+
+  return (
+    <section>
+      <h2 className="text-2xl font-semibold text-text-primary mb-6">
+        Variant Tabs
+      </h2>
+      <p className="text-text-secondary text-sm mb-4">
+        Tab component for switching between skill bar variants. Used in both viewer (read-only)
+        and editor (with add/delete) modes. Max 5 variants per bar.
+      </p>
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-sm font-medium text-text-muted mb-3">
+            Viewer Mode (Read-only)
+          </h3>
+          <VariantTabs
+            variants={[{ name: undefined }, { name: 'Anti-Caster' }, { name: 'Budget' }]}
+            activeIndex={activeIndex1}
+            onChange={setActiveIndex1}
+          />
+        </div>
+        <div>
+          <h3 className="text-sm font-medium text-text-muted mb-3">
+            Editor Mode (Add/Delete)
+          </h3>
+          <VariantTabs
+            variants={variants}
+            activeIndex={activeIndex2}
+            onChange={setActiveIndex2}
+            editable
+            onAdd={handleAdd}
+            onDelete={handleDelete}
+          />
+        </div>
+        <div>
+          <h3 className="text-sm font-medium text-text-muted mb-3">
+            Single Variant (No tabs shown in viewer)
+          </h3>
+          <p className="text-xs text-text-muted italic">
+            When only the default variant exists, tabs are typically hidden in the viewer.
+            In the editor, you can still add variants.
+          </p>
+        </div>
+      </div>
+    </section>
+  )
 }
 
 export default function DesignSystemPage() {
@@ -353,6 +433,56 @@ export default function DesignSystemPage() {
               </div>
             </div>
           </section>
+
+          {/* Player Count Control */}
+          <section>
+            <h2 className="text-2xl font-semibold text-text-primary mb-6">
+              Player Count Control
+            </h2>
+            <p className="text-text-secondary text-sm mb-4">
+              +/- buttons for specifying player count in team builds. Shows profession icon.
+              Used to indicate how many players run a specific build in a team composition.
+            </p>
+            <div className="flex flex-wrap items-center gap-6">
+              <div className="flex flex-col gap-2">
+                <span className="text-xs text-text-muted">Default (1)</span>
+                <PlayerCountControl
+                  count={1}
+                  onChange={() => {}}
+                  profession="mesmer"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <span className="text-xs text-text-muted">Multiple (3)</span>
+                <PlayerCountControl
+                  count={3}
+                  onChange={() => {}}
+                  profession="ritualist"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <span className="text-xs text-text-muted">At max (12)</span>
+                <PlayerCountControl
+                  count={12}
+                  onChange={() => {}}
+                  profession="warrior"
+                  max={12}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <span className="text-xs text-text-muted">Disabled</span>
+                <PlayerCountControl
+                  count={2}
+                  onChange={() => {}}
+                  profession="monk"
+                  disabled
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Variant Tabs */}
+          <VariantTabsDemo />
 
           {/* Cards */}
           <section>
@@ -565,7 +695,54 @@ export default function DesignSystemPage() {
             <div className="space-y-6">
               <div>
                 <h3 className="text-sm font-medium text-text-muted mb-3">
-                  Individual Skill Slots
+                  Skill Icon (standalone, no tooltip)
+                </h3>
+                <div className="flex items-end gap-4">
+                  <div className="flex flex-col items-center gap-1">
+                    <SkillIcon skillId={946} size="lg" name="Energy Surge" elite />
+                    <span className="text-xs text-text-muted">lg (64px)</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <SkillIcon skillId={946} size="md" name="Energy Surge" elite />
+                    <span className="text-xs text-text-muted">md (56px)</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <SkillIcon skillId={946} size="sm" name="Energy Surge" />
+                    <span className="text-xs text-text-muted">sm (44px)</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <SkillIcon skillId={946} size="xs" name="Energy Surge" />
+                    <span className="text-xs text-text-muted">xs (24px)</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <SkillIcon skillId={0} size="sm" showEmptyGhost emptyVariant="viewer" />
+                    <span className="text-xs text-text-muted">empty</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <SkillIcon skillId={0} size="sm" showEmptyGhost emptyVariant="editor" />
+                    <span className="text-xs text-text-muted">editor</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-medium text-text-muted mb-3">
+                  Cost Stats
+                </h3>
+                <div className="flex items-center gap-6 text-sm">
+                  <CostStat type="energy" value={10} />
+                  <CostStat type="adrenaline" value={4} />
+                  <CostStat type="activation" value={1.5} showUnit />
+                  <CostStat type="recharge" value={20} showUnit />
+                  <CostStat type="sacrifice" value={10} showUnit />
+                  <CostStat type="upkeep" value={-1} />
+                  <CostStat type="overcast" value={2} />
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-medium text-text-muted mb-3">
+                  Individual Skill Slots (with tooltip)
                 </h3>
                 <div className="flex gap-2">
                   <SkillSlot skill={sampleSkills[0]} size="lg" />
@@ -658,6 +835,27 @@ export default function DesignSystemPage() {
                   label="Build Notes"
                   placeholder="Describe your build strategy, usage tips, and variations..."
                 />
+              </div>
+            </div>
+          </section>
+
+          {/* Toggle */}
+          <section>
+            <h2 className="text-2xl font-semibold text-text-primary mb-6">
+              Toggle
+            </h2>
+            <div className="space-y-4 max-w-sm">
+              <div className="flex items-center justify-between p-3 bg-bg-card rounded-lg border border-border">
+                <span className="text-sm text-text-primary">Default (off)</span>
+                <Toggle checked={false} onChange={() => {}} label="Example toggle" />
+              </div>
+              <div className="flex items-center justify-between p-3 bg-bg-card rounded-lg border border-border">
+                <span className="text-sm text-text-primary">Active (on)</span>
+                <Toggle checked={true} onChange={() => {}} label="Example toggle" />
+              </div>
+              <div className="flex items-center justify-between p-3 bg-bg-card rounded-lg border border-border opacity-50">
+                <span className="text-sm text-text-primary">Disabled</span>
+                <Toggle checked={false} onChange={() => {}} disabled label="Disabled toggle" />
               </div>
             </div>
           </section>
