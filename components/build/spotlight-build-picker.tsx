@@ -17,7 +17,7 @@ import { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } f
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, X } from 'lucide-react'
+import { Search, X, HelpCircle } from 'lucide-react'
 import Fuse from 'fuse.js'
 
 import { cn } from '@/lib/utils'
@@ -27,6 +27,7 @@ import { getSkillIconUrlById } from '@/lib/gw/icons'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
 import { type ProfessionKey } from '@/types/gw1'
 import { BuildFeedCard } from '@/components/build/build-feed-card'
+import { Modal, ModalBody } from '@/components/ui/modal'
 import { TAG_LABELS } from '@/lib/constants'
 import type { BuildListItem } from '@/types/database'
 import {
@@ -42,6 +43,20 @@ import {
   normalizeBuilds,
   clearFilteredFuseCache,
 } from '@/lib/search/build-search'
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+/** Tag groups for help modal display */
+const TAG_GROUPS: Record<string, string[]> = {
+  'Game Mode': ['pve', 'pvp', 'general'],
+  'PvE Activities': ['general-pve', 'hard-mode', 'farming', 'speed-clear', 'running', 'dungeon'],
+  'Elite Areas': ['uw', 'fow', 'doa', 'deep', 'urgoz', 'se', 'sf'],
+  'PvP Formats': ['gvg', 'ha', 'ra', 'ab', 'fa', 'jq', 'ca'],
+  'Build Type': ['player', 'hero', 'team'],
+  'Characteristics': ['meta', 'beginner', 'budget', 'alternative', 'niche', 'meme'],
+}
 
 // ============================================================================
 // TYPES
@@ -85,6 +100,7 @@ export function SpotlightBuildPicker({
   const [searchIndex, setSearchIndex] = useState<Fuse<SearchableBuild> | null>(null)
   const [allBuilds, setAllBuilds] = useState<SearchableBuild[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [showHelp, setShowHelp] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const selectedItemRef = useRef<HTMLElement | null>(null)
@@ -167,6 +183,7 @@ export function SpotlightBuildPicker({
   // Initialize state when modal opens (e.g., back button navigation)
   useEffect(() => {
     if (!isOpen) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional reset on modal open
     setQuery(initialQuery)
     setActiveFilters(initialFilters)
     setSelectedIndex(0)
@@ -175,6 +192,7 @@ export function SpotlightBuildPicker({
 
   // Reset selection and scroll when results change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional reset on search change
     setSelectedIndex(0)
     scrollContainerRef.current?.scrollTo({ top: 0 })
   }, [deferredQuery, activeFilters])
@@ -212,6 +230,7 @@ export function SpotlightBuildPicker({
 
     // Skip skill suggestions for tag or profession searches
     if (q.startsWith('#') || q.includes('/')) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clearing suggestions is sync
       setSkillSuggestions([])
       return
     }
@@ -418,6 +437,7 @@ export function SpotlightBuildPicker({
   }, [addSkillFilter])
 
   return (
+    <>
     <AnimatePresence>
       {isOpen && (
         <>
@@ -479,10 +499,10 @@ export function SpotlightBuildPicker({
                         title={pillTitle}
                         aria-label={`Remove filter: ${pillTitle}`}
                         className={cn(
-                          'flex items-center gap-0.5 sm:gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded text-[11px] sm:text-xs font-medium transition-colors shrink-0 cursor-pointer',
-                          filter.type === 'profession' && 'bg-accent-gold/20 text-accent-gold hover:bg-accent-gold/30 active:bg-accent-gold/40',
-                          filter.type === 'tag' && 'bg-accent-purple/20 text-accent-purple hover:bg-accent-purple/30 active:bg-accent-purple/40',
-                          filter.type === 'skill' && 'bg-accent-blue/20 text-accent-blue hover:bg-accent-blue/30 active:bg-accent-blue/40'
+                          'flex items-center gap-0.5 sm:gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded text-[11px] sm:text-xs font-medium transition-colors cursor-pointer',
+                          filter.type === 'profession' && 'shrink-0 bg-accent-gold/20 text-accent-gold hover:bg-accent-gold/30 active:bg-accent-gold/40',
+                          filter.type === 'tag' && 'shrink-0 bg-accent-purple/20 text-accent-purple hover:bg-accent-purple/30 active:bg-accent-purple/40',
+                          filter.type === 'skill' && 'bg-accent-blue/20 text-accent-blue hover:bg-accent-blue/30 active:bg-accent-blue/40 shrink-0 md:max-w-[180px] md:min-w-0 md:overflow-hidden'
                         )}
                       >
                         {filter.type === 'profession' && (
@@ -497,13 +517,13 @@ export function SpotlightBuildPicker({
                             alt=""
                             width={20}
                             height={20}
-                            className="w-4 h-4 sm:w-5 sm:h-5 object-cover"
+                            className="w-4 h-4 sm:w-5 sm:h-5 object-cover shrink-0"
                             aria-hidden="true"
                             unoptimized
                           />
                         )}
-                        <span className={cn(filter.type !== 'skill' && 'font-mono')}>{pillLabel}</span>
-                        <X className="w-3 h-3 sm:w-4 sm:h-4 opacity-60" aria-hidden="true" />
+                        <span className={cn(filter.type !== 'skill' && 'font-mono', filter.type === 'skill' && 'hidden md:inline md:truncate md:min-w-0')}>{pillLabel}</span>
+                        <X className="w-3 h-3 sm:w-4 sm:h-4 opacity-60 shrink-0" aria-hidden="true" />
                       </button>
                     )
                   })}
@@ -522,6 +542,15 @@ export function SpotlightBuildPicker({
 
                   {/* Action buttons - grouped so they stay together when wrapping */}
                   <div className="flex items-center gap-1 shrink-0 ml-auto">
+                    {/* Help button */}
+                    <button
+                      onClick={() => setShowHelp(true)}
+                      aria-label="Search help"
+                      className="px-2 py-1 sm:py-1.5 flex items-center gap-1.5 text-text-muted hover:text-text-primary active:text-text-primary cursor-pointer text-xs rounded hover:bg-bg-hover transition-colors"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Help</span>
+                    </button>
                     {/* X button to clear, or Close button on mobile when empty */}
                     {(query || activeFilters.length > 0) ? (
                       <button
@@ -815,6 +844,71 @@ export function SpotlightBuildPicker({
         </>
       )}
     </AnimatePresence>
+
+    {/* Search Help Modal */}
+    <Modal
+      isOpen={showHelp}
+      onClose={() => setShowHelp(false)}
+      title="How to Search"
+      maxWidth="max-w-md"
+    >
+      <ModalBody>
+        <div className="space-y-4">
+          {/* Professions */}
+          <div>
+            <p className="text-text-muted text-xs mb-2">By profession</p>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { code: 'W/Mo', label: 'primary / secondary' },
+                { code: '/Me', label: 'any primary' },
+                { code: 'R/', label: 'any secondary' },
+              ].map(({ code, label }) => (
+                <button
+                  key={code}
+                  onClick={() => { handleHintClick(code); setShowHelp(false) }}
+                  className="px-2 py-1.5 rounded bg-accent-gold/10 hover:bg-accent-gold/20 active:bg-accent-gold/30 text-accent-gold text-xs font-mono transition-colors cursor-pointer"
+                >
+                  {code} <span className="text-accent-gold/60 font-sans">({label})</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Skills */}
+          <div>
+            <p className="text-text-muted text-xs mb-2">By skill name</p>
+            <div className="flex flex-wrap gap-1.5">
+              {['Energy Surge', 'Heal Party', 'Spirit Bond'].map(skill => (
+                <button
+                  key={skill}
+                  onClick={() => { handleHintClick(skill); setShowHelp(false) }}
+                  className="px-2 py-1.5 rounded bg-accent-blue/10 hover:bg-accent-blue/20 active:bg-accent-blue/30 text-accent-blue text-xs font-mono transition-colors cursor-pointer"
+                >
+                  {skill}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div>
+            <p className="text-text-muted text-xs mb-2">By tag</p>
+            <div className="flex flex-wrap gap-1.5">
+              {Object.values(TAG_GROUPS).flat().map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => { handleHintClick(`#${tag}`); setShowHelp(false) }}
+                  className="px-2 py-1.5 rounded bg-accent-purple/10 hover:bg-accent-purple/20 active:bg-accent-purple/30 text-accent-purple text-xs font-mono transition-colors cursor-pointer"
+                >
+                  #{TAG_LABELS[tag] || tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </ModalBody>
+    </Modal>
+    </>
   )
 }
 

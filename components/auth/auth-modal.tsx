@@ -22,18 +22,14 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Check, Loader2, X } from 'lucide-react'
 import { useAuth } from '@/components/providers/auth-provider'
 import { Button } from '@/components/ui/button'
+import { Modal } from '@/components/ui/modal'
 import {
   validateUsername,
   isReservedUsername,
   USERNAME_MIN,
   USERNAME_MAX,
 } from '@/lib/validations/username'
-import {
-  modalOverlayVariants,
-  modalContentVariants,
-  MOTION_DURATION,
-  MOTION_EASE,
-} from '@/lib/motion'
+import { MOTION_DURATION, MOTION_EASE } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
 // ============================================================================
@@ -98,9 +94,6 @@ function AuthModal({
 }) {
   const { user, profile, refreshProfile, signOut } = useAuth()
   const router = useRouter()
-  const modalRef = useRef<HTMLDivElement>(null)
-  const previousFocusRef = useRef<HTMLElement | null>(null)
-  const reducedMotion = useReducedMotion()
 
   // Determine modal state
   const needsUsername = user && !profile?.username
@@ -132,148 +125,31 @@ function AuthModal({
     }
   }, [])
 
-  // Focus trap
-  useEffect(() => {
-    if (!isOpen) return
-
-    previousFocusRef.current = document.activeElement as HTMLElement
-
-    const focusFirst = () => {
-      const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      )
-      focusable?.[0]?.focus()
-    }
-
-    const timer = setTimeout(focusFirst, 100)
-
-    const handleTab = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab' || !modalRef.current) return
-
-      const focusable = modalRef.current.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      )
-      if (!focusable.length) return
-
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault()
-        last.focus()
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault()
-        first.focus()
-      }
-    }
-
-    document.addEventListener('keydown', handleTab)
-
-    return () => {
-      clearTimeout(timer)
-      document.removeEventListener('keydown', handleTab)
-      previousFocusRef.current?.focus()
-    }
-  }, [isOpen])
-
-  // Close on escape
-  useEffect(() => {
-    if (!isOpen || !canClose) return
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [isOpen, canClose, onClose])
-
-  // Prevent body scroll
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isOpen])
-
-  const handleBackdropClick = () => {
-    if (canClose) onClose()
-  }
-
   const handleSignOutAndClose = async () => {
     await signOut()
     onClose()
   }
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          variants={reducedMotion ? undefined : modalOverlayVariants}
-          initial={reducedMotion ? undefined : 'hidden'}
-          animate={reducedMotion ? undefined : 'visible'}
-          exit={reducedMotion ? undefined : 'exit'}
-        >
-          {/* Backdrop */}
-          <motion.div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={handleBackdropClick}
-          />
-
-          {/* Modal Card */}
-          <motion.div
-            ref={modalRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="auth-modal-title"
-            aria-describedby="auth-modal-description"
-            className={cn(
-              'relative z-10 w-full max-w-md',
-              'bg-bg-card',
-              'border border-border',
-              'rounded-xl',
-              'max-h-[90vh] overflow-y-auto',
-              'shadow-xl'
-            )}
-            variants={reducedMotion ? undefined : modalContentVariants}
-            initial={reducedMotion ? undefined : 'hidden'}
-            animate={reducedMotion ? undefined : 'visible'}
-            exit={reducedMotion ? undefined : 'exit'}
-          >
-            {/* Close button */}
-            {canClose && (
-              <motion.button
-                onClick={onClose}
-                aria-label="Close modal"
-                className={cn(
-                  'absolute top-3 right-3 p-2 rounded-[var(--radius-md)]',
-                  'text-text-muted hover:text-text-primary',
-                  'hover:bg-bg-hover transition-colors z-10 cursor-pointer'
-                )}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <X className="w-4 h-4" />
-              </motion.button>
-            )}
-
-            {needsUsername ? (
-              <UsernameStep
-                onSuccess={refreshProfile}
-                onCancel={handleSignOutAndClose}
-                redirectTo={redirectTo}
-              />
-            ) : (
-              <SignInStep />
-            )}
-          </motion.div>
-        </motion.div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      canClose={canClose}
+      closeOnBackdropClick={canClose}
+      closeOnEscape={canClose}
+      showCloseButton={canClose}
+      showHeader={false}
+    >
+      {needsUsername ? (
+        <UsernameStep
+          onSuccess={refreshProfile}
+          onCancel={handleSignOutAndClose}
+          redirectTo={redirectTo}
+        />
+      ) : (
+        <SignInStep />
       )}
-    </AnimatePresence>
+    </Modal>
   )
 }
 

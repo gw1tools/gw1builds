@@ -3,6 +3,14 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
+  useFloating,
+  offset,
+  flip,
+  shift,
+  autoUpdate,
+  FloatingPortal,
+} from '@floating-ui/react'
+import {
   Search,
   X,
   ChevronDown,
@@ -13,10 +21,12 @@ import { getAllSkills, type Skill } from '@/lib/gw/skills'
 import { SkillIcon } from '@/components/ui/skill-icon'
 import { CostStat } from '@/components/ui/cost-stat'
 import { ScaledDescription } from '@/components/ui/scaled-description'
+import { SkillTooltipContent } from '@/components/ui/skill-tooltip'
 import { ATTRIBUTES_BY_PROFESSION, PROFESSION_TO_ID, PROFESSION_BY_ID, ATTRIBUTE_BY_ID } from '@/lib/constants'
 import { PROFESSIONS, professionToKey } from '@/types/gw1'
 import type { Profession } from '@/types/gw1'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
+import { useCanHover } from '@/hooks'
 
 const ALL_ATTRIBUTES = Object.values(ATTRIBUTE_BY_ID).filter(
   (attr, idx, arr) => attr !== 'No Attribute' && arr.indexOf(attr) === idx
@@ -81,7 +91,6 @@ interface SkillCategoryMatch {
 interface AttributeGroup {
   attribute: string
   skills: Skill[]
-  isCollapsed: boolean
 }
 
 export interface SpotlightSkillPickerProps {
@@ -109,6 +118,63 @@ export function SpotlightSkillPicker({
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
 
+  // Hover tooltip state (desktop only)
+  const canHover = useCanHover()
+  const [hoveredSkill, setHoveredSkill] = useState<Skill | null>(null)
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Floating UI for hover tooltip
+  const { refs, floatingStyles, isPositioned } = useFloating({
+    open: hoveredSkill !== null,
+    placement: 'right',
+    strategy: 'fixed',
+    middleware: [
+      offset(12),
+      flip({ fallbackPlacements: ['left', 'top', 'bottom'] }),
+      shift({ padding: 12 }),
+    ],
+    whileElementsMounted: autoUpdate,
+  })
+
+  // Handle hover with delay - call refs.setReference directly
+  const handleSkillHover = useCallback((skill: Skill, el: HTMLElement) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current)
+    }
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredSkill(skill)
+      refs.setReference(el)
+    }, 80)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs object is stable from useFloating
+  }, [])
+
+  const handleSkillHoverEnd = useCallback(() => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current)
+    }
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredSkill(null)
+      refs.setReference(null)
+    }, 50)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs object is stable from useFloating
+  }, [])
+
+  // Cleanup hover timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  // Clear hovered skill when query changes (skill may no longer be visible)
+  useEffect(() => {
+    setHoveredSkill(null)
+    refs.setReference(null)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only clear on query/filter change
+  }, [query, activeFilter])
+
   useEffect(() => {
     getAllSkills().then(skills => {
       setAllSkills(skills)
@@ -116,38 +182,74 @@ export function SpotlightSkillPicker({
     })
   }, [])
 
+  // Pre-compute search index with lowercase names/descriptions and category counts
+  const searchIndex = useMemo(() => {
+    if (allSkills.length === 0) return null
+
+    // Pre-compute lowercase values once for all skills
+    const skillsWithLower = allSkills.map(skill => ({
+      skill,
+      nameLower: skill.name.toLowerCase(),
+      descLower: skill.description.toLowerCase(),
+    }))
+
+    // Pre-compute counts for professions and attributes
+    const professionCounts = new Map<string, number>()
+    const attributeCounts = new Map<string, number>()
+
+    for (const skill of allSkills) {
+      professionCounts.set(skill.profession, (professionCounts.get(skill.profession) ?? 0) + 1)
+      attributeCounts.set(skill.attribute, (attributeCounts.get(skill.attribute) ?? 0) + 1)
+    }
+
+    return { skillsWithLower, professionCounts, attributeCounts }
+  }, [allSkills])
+
+  // Reset state when modal closes
   useEffect(() => {
     if (isOpen) {
       inputRef.current?.focus()
     } else {
-      /* eslint-disable react-hooks/set-state-in-effect -- reset on close */
       setQuery('')
       setSelectedIndex(0)
       setActiveFilter(null)
       setCollapsedAttributes(new Set())
-      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [isOpen])
 
   const smartSearchResults = useMemo(() => {
-    if (!isOpen || isLoading) return { categories: [], skills: [], groupedByAttribute: [] as AttributeGroup[] }
+    const emptyResult = { categories: [], skills: [], groupedByAttribute: [] as AttributeGroup[], searchQuery: '', descriptionMatchIds: new Set<number>() }
+    if (!isOpen || isLoading || !searchIndex) return emptyResult
 
-    const lowerQuery = query.trim().toLowerCase()
+    const searchQuery = query.trim().toLowerCase()
 
     if (activeFilter?.type === 'profession') {
-      const professionSkills = allSkills.filter(skill => skill.profession === activeFilter.value)
-      const filteredSkills = lowerQuery
-        ? professionSkills.filter(s => s.name.toLowerCase().includes(lowerQuery))
+      const professionSkills = searchIndex.skillsWithLower.filter(s => s.skill.profession === activeFilter.value)
+
+      // Track description-only matches for highlighting
+      const descriptionMatchIds = new Set<number>()
+
+      const filteredSkills = searchQuery
+        ? professionSkills.filter(({ skill, nameLower, descLower }) => {
+            if (nameLower.includes(searchQuery)) {
+              return true
+            }
+            if (descLower.includes(searchQuery)) {
+              descriptionMatchIds.add(skill.id)
+              return true
+            }
+            return false
+          })
         : professionSkills
 
       const attributeMap = new Map<string, Skill[]>()
-      filteredSkills.forEach(skill => {
+      for (const { skill } of filteredSkills) {
         const attr = skill.attribute || 'No Attribute'
         if (!attributeMap.has(attr)) {
           attributeMap.set(attr, [])
         }
         attributeMap.get(attr)!.push(skill)
-      })
+      }
 
       const profId = PROFESSION_TO_ID[activeFilter.value as keyof typeof PROFESSION_TO_ID]
       const profAttrs = profId ? ATTRIBUTES_BY_PROFESSION[profId] || [] : []
@@ -166,82 +268,119 @@ export function SpotlightSkillPicker({
       const groupedByAttribute: AttributeGroup[] = sortedAttrs.map(attr => ({
         attribute: attr,
         skills: attributeMap.get(attr)!.sort((a, b) => a.name.localeCompare(b.name)),
-        isCollapsed: collapsedAttributes.has(attr),
       }))
 
-      return { categories: [], skills: [], groupedByAttribute }
+      return { categories: [], skills: [], groupedByAttribute, searchQuery, descriptionMatchIds }
     }
 
     if (activeFilter?.type === 'attribute') {
-      const filteredSkills = allSkills.filter(skill => skill.attribute === activeFilter.value)
-      const matchedSkills = lowerQuery
-        ? filteredSkills.filter(s => s.name.toLowerCase().includes(lowerQuery))
-        : filteredSkills
+      const filteredSkills = searchIndex.skillsWithLower.filter(s => s.skill.attribute === activeFilter.value)
+
+      if (!searchQuery) {
+        return {
+          categories: [],
+          skills: filteredSkills.map(s => s.skill).sort((a, b) => a.name.localeCompare(b.name)),
+          groupedByAttribute: [],
+          searchQuery: '',
+          descriptionMatchIds: new Set<number>(),
+        }
+      }
+
+      // Search both name and description
+      const nameMatches: Skill[] = []
+      const descriptionOnlyMatches: Skill[] = []
+
+      for (const { skill, nameLower, descLower } of filteredSkills) {
+        if (nameLower.includes(searchQuery)) {
+          nameMatches.push(skill)
+        } else if (descLower.includes(searchQuery)) {
+          descriptionOnlyMatches.push(skill)
+        }
+      }
+
+      const allMatches = [...nameMatches, ...descriptionOnlyMatches].sort((a, b) => a.name.localeCompare(b.name))
+      const descriptionMatchIds = new Set(descriptionOnlyMatches.map(s => s.id))
 
       return {
         categories: [],
-        skills: matchedSkills.sort((a, b) => a.name.localeCompare(b.name)),
+        skills: allMatches,
         groupedByAttribute: [],
+        searchQuery,
+        descriptionMatchIds,
       }
     }
 
-    if (lowerQuery === '') return { categories: [], skills: [], groupedByAttribute: [] }
+    if (searchQuery === '') return emptyResult
 
     const categories: SkillCategoryMatch[] = []
 
-    const matchedProfessionByAlias = PROFESSION_ALIASES[lowerQuery]
-    PROFESSIONS.forEach(prof => {
-      const nameMatch = prof.name.toLowerCase().startsWith(lowerQuery) || prof.abbreviation.toLowerCase().startsWith(lowerQuery)
+    // Use pre-computed counts for categories
+    const matchedProfessionByAlias = PROFESSION_ALIASES[searchQuery]
+    for (const prof of PROFESSIONS) {
+      const nameMatch = prof.name.toLowerCase().startsWith(searchQuery) || prof.abbreviation.toLowerCase().startsWith(searchQuery)
       const aliasMatch = matchedProfessionByAlias === prof.name
 
       if (nameMatch || aliasMatch) {
-        const count = allSkills.filter(s => s.profession === prof.name).length
         categories.push({
           type: 'profession',
           name: prof.name,
-          count,
+          count: searchIndex.professionCounts.get(prof.name) ?? 0,
         })
       }
-    })
+    }
 
-    ALL_ATTRIBUTES.forEach(attr => {
-      if (attr.toLowerCase().includes(lowerQuery)) {
-        const count = allSkills.filter(s => s.attribute === attr).length
+    for (const attr of ALL_ATTRIBUTES) {
+      if (attr.toLowerCase().includes(searchQuery)) {
         categories.push({
           type: 'attribute',
           name: attr,
-          count,
+          count: searchIndex.attributeCounts.get(attr) ?? 0,
         })
       }
-    })
+    }
 
-    const skillMatches = allSkills
-      .filter(skill => skill.name.toLowerCase().includes(lowerQuery))
-      .sort((a, b) => {
-        const aStarts = a.name.toLowerCase().startsWith(lowerQuery)
-        const bStarts = b.name.toLowerCase().startsWith(lowerQuery)
-        if (aStarts && !bStarts) return -1
-        if (!aStarts && bStarts) return 1
-        return a.name.localeCompare(b.name)
-      })
-      .slice(0, 30)
+    // Search both name and description using pre-computed lowercase
+    const prefixMatches: Skill[] = []
+    const containsMatches: Skill[] = []
+    const descriptionOnlyMatches: Skill[] = []
 
-    return { categories, skills: skillMatches, groupedByAttribute: [] }
-  }, [query, isOpen, allSkills, isLoading, activeFilter, collapsedAttributes])
+    for (const { skill, nameLower, descLower } of searchIndex.skillsWithLower) {
+      if (nameLower.startsWith(searchQuery)) {
+        prefixMatches.push(skill)
+      } else if (nameLower.includes(searchQuery)) {
+        containsMatches.push(skill)
+      } else if (descLower.includes(searchQuery)) {
+        descriptionOnlyMatches.push(skill)
+      }
+    }
+
+    // Sort each partition alphabetically, then combine (partition approach)
+    prefixMatches.sort((a, b) => a.name.localeCompare(b.name))
+    containsMatches.sort((a, b) => a.name.localeCompare(b.name))
+    descriptionOnlyMatches.sort((a, b) => a.name.localeCompare(b.name))
+
+    // Combine: prefix matches first, then contains matches, then description matches
+    const skillMatches = [...prefixMatches, ...containsMatches, ...descriptionOnlyMatches].slice(0, 50)
+
+    // Track which skills matched only on description (not name)
+    const descriptionMatchIds = new Set(descriptionOnlyMatches.map(s => s.id))
+
+    return { categories, skills: skillMatches, groupedByAttribute: [], searchQuery, descriptionMatchIds }
+  }, [query, isOpen, searchIndex, isLoading, activeFilter])
 
   const isSkillInBar = useCallback((skill: Skill) => currentSkills.some(s => s.id === skill.id), [currentSkills])
-  const hasEliteInBar = currentSkills.some(s => s.elite)
+  const hasEliteInBar = useMemo(() => currentSkills.some(s => s.elite), [currentSkills])
 
   const totalVisibleSkills = useMemo(() => {
     if (smartSearchResults.groupedByAttribute.length > 0) {
       return smartSearchResults.groupedByAttribute.reduce((sum, g) =>
-        sum + (g.isCollapsed ? 0 : g.skills.length), 0
+        sum + (collapsedAttributes.has(g.attribute) ? 0 : g.skills.length), 0
       )
     }
     return smartSearchResults.skills.length
-  }, [smartSearchResults])
+  }, [smartSearchResults, collapsedAttributes])
 
-  const toggleAttributeCollapse = (attr: string) => {
+  const toggleAttributeCollapse = useCallback((attr: string) => {
     setCollapsedAttributes(prev => {
       const next = new Set(prev)
       if (next.has(attr)) {
@@ -251,7 +390,7 @@ export function SpotlightSkillPicker({
       }
       return next
     })
-  }
+  }, [])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -278,20 +417,20 @@ export function SpotlightSkillPicker({
     }
   }, [smartSearchResults, activeFilter, onClose, query])
 
-  const handleCategoryClick = (cat: SkillCategoryMatch) => {
+  const handleCategoryClick = useCallback((cat: SkillCategoryMatch) => {
     setActiveFilter({ type: cat.type, value: cat.name })
     setQuery('')
     setSelectedIndex(0)
     inputRef.current?.focus()
-  }
+  }, [])
 
-  const clearFilter = () => {
+  const clearFilter = useCallback(() => {
     setActiveFilter(null)
     setQuery('')
     setSelectedIndex(0)
     setCollapsedAttributes(new Set())
     inputRef.current?.focus()
-  }
+  }, [])
 
   const isGroupedView = activeFilter?.type === 'profession' && smartSearchResults.groupedByAttribute.length > 0
 
@@ -309,6 +448,8 @@ export function SpotlightSkillPicker({
           />
 
           <motion.div
+            role="dialog"
+            aria-modal="true"
             initial={{ opacity: 0, scale: 0.95, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -10 }}
@@ -351,7 +492,7 @@ export function SpotlightSkillPicker({
                   value={query}
                   onChange={e => { setQuery(e.target.value); setSelectedIndex(0) }}
                   onKeyDown={handleKeyDown}
-                  placeholder={activeFilter ? `Search ${activeFilter.value} skills...` : 'Search skills...'}
+                  placeholder={activeFilter ? 'Search...' : 'Search skills...'}
                   className={cn(
                     'flex-1 bg-transparent text-text-primary py-4 pr-14 sm:pr-10 text-lg placeholder:text-text-muted focus:outline-none',
                     activeFilter ? 'pl-2' : 'pl-12'
@@ -425,11 +566,17 @@ export function SpotlightSkillPicker({
                       <AttributeGroupSection
                         key={group.attribute}
                         group={group}
+                        isCollapsed={collapsedAttributes.has(group.attribute)}
                         onToggleCollapse={() => toggleAttributeCollapse(group.attribute)}
                         onSelectSkill={onSelect}
                         isSkillInBar={isSkillInBar}
                         hasEliteInBar={hasEliteInBar}
                         attributes={attributes}
+                        compactMode={canHover}
+                        onHover={handleSkillHover}
+                        onHoverEnd={handleSkillHoverEnd}
+                        searchQuery={smartSearchResults.searchQuery}
+                        descriptionMatchIds={smartSearchResults.descriptionMatchIds}
                       />
                     ))}
                   </div>
@@ -489,6 +636,10 @@ export function SpotlightSkillPicker({
                         eliteBlocked={skill.elite && hasEliteInBar && !isSkillInBar(skill)}
                         onSelect={() => onSelect(skill)}
                         attributes={attributes}
+                        compactMode={canHover}
+                        onHover={handleSkillHover}
+                        onHoverEnd={handleSkillHoverEnd}
+                        descriptionSnippet={smartSearchResults.descriptionMatchIds.has(skill.id) ? smartSearchResults.searchQuery : undefined}
                       />
                     ))}
                   </div>
@@ -517,6 +668,26 @@ export function SpotlightSkillPicker({
               </div>
             </div>
           </motion.div>
+
+          {/* Hover tooltip (desktop only) */}
+          <FloatingPortal>
+            {hoveredSkill && canHover && (
+              <div
+                ref={refs.setFloating}
+                style={floatingStyles}
+                className={cn(
+                  'z-[60] pointer-events-none transition-opacity duration-75',
+                  isPositioned ? 'opacity-100' : 'opacity-0'
+                )}
+              >
+                <SkillTooltipContent
+                  skill={hoveredSkill}
+                  showIcon
+                  attributes={attributes}
+                />
+              </div>
+            )}
+          </FloatingPortal>
         </>
       )}
     </AnimatePresence>
@@ -532,8 +703,6 @@ function SkillRowContent({
   isInBar: boolean
   attributes?: Record<string, number>
 }) {
-  const attributeLevel = attributes?.[skill.attribute] ?? 0
-
   return (
     <>
       <div className="flex items-start gap-3 w-full">
@@ -576,7 +745,7 @@ function SkillRowContent({
         <p className="text-sm text-text-secondary leading-relaxed mt-2 w-full line-clamp-3">
           <ScaledDescription
             description={skill.description}
-            attributeLevel={attributeLevel}
+            attributeLevel={attributes?.[skill.attribute] ?? 0}
           />
         </p>
       )}
@@ -598,18 +767,30 @@ function SkillCostStats({ skill }: { skill: Skill }) {
 
 function AttributeGroupSection({
   group,
+  isCollapsed,
   onToggleCollapse,
   onSelectSkill,
   isSkillInBar,
   hasEliteInBar,
   attributes,
+  compactMode = false,
+  onHover,
+  onHoverEnd,
+  searchQuery,
+  descriptionMatchIds,
 }: {
   group: AttributeGroup
+  isCollapsed: boolean
   onToggleCollapse: () => void
   onSelectSkill: (skill: Skill) => void
   isSkillInBar: (skill: Skill) => boolean
   hasEliteInBar: boolean
   attributes?: Record<string, number>
+  compactMode?: boolean
+  onHover?: (skill: Skill, el: HTMLElement) => void
+  onHoverEnd?: () => void
+  searchQuery?: string
+  descriptionMatchIds?: Set<number>
 }) {
   return (
     <div className="relative">
@@ -623,7 +804,7 @@ function AttributeGroupSection({
             <ChevronDown
               className={cn(
                 'w-3.5 h-3.5 text-text-muted transition-transform duration-200',
-                group.isCollapsed && '-rotate-90'
+                isCollapsed && '-rotate-90'
               )}
             />
             <span className="font-semibold text-sm text-text-primary tracking-wide">{group.attribute}</span>
@@ -633,7 +814,7 @@ function AttributeGroupSection({
       </div>
 
       <AnimatePresence initial={false}>
-        {!group.isCollapsed && (
+        {!isCollapsed && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -655,6 +836,10 @@ function AttributeGroupSection({
                     eliteBlocked={skill.elite && hasEliteInBar && !isSkillInBar(skill)}
                     onSelect={() => onSelectSkill(skill)}
                     attributes={attributes}
+                    compactMode={compactMode}
+                    onHover={onHover}
+                    onHoverEnd={onHoverEnd}
+                    descriptionSnippet={descriptionMatchIds?.has(skill.id) ? searchQuery : undefined}
                   />
                 </motion.div>
               ))}
@@ -672,30 +857,129 @@ function GroupedSkillRow({
   eliteBlocked,
   onSelect,
   attributes,
+  compactMode = false,
+  onHover,
+  onHoverEnd,
+  descriptionSnippet,
 }: {
   skill: Skill
   isInBar: boolean
   eliteBlocked: boolean
   onSelect: () => void
   attributes?: Record<string, number>
+  compactMode?: boolean
+  onHover?: (skill: Skill, el: HTMLElement) => void
+  onHoverEnd?: () => void
+  descriptionSnippet?: string
 }) {
   const disabled = isInBar || eliteBlocked
+
+  const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (compactMode && onHover) {
+      onHover(skill, e.currentTarget)
+    }
+  }
 
   return (
     <button
       type="button"
       onClick={() => !disabled && onSelect()}
       disabled={disabled}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={compactMode ? onHoverEnd : undefined}
       className={cn(
-        'w-full flex flex-col p-2.5 rounded-lg text-left transition-all duration-150 cursor-pointer',
+        'w-full flex flex-col rounded-lg text-left transition-all duration-150 cursor-pointer',
         'border border-transparent',
+        compactMode ? 'p-2' : 'p-2.5',
         disabled
           ? 'opacity-40 cursor-not-allowed'
           : 'hover:bg-bg-hover/80 hover:border-border/50'
       )}
     >
-      <SkillRowContent skill={skill} isInBar={isInBar} attributes={attributes} />
+      {compactMode ? (
+        <CompactSkillRow skill={skill} isInBar={isInBar} descriptionSnippet={descriptionSnippet} />
+      ) : (
+        <SkillRowContent skill={skill} isInBar={isInBar} attributes={attributes} />
+      )}
     </button>
+  )
+}
+
+/**
+ * Compact skill row for desktop - shows icon + name, with optional description snippet
+ */
+function CompactSkillRow({
+  skill,
+  isInBar,
+  descriptionSnippet,
+}: {
+  skill: Skill
+  isInBar: boolean
+  /** Search query to extract and highlight a snippet from description */
+  descriptionSnippet?: string
+}) {
+  return (
+    <div className="flex flex-col gap-1 w-full">
+      <div className="flex items-center gap-2">
+        <SkillIcon skillId={skill.id} size={32} elite={skill.elite} name={skill.name} />
+        <span className={cn('text-sm font-medium', skill.elite ? 'text-accent-gold' : 'text-text-primary')}>
+          {skill.name}
+        </span>
+        {skill.elite && (
+          <span className="text-[9px] uppercase tracking-widest text-accent-gold/60 font-semibold px-1.5 py-0.5 bg-accent-gold/10 rounded">
+            Elite
+          </span>
+        )}
+        {isInBar && (
+          <span className="text-[9px] uppercase tracking-wider text-text-muted font-medium px-1.5 py-0.5 bg-bg-card rounded">
+            Equipped
+          </span>
+        )}
+        <span className="flex items-center gap-1.5 ml-auto">
+          <SkillCostStats skill={skill} />
+        </span>
+      </div>
+      {descriptionSnippet && skill.description && (
+        <DescriptionSnippet description={skill.description} searchQuery={descriptionSnippet} />
+      )}
+    </div>
+  )
+}
+
+/**
+ * Shows a single-line snippet of description with highlighted match
+ */
+function DescriptionSnippet({
+  description,
+  searchQuery,
+}: {
+  description: string
+  searchQuery: string
+}) {
+  const lowerDesc = description.toLowerCase()
+  const matchIndex = lowerDesc.indexOf(searchQuery.toLowerCase())
+
+  if (matchIndex === -1) {
+    return null
+  }
+
+  // Extract ~40 chars before and after the match
+  const snippetStart = Math.max(0, matchIndex - 40)
+  const snippetEnd = Math.min(description.length, matchIndex + searchQuery.length + 40)
+
+  const prefix = snippetStart > 0 ? '...' : ''
+  const suffix = snippetEnd < description.length ? '...' : ''
+
+  const before = description.slice(snippetStart, matchIndex)
+  const match = description.slice(matchIndex, matchIndex + searchQuery.length)
+  const after = description.slice(matchIndex + searchQuery.length, snippetEnd)
+
+  return (
+    <p className="text-xs text-text-muted pl-11 truncate">
+      {prefix}{before}
+      <mark className="bg-accent-gold/30 text-text-primary px-0.5 rounded">{match}</mark>
+      {after}{suffix}
+    </p>
   )
 }
 
@@ -706,6 +990,10 @@ function SkillResultRow({
   eliteBlocked,
   onSelect,
   attributes,
+  compactMode = false,
+  onHover,
+  onHoverEnd,
+  descriptionSnippet,
 }: {
   skill: Skill
   isSelected: boolean
@@ -713,22 +1001,41 @@ function SkillResultRow({
   eliteBlocked: boolean
   onSelect: () => void
   attributes?: Record<string, number>
+  /** Desktop compact mode - shows only name, tooltip on hover */
+  compactMode?: boolean
+  onHover?: (skill: Skill, el: HTMLElement) => void
+  onHoverEnd?: () => void
+  /** Search query for showing description snippet (description search mode) */
+  descriptionSnippet?: string
 }) {
   const disabled = isInBar || eliteBlocked
+
+  const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (compactMode && onHover) {
+      onHover(skill, e.currentTarget)
+    }
+  }
 
   return (
     <button
       type="button"
       onClick={() => !disabled && onSelect()}
       disabled={disabled}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={compactMode ? onHoverEnd : undefined}
       className={cn(
-        'w-full flex flex-col p-2.5 rounded-lg text-left transition-all duration-150',
+        'w-full flex flex-col rounded-lg text-left transition-all duration-150',
         'border border-transparent',
+        compactMode ? 'p-2' : 'p-2.5',
         isSelected && 'bg-bg-hover/80 border-accent-gold/30 shadow-sm',
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:bg-bg-hover/60'
       )}
     >
-      <SkillRowContent skill={skill} isInBar={isInBar} attributes={attributes} />
+      {compactMode ? (
+        <CompactSkillRow skill={skill} isInBar={isInBar} descriptionSnippet={descriptionSnippet} />
+      ) : (
+        <SkillRowContent skill={skill} isInBar={isInBar} attributes={attributes} />
+      )}
     </button>
   )
 }

@@ -9,7 +9,7 @@
 
 'use client'
 
-import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   useFloating,
@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils'
 import { modalOverlayVariants, modalContentVariants } from '@/lib/motion'
 import { MAX_BAR_NAME_LENGTH, MAX_VARIANT_NAME_LENGTH, PROFESSION_COLORS } from '@/lib/constants'
 import { sanitizeSingleLine } from '@/lib/validation'
-import { useVariantData } from '@/hooks'
+import { useVariantData, useEquipmentValidation } from '@/hooks'
 import { encodeTemplate, type DecodedTemplate } from '@/lib/gw/decoder'
 import { TemplateInput } from './template-input'
 import type { Skill } from '@/lib/gw/skills'
@@ -45,6 +45,7 @@ import { SpotlightSkillPicker } from './skill-picker'
 import { EquipmentSection } from './equipment-section'
 import { AttributeEditorModal } from './attribute-editor-modal'
 import { getAttributeBonusBreakdown } from '@/lib/gw/equipment/armor'
+import { clearInvalidEquipment } from '@/lib/gw/equipment/validation'
 
 export interface SkillBarData {
   name: string
@@ -229,7 +230,7 @@ export function SkillBarEditor({
 }: SkillBarEditorProps) {
   // Store callback in ref to avoid useEffect dependency issues
   const onValidationChangeRef = useRef(onValidationChange)
-  useLayoutEffect(() => {
+  useEffect(() => {
     onValidationChangeRef.current = onValidationChange
   })
 
@@ -272,7 +273,6 @@ export function SkillBarEditor({
 
   // Sync template code from current variant
   useEffect(() => {
-     
     setTemplateCode(currentVariant.template)
   }, [currentVariant.template])
 
@@ -280,7 +280,6 @@ export function SkillBarEditor({
   useEffect(() => {
     const skills = currentVariant.skills
     if (!skills || skills.length === 0) {
-       
       setLoadedSkills([])
       lastSkillsRef.current = ''
       return
@@ -351,11 +350,11 @@ export function SkillBarEditor({
   }
 
   const handleAddVariant = () => {
-    // Copy current variant as starting point
+    // Start with empty variant - user can paste their own template
     const newVariant: SkillBarVariant = {
-      template: currentVariant.template,
-      skills: [...currentVariant.skills],
-      attributes: { ...currentVariant.attributes },
+      template: '',
+      skills: [],
+      attributes: {},
     }
     const newVariants = [...(data.variants || []), newVariant]
     onChange({ ...data, variants: newVariants })
@@ -455,7 +454,7 @@ export function SkillBarEditor({
   const invalidSkillIndices = useMemo(() => {
     if (!loadedSkills.length || (!data.primary && !data.secondary)) return []
 
-    const validProfessions = new Set<string>(['No Profession'])
+    const validProfessions = new Set<string>(['No Profession', 'Unknown'])
     if (data.primary) validProfessions.add(data.primary)
     if (data.secondary && data.secondary !== 'None') validProfessions.add(data.secondary)
 
@@ -464,10 +463,17 @@ export function SkillBarEditor({
       .filter(index => index !== -1)
   }, [loadedSkills, data.primary, data.secondary])
 
+  // Validate equipment against current primary profession
+  const { invalidItems: invalidEquipmentItems } = useEquipmentValidation(
+    data.equipment,
+    data.primary
+  )
+
   // Notify parent of validation changes
   useEffect(() => {
-    onValidationChangeRef.current?.(invalidSkillIndices.length > 0)
-  }, [invalidSkillIndices.length])
+    const hasErrors = invalidSkillIndices.length > 0 || invalidEquipmentItems.length > 0
+    onValidationChangeRef.current?.(hasErrors)
+  }, [invalidSkillIndices.length, invalidEquipmentItems.length])
 
   // Profession change handlers
   const handlePrimaryChange = useCallback((profession: string) => {
@@ -506,6 +512,59 @@ export function SkillBarEditor({
   const handleEquipmentChange = useCallback((equipment: Equipment | undefined) => {
     onChange({ ...data, equipment })
   }, [data, onChange])
+
+  // Clear all invalid items (skills + equipment)
+  const handleFixAllInvalid = useCallback(() => {
+    // Clear invalid skills (set to 0)
+    const newSkills = currentVariant.skills.map((skillId, idx) =>
+      invalidSkillIndices.includes(idx) ? 0 : skillId
+    )
+
+    // Clear invalid equipment (only if we have equipment and invalid items)
+    const newEquipment: Equipment | undefined =
+      data.equipment && invalidEquipmentItems.length > 0
+        ? { ...data.equipment, armor: clearInvalidEquipment(data.equipment.armor, invalidEquipmentItems) }
+        : data.equipment
+
+    // Generate new template
+    const newTemplate = encodeTemplate(
+      data.primary || 'None',
+      data.secondary || 'None',
+      currentVariant.attributes || {},
+      newSkills
+    ) || ''
+
+    if (activeVariantIndex === 0) {
+      onChange({
+        ...data,
+        skills: newSkills,
+        template: newTemplate,
+        equipment: newEquipment,
+      })
+    } else {
+      const newVariants = [...(data.variants || [])]
+      newVariants[activeVariantIndex - 1] = {
+        ...newVariants[activeVariantIndex - 1],
+        skills: newSkills,
+        template: newTemplate,
+      }
+      onChange({
+        ...data,
+        variants: newVariants,
+        equipment: newEquipment,
+      })
+    }
+
+    setTemplateCode(newTemplate)
+  }, [
+    currentVariant.skills,
+    currentVariant.attributes,
+    invalidSkillIndices,
+    invalidEquipmentItems,
+    data,
+    activeVariantIndex,
+    onChange,
+  ])
 
   // Attribute change handler
   const handleAttributeChange = useCallback(
@@ -861,21 +920,45 @@ export function SkillBarEditor({
             value={data.equipment}
             onChange={handleEquipmentChange}
             profession={data.primary?.toLowerCase() as ProfessionKey | undefined}
+            invalidItems={invalidEquipmentItems}
             className="mt-4"
           />
 
           {/* Validation warning - bottom of card */}
           <AnimatePresence>
-            {invalidSkillIndices.length > 0 && (
-              <motion.p
+            {(invalidSkillIndices.length > 0 || invalidEquipmentItems.length > 0) && (
+              <motion.div
                 initial={{ opacity: 0, height: 0, marginTop: 0 }}
                 animate={{ opacity: 1, height: 'auto', marginTop: 20 }}
                 exit={{ opacity: 0, height: 0, marginTop: 0 }}
                 transition={{ duration: 0.2 }}
-                className="text-xs text-accent-red/80 overflow-hidden"
+                className="overflow-hidden"
               >
-                {invalidSkillIndices.length} invalid skill{invalidSkillIndices.length > 1 ? 's' : ''} — change profession or remove
-              </motion.p>
+                <div role="alert" className="flex items-center justify-between gap-4 p-3 rounded-lg bg-accent-red/10 border border-accent-red/30">
+                  <div className="flex-1 min-w-0">
+                    {invalidSkillIndices.length > 0 && (
+                      <p className="text-xs text-accent-red">
+                        {invalidSkillIndices.length} invalid skill{invalidSkillIndices.length > 1 ? 's' : ''}
+                      </p>
+                    )}
+                    {invalidEquipmentItems.length > 0 && (
+                      <p className="text-xs text-accent-red">
+                        {invalidEquipmentItems.length} invalid equipment piece{invalidEquipmentItems.length > 1 ? 's' : ''}
+                      </p>
+                    )}
+                    <p className="text-[11px] text-text-muted mt-0.5">
+                      Change profession or remove to resolve
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleFixAllInvalid}
+                    className="shrink-0 px-3 py-1.5 text-xs font-medium text-accent-red border border-accent-red/40 rounded-lg hover:bg-accent-red hover:text-white transition-colors cursor-pointer"
+                  >
+                    Fix all
+                  </button>
+                </div>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>

@@ -10,7 +10,8 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Sword, Shield as ShieldIcon, Shirt, Copy, Check, X } from 'lucide-react'
+import { ChevronRight, Sword, Shield as ShieldIcon, Shirt, Copy, Check } from 'lucide-react'
+import { Modal, ModalBody } from '@/components/ui/modal'
 import { cn } from '@/lib/utils'
 import {
   type Equipment,
@@ -217,8 +218,6 @@ function ArmorDetailModal({
   onClose: () => void
   armor: ArmorSetConfig
 }) {
-  if (!isOpen) return null
-
   const slots = ['head', 'chest', 'hands', 'legs', 'feet'] as const
   const slotLabels: Record<typeof slots[number], string> = {
     head: 'Head',
@@ -229,67 +228,49 @@ function ArmorDetailModal({
   }
 
   return (
-    <>
-      <div className="fixed inset-0 bg-black/70 z-50" onClick={onClose} />
-      <div className="fixed inset-x-4 top-[10%] mx-auto max-w-md z-50">
-        <div className="bg-bg-elevated rounded-xl border border-border shadow-xl">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-            <h2 className="text-base font-semibold text-text-primary">Armor Details</h2>
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-1 rounded hover:bg-bg-hover text-text-muted hover:text-text-primary transition-colors cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+    <Modal isOpen={isOpen} onClose={onClose} title="Armor Details">
+      <ModalBody className="space-y-3">
+        {slots.map(slot => {
+          const slotConfig = armor[slot]
+          const rune = slotConfig.runeId ? getRuneById(slotConfig.runeId) : null
+          const insignia = slotConfig.insigniaId ? getInsigniaById(slotConfig.insigniaId) : null
+          const headAttr = slot === 'head' ? armor.headAttribute : null
 
-          {/* Content */}
-          <div className="p-4 space-y-3 max-h-[70vh] overflow-y-auto">
-            {slots.map(slot => {
-              const slotConfig = armor[slot]
-              const rune = slotConfig.runeId ? getRuneById(slotConfig.runeId) : null
-              const insignia = slotConfig.insigniaId ? getInsigniaById(slotConfig.insigniaId) : null
-              const headAttr = slot === 'head' ? armor.headAttribute : null
+          const hasContent = headAttr || rune || insignia
+          if (!hasContent) return null
 
-              const hasContent = headAttr || rune || insignia
-              if (!hasContent) return null
-
-              return (
-                <div key={slot} className="border border-border/60 rounded-lg p-3">
-                  <div className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">
-                    {slotLabels[slot]}
+          return (
+            <div key={slot} className="border border-border/60 rounded-lg p-3">
+              <div className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">
+                {slotLabels[slot]}
+              </div>
+              <div className="space-y-1.5">
+                {headAttr && (
+                  <div>
+                    <span className="text-sm text-accent-gold font-medium">+1 {headAttr}</span>
+                    <span className="text-xs text-text-muted ml-2">Headpiece bonus</span>
                   </div>
-                  <div className="space-y-1.5">
-                    {headAttr && (
-                      <div>
-                        <span className="text-sm text-accent-gold font-medium">+1 {headAttr}</span>
-                        <span className="text-xs text-text-muted ml-2">Headpiece bonus</span>
-                      </div>
-                    )}
-                    {rune && (
-                      <div>
-                        <span className="text-sm text-text-primary font-medium">{formatRuneLabel(rune)}</span>
-                        <div className="text-xs text-text-secondary mt-0.5">{rune.effect}</div>
-                      </div>
-                    )}
-                    {insignia && (
-                      <div>
-                        <span className="text-sm text-text-primary font-medium">{formatInsigniaLabel(insignia)}</span>
-                        <div className="text-xs text-text-secondary mt-0.5">
-                          {insignia.slotEffects?.[slot] || insignia.effect}
-                        </div>
-                      </div>
-                    )}
+                )}
+                {rune && (
+                  <div>
+                    <span className="text-sm text-text-primary font-medium">{formatRuneLabel(rune)}</span>
+                    <div className="text-xs text-text-secondary mt-0.5">{rune.effect}</div>
                   </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-    </>
+                )}
+                {insignia && (
+                  <div>
+                    <span className="text-sm text-text-primary font-medium">{formatInsigniaLabel(insignia)}</span>
+                    <div className="text-xs text-text-secondary mt-0.5">
+                      {insignia.slotEffects?.[slot] || insignia.effect}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </ModalBody>
+    </Modal>
   )
 }
 

@@ -38,6 +38,7 @@ import {
 } from '@/components/ui'
 import { Header, Container, ActionBar, PageWrapper } from '@/components/layout'
 import { BuildFeedCard, BuildFeedCardSkeleton } from '@/components/build/build-feed-card'
+import { Modal, ModalBody, ModalFooter } from '@/components/ui/modal'
 
 // Sample skill data for demos
 const sampleSkills = [
@@ -255,6 +256,8 @@ function VariantTabsDemo() {
 
 export default function DesignSystemPage() {
   const [, setCopied] = useState(false)
+  const [showDemoModal, setShowDemoModal] = useState(false)
+  const [showDemoModalNoClose, setShowDemoModalNoClose] = useState(false)
 
   return (
     <PageWrapper>
@@ -949,6 +952,36 @@ export default function DesignSystemPage() {
             </div>
           </section>
 
+          {/* Modal */}
+          <section>
+            <h2 className="text-2xl font-semibold text-text-primary mb-6">
+              Modal
+            </h2>
+            <p className="text-sm text-text-secondary mb-4">
+              Reusable modal component with body scroll lock, focus trap, escape key handling, and ARIA attributes.
+            </p>
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  variant="primary"
+                  onClick={() => setShowDemoModal(true)}
+                >
+                  Open Demo Modal
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowDemoModalNoClose(true)}
+                >
+                  Modal (Can&apos;t Close)
+                </Button>
+              </div>
+              <div className="text-xs text-text-muted space-y-1">
+                <p>Props: isOpen, onClose, title, maxWidth, canClose, closeOnBackdropClick, closeOnEscape, showCloseButton, showHeader, headerContent, footerContent</p>
+                <p>Sub-components: ModalBody, ModalFooter</p>
+              </div>
+            </div>
+          </section>
+
           {/* Empty States */}
           <section>
             <h2 className="text-2xl font-semibold text-text-primary mb-6">
@@ -1104,6 +1137,51 @@ export default function DesignSystemPage() {
         </Button>
         <StarButton count={42} isStarred={false} />
       </ActionBar>
+
+      {/* Demo Modals */}
+      <Modal
+        isOpen={showDemoModal}
+        onClose={() => setShowDemoModal(false)}
+        title="Demo Modal"
+        footerContent={
+          <ModalFooter>
+            <Button variant="secondary" onClick={() => setShowDemoModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={() => setShowDemoModal(false)}>
+              Confirm
+            </Button>
+          </ModalFooter>
+        }
+      >
+        <ModalBody>
+          <p className="text-text-secondary">
+            This is a demo modal with all features enabled: body scroll lock,
+            focus trap, escape to close, and backdrop click to close.
+          </p>
+        </ModalBody>
+      </Modal>
+
+      <Modal
+        isOpen={showDemoModalNoClose}
+        onClose={() => setShowDemoModalNoClose(false)}
+        title="Modal (Cannot Close)"
+        canClose={false}
+      >
+        <ModalBody className="space-y-4">
+          <p className="text-text-secondary">
+            This modal cannot be closed via escape, backdrop click, or close button.
+            Use this for mandatory flows like username selection.
+          </p>
+          <Button
+            variant="primary"
+            onClick={() => setShowDemoModalNoClose(false)}
+            className="w-full"
+          >
+            Acknowledge and Close
+          </Button>
+        </ModalBody>
+      </Modal>
     </PageWrapper>
   )
 }
