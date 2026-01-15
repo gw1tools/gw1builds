@@ -263,42 +263,31 @@ export async function getSkillsByIds(
 }
 
 /**
- * Searches skills by name substring
- *
- * @param query - Search query (case-insensitive)
- * @param limit - Maximum results to return (default 10)
- * @returns Array of matching skills, sorted by relevance
+ * Searches skills by name substring (case-insensitive).
+ * Results are sorted by relevance: startsWith matches first, then contains matches.
  */
-export async function searchSkills(
-  query: string,
-  limit = 10
-): Promise<Skill[]> {
+export async function searchSkills(query: string, limit = 10): Promise<Skill[]> {
   await ensureInitialized()
   if (!allSkills || !query.trim()) return []
 
   const lowerQuery = query.toLowerCase()
-  const results: Skill[] = []
+  const startsWithMatches: Skill[] = []
+  const containsMatches: Skill[] = []
 
-  // First pass: exact name starts with query (most relevant)
   for (const skill of allSkills) {
-    if (skill.name.toLowerCase().startsWith(lowerQuery)) {
-      results.push(skill)
-      if (results.length >= limit) return results
+    const lowerName = skill.name.toLowerCase()
+
+    if (lowerName.startsWith(lowerQuery)) {
+      startsWithMatches.push(skill)
+      if (startsWithMatches.length >= limit) {
+        return startsWithMatches.slice(0, limit)
+      }
+    } else if (lowerName.includes(lowerQuery)) {
+      containsMatches.push(skill)
     }
   }
 
-  // Second pass: name contains query
-  for (const skill of allSkills) {
-    if (
-      skill.name.toLowerCase().includes(lowerQuery) &&
-      !results.includes(skill)
-    ) {
-      results.push(skill)
-      if (results.length >= limit) return results
-    }
-  }
-
-  return results
+  return startsWithMatches.concat(containsMatches).slice(0, limit)
 }
 
 /**

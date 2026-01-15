@@ -13,7 +13,7 @@
  */
 'use client'
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo, useDeferredValue } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -40,6 +40,7 @@ import {
   getProfessionAbbreviation,
   parseSlashPattern,
   normalizeBuilds,
+  clearFilteredFuseCache,
 } from '@/lib/search/build-search'
 
 // ============================================================================
@@ -77,7 +78,6 @@ export function SpotlightBuildPicker({
   onBeforeNavigate,
 }: SpotlightBuildPickerProps) {
   const [query, setQuery] = useState(initialQuery)
-  const [debouncedQuery, setDebouncedQuery] = useState('')
   const [activeFilters, setActiveFilters] = useState<BuildFilter[]>([])
   const [filterMode, setFilterMode] = useState<FilterMode>('and')
   const [isLoading, setIsLoading] = useState(true)
@@ -90,6 +90,9 @@ export function SpotlightBuildPicker({
   const selectedItemRef = useRef<HTMLElement | null>(null)
   const router = useRouter()
 
+  // Defer query to keep input responsive during search
+  const deferredQuery = useDeferredValue(query)
+
   // Search analytics tracking
   const {
     onSearchChange: trackSearchChange,
@@ -97,12 +100,6 @@ export function SpotlightBuildPicker({
     onSearchClose: trackSearchClose,
     onSearchClear: trackSearchClear,
   } = useSearchAnalytics()
-
-  // Debounce query for search (200ms)
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(query), 200)
-    return () => clearTimeout(timer)
-  }, [query])
 
   // Prevent body scroll when modal is open (iOS-compatible approach)
   useEffect(() => {
@@ -148,6 +145,8 @@ export function SpotlightBuildPicker({
         const combined = [...dbNormalized, ...pvx]
 
         if (!cancelled) {
+          // Clear cached filtered indexes before setting new builds
+          clearFilteredFuseCache()
           setAllBuilds(combined)
           setSearchIndex(createBuildSearchIndex(combined))
         }
@@ -165,24 +164,20 @@ export function SpotlightBuildPicker({
     return () => { cancelled = true }
   }, [loadBuilds])
 
-  // Initialize state when modal opens with initial values (e.g., back button navigation)
-  /* eslint-disable react-hooks/set-state-in-effect */
+  // Initialize state when modal opens (e.g., back button navigation)
   useEffect(() => {
     if (!isOpen) return
-
     setQuery(initialQuery)
     setActiveFilters(initialFilters)
     setSelectedIndex(0)
     requestAnimationFrame(() => inputRef.current?.focus())
   }, [isOpen, initialQuery, initialFilters])
 
-  // Reset selected index and scroll when results change
+  // Reset selection and scroll when results change
   useEffect(() => {
     setSelectedIndex(0)
-    // Scroll to top when results change
     scrollContainerRef.current?.scrollTo({ top: 0 })
-  }, [query, activeFilters])
-  /* eslint-enable react-hooks/set-state-in-effect */
+  }, [deferredQuery, activeFilters])
 
   // Scroll selected item into view when navigating with keyboard
   useEffect(() => {
@@ -198,61 +193,45 @@ export function SpotlightBuildPicker({
       return { matchType: 'none', matchedValue: null, categories: [], results: [], totalCount: 0 }
     }
     const filters = activeFilters.length > 0 ? activeFilters : undefined
-    return searchBuilds(searchIndex, allBuilds, debouncedQuery, filters, filterMode)
-  }, [searchIndex, allBuilds, debouncedQuery, activeFilters, filterMode, isOpen])
+    return searchBuilds(searchIndex, allBuilds, deferredQuery, filters, filterMode)
+  }, [searchIndex, allBuilds, deferredQuery, activeFilters, filterMode, isOpen])
 
   // Track search changes for analytics (debounced via hook)
   useEffect(() => {
-    if (isOpen && debouncedQuery.trim()) {
-      trackSearchChange(debouncedQuery, searchResults.totalCount)
+    if (isOpen && deferredQuery.trim()) {
+      trackSearchChange(deferredQuery, searchResults.totalCount)
     }
-  }, [isOpen, debouncedQuery, searchResults.totalCount, trackSearchChange])
+  }, [isOpen, deferredQuery, searchResults.totalCount, trackSearchChange])
 
   // Skill autocomplete suggestions
   const [skillSuggestions, setSkillSuggestions] = useState<Skill[]>([])
 
-  // Fetch skill suggestions when query changes (debounced)
-  /* eslint-disable react-hooks/set-state-in-effect */
+  // Fetch skill suggestions when query changes
   useEffect(() => {
-    let q = query.trim()
+    let q = deferredQuery.trim()
 
-    // Don't show skill suggestions for tag or profession searches
-    const isTagSearch = q.startsWith('#')
-    const isSlashSearch = q.includes('/')
-
-    if (isTagSearch || isSlashSearch) {
+    // Skip skill suggestions for tag or profession searches
+    if (q.startsWith('#') || q.includes('/')) {
       setSkillSuggestions([])
       return
     }
 
-    // Strip brackets for skill searches
+    // Strip wiki-style brackets
     if (q.startsWith('[[')) q = q.slice(2)
     if (q.endsWith(']]')) q = q.slice(0, -2)
 
-    // Only search if 2+ characters
-    if (q.length < 2) {
+    // Require 3+ chars to reduce noise on mobile
+    if (q.length < 3) {
       setSkillSuggestions([])
       return
     }
 
-    // Search for skills with debounce to avoid hammering during typing
     let cancelled = false
-    const currentQuery = q
-    const debounceTimer = setTimeout(() => {
-      searchSkills(currentQuery, 5).then(skills => {
-        // Verify query hasn't changed to prevent race conditions
-        if (!cancelled) {
-          setSkillSuggestions(skills)
-        }
-      })
-    }, 150)
-
-    return () => {
-      cancelled = true
-      clearTimeout(debounceTimer)
-    }
-  }, [query])
-  /* eslint-enable react-hooks/set-state-in-effect */
+    searchSkills(q, 5).then(skills => {
+      if (!cancelled) setSkillSuggestions(skills)
+    })
+    return () => { cancelled = true }
+  }, [deferredQuery])
 
   // Add filter from category match
   const addFiltersFromCategory = useCallback((cat: CategoryMatch): boolean => {
