@@ -694,30 +694,6 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
 
       {/* Loading overlay */}
       <SubmitOverlay isVisible={isSubmitting} message="Saving changes..." />
-
-      {/* Unsaved changes warning */}
-      {typeof window !== 'undefined' && (
-        <BeforeUnloadWarning enabled={!isSubmitting && hasChanges()} />
-      )}
     </motion.div>
   )
-}
-
-/**
- * Component that warns user before leaving with unsaved changes
- */
-function BeforeUnloadWarning({ enabled }: { enabled: boolean }) {
-  useEffect(() => {
-    if (!enabled) return
-
-    const handler = (e: BeforeUnloadEvent) => {
-      e.preventDefault()
-      e.returnValue = ''
-    }
-
-    window.addEventListener('beforeunload', handler)
-    return () => window.removeEventListener('beforeunload', handler)
-  }, [enabled])
-
-  return null
 }
