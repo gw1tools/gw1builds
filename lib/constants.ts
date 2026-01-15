@@ -416,9 +416,10 @@ export const TAGS = {
 
 /**
  * Maximum skill bars in a team build
- * GW1 allows 1 player + 7 heroes = 8 total characters
+ * Standard party is 8 (1 player + 7 heroes), but 12-man areas exist
+ * (e.g., Alliance Battles, some elite areas with multiple players)
  */
-export const MAX_BARS = 8
+export const MAX_BARS = 12
 
 /** Minimum skill bars (at least 1 required) */
 export const MIN_BARS = 1

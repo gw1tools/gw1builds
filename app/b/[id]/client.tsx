@@ -7,6 +7,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Eye, Clock, Copy, Link2, Pencil, Check, Flag } from 'lucide-react'
 import { useState, useMemo, useEffect } from 'react'
@@ -24,6 +25,7 @@ import { SkillBar } from '@/components/ui/skill-bar'
 import { AttributeBar } from '@/components/ui/attribute-bar'
 import { Button } from '@/components/ui/button'
 import { StarButton } from '@/components/ui/star-button'
+import { OverflowMenu } from '@/components/ui/overflow-menu'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
 import { Tag, TagGroup } from '@/components/ui/tag'
 import { CollaboratorList } from '@/components/ui/collaborator-list'
@@ -73,7 +75,17 @@ export function BuildPageClient({
   // Track active variant for each bar in team builds { barIndex: variantIndex }
   const [activeVariants, setActiveVariants] = useState<Record<number, number>>({})
   const isDelisted = build.moderation_status === 'delisted'
+  const [isScrolled, setIsScrolled] = useState(false)
   const { openModal } = useAuthModal()
+
+  // Track scroll position for sticky header
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const handleReportClick = () => {
     if (!isAuthenticated) {
@@ -115,8 +127,42 @@ export function BuildPageClient({
           </div>
         </div>
       )}
-      {/* Breadcrumb + Actions Row - consistent for all builds */}
-      <nav className="flex items-center justify-between mb-6">
+      {/* Sticky Breadcrumb + Actions Row - click to scroll to top */}
+      <nav
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={cn(
+          'fixed top-16 left-0 right-0 z-30 cursor-pointer',
+          'bg-bg-primary/95 backdrop-blur-md border-b border-border shadow-lg',
+          'transition-opacity duration-200',
+          isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        )}
+      >
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <div className="text-sm font-mono">
+            <span className="text-text-secondary">builds</span>
+            {' / '}
+            <span className="text-text-muted">{build.id}</span>
+            <span className="text-text-muted mx-2">·</span>
+            <span className="text-text-primary truncate max-w-[200px] inline-block align-bottom">
+              {build.name}
+            </span>
+          </div>
+
+          {/* Stop propagation so button clicks don't trigger scroll */}
+          <div onClick={(e) => e.stopPropagation()}>
+            <PageActions
+              build={build}
+              canEdit={canEdit}
+              initialStarred={initialStarred}
+              starCount={starCount}
+              isAuthenticated={isAuthenticated}
+            />
+          </div>
+        </div>
+      </nav>
+
+      {/* Static Breadcrumb + Actions Row (visible before scroll) */}
+      <div className="flex items-center justify-between mb-6">
         <div className="text-sm text-text-muted font-mono">
           <Link
             href="/"
@@ -128,15 +174,14 @@ export function BuildPageClient({
           <span>{build.id}</span>
         </div>
 
-        {/* Actions always in breadcrumb row for consistency */}
         <PageActions
-          buildId={build.id}
+          build={build}
           canEdit={canEdit}
           initialStarred={initialStarred}
           starCount={starCount}
           isAuthenticated={isAuthenticated}
         />
-      </nav>
+      </div>
 
       {/* Single Build View - unified card with title */}
       {isSingleBuild && (
@@ -255,26 +300,26 @@ export function BuildPageClient({
 }
 
 /**
- * Page-level actions: Star, Share, Edit
+ * Page-level actions: Star, Share, More (Edit + Use as Template)
  */
 function PageActions({
-  buildId,
+  build,
   canEdit,
   initialStarred,
   starCount,
   isAuthenticated,
 }: {
-  buildId: string
+  build: BuildWithAuthor
   canEdit: boolean
   initialStarred: boolean
   starCount: number
   isAuthenticated: boolean
 }) {
-  const [linkCopied, setLinkCopied] = useState(false)
+  const router = useRouter()
   const { openModal } = useAuthModal()
 
   const handleStarChange = async () => {
-    const response = await fetch(`/api/builds/${buildId}/star`, {
+    const response = await fetch(`/api/builds/${build.id}/star`, {
       method: 'POST',
     })
 
@@ -286,11 +331,22 @@ function PageActions({
   }
 
   const handleCopyLink = async () => {
-    const url = `${window.location.origin}/b/${buildId}`
+    const url = `${window.location.origin}/b/${build.id}`
     await navigator.clipboard.writeText(url)
-    setLinkCopied(true)
-    trackBuildShared({ build_id: buildId, method: 'clipboard' })
-    setTimeout(() => setLinkCopied(false), 2000)
+    trackBuildShared({ build_id: build.id, method: 'clipboard' })
+  }
+
+  const handleUseAsTemplate = () => {
+    localStorage.setItem(
+      'build-template',
+      JSON.stringify({
+        name: `Copy: ${build.name}`,
+        bars: build.bars,
+        notes: build.notes,
+        tags: build.tags,
+      })
+    )
+    router.push('/new')
   }
 
   return (
@@ -303,37 +359,33 @@ function PageActions({
         size="sm"
       />
 
-      <Button
-        variant="secondary"
+      <OverflowMenu
         size="sm"
-        onClick={handleCopyLink}
-        leftIcon={
-          linkCopied ? (
-            <Check className="w-4 h-4" />
-          ) : (
-            <Link2 className="w-4 h-4" />
-          )
-        }
-        className={cn(
-          linkCopied &&
-            'bg-accent-green/20 text-accent-green border-accent-green/50'
-        )}
-        noLift
-      >
-        {linkCopied ? 'Copied!' : 'Copy Link'}
-      </Button>
-
-      {canEdit && (
-        <Button
-          variant="secondary"
-          size="sm"
-          href={`/b/${buildId}/edit`}
-          leftIcon={<Pencil className="w-4 h-4" />}
-          noLift
-        >
-          Edit
-        </Button>
-      )}
+        items={[
+          {
+            label: 'Copy Link',
+            icon: <Link2 className="w-4 h-4" />,
+            onClick: handleCopyLink,
+            successLabel: 'Copied!',
+          },
+          ...(canEdit
+            ? [
+                {
+                  label: 'Edit',
+                  icon: <Pencil className="w-4 h-4" />,
+                  onClick: () => router.push(`/b/${build.id}/edit`),
+                  successLabel: 'Opening...',
+                },
+              ]
+            : []),
+          {
+            label: 'Use as Template',
+            icon: <Copy className="w-4 h-4" />,
+            onClick: handleUseAsTemplate,
+            successLabel: 'Creating...',
+          },
+        ]}
+      />
     </div>
   )
 }

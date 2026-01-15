@@ -377,7 +377,7 @@ export function EquipmentDisplay({ equipment, equipmentId, className }: Equipmen
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="pb-2 pl-4 space-y-4">
+            <div className="pb-2 space-y-4">
               {/* Equipment template code - same style as skill template code */}
               {templateCode && (
                 <button
@@ -426,69 +426,66 @@ export function EquipmentDisplay({ equipment, equipmentId, className }: Equipmen
 
               {/* Equipment grid: Weapons (with tabs) | Armor */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Left column: Weapons with set tabs */}
-                <div className="space-y-3">
-                  {/* Main Hand with attached tabs */}
-                  {mainHandName && (
-                    <div className="flex">
-                      {/* Set tabs - attached to left of Main Hand */}
-                      {hasMultipleSets && (
-                        <div className="flex flex-col justify-start">
-                          {configuredSets.map(({ set, originalIndex }, index) => {
-                            const isActive = index === activeSetIndex
-                            const label = set.name || `Slot ${originalIndex + 1}`
-                            const isLast = index === configuredSets.length - 1
-                            return (
-                              <button
-                                key={originalIndex}
-                                type="button"
-                                onClick={() => setActiveSetIndex(index)}
-                                className={cn(
-                                  'px-2 py-2 text-xs font-medium transition-colors cursor-pointer',
-                                  'border-y border-l border-r-0',
-                                  'first:border-t first:rounded-tl-lg',
-                                  isLast && 'rounded-bl-lg',
-                                  isActive
-                                    ? 'bg-bg-elevated border-border-hover text-accent-gold'
-                                    : 'bg-bg-secondary border-border text-text-muted hover:text-text-secondary hover:bg-bg-hover'
-                                )}
-                              >
-                                {label}
-                              </button>
-                            )
-                          })}
-                        </div>
-                      )}
+                {/* Left column: Tabs + Weapons side by side */}
+                <div className="flex items-start">
+                  {/* Vertical set tabs - connected style */}
+                  {hasMultipleSets && (
+                    <div className="flex flex-col shrink-0 mr-3">
+                      {configuredSets.map(({ set, originalIndex }, index) => {
+                        const isActive = index === activeSetIndex
+                        const label = set.name || `Set ${originalIndex + 1}`
+                        const isFirst = index === 0
+                        const isLast = index === configuredSets.length - 1
 
-                      <div className={cn(
-                        'flex-1 min-w-0',
-                        hasMultipleSets && '[&>div]:rounded-tl-none'
-                      )}>
-                        <EquipmentCard
-                          icon={Sword}
-                          label="Main Hand"
-                          title={mainHandName}
-                          effects={mainHandEffects}
-                        />
-                      </div>
+                        return (
+                          <button
+                            key={originalIndex}
+                            type="button"
+                            onClick={() => setActiveSetIndex(index)}
+                            className={cn(
+                              'px-3 py-2 text-xs font-medium transition-colors cursor-pointer',
+                              'border-x border-t',
+                              // Bottom border only on last tab
+                              isLast && 'border-b',
+                              // Border radius: top on first, bottom on last
+                              isFirst && 'rounded-t-lg',
+                              isLast && 'rounded-b-lg',
+                              // Colors
+                              isActive
+                                ? 'bg-bg-elevated border-border-hover text-accent-gold'
+                                : 'bg-bg-secondary border-border text-text-muted hover:text-text-secondary hover:bg-bg-hover'
+                            )}
+                          >
+                            {label}
+                          </button>
+                        )
+                      })}
                     </div>
                   )}
 
-                  {/* Off-Hand (only if not two-handed) - same width as Main Hand */}
-                  {!isTwoHanded && offHandName && (
-                    <div className="flex">
-                      {/* Spacer to match Main Hand width when tabs present */}
-                      {hasMultipleSets && <div className="w-[52px] shrink-0" />}
-                      <div className="flex-1 min-w-0">
-                        <EquipmentCard
-                          icon={ShieldIcon}
-                          label="Off-Hand"
-                          title={offHandName}
-                          effects={offHandEffects}
-                        />
-                      </div>
-                    </div>
-                  )}
+                  {/* Weapon cards stacked vertically */}
+                  <div className="flex-1 min-w-0 space-y-3">
+                    {mainHandName && (
+                      <EquipmentCard
+                        icon={Sword}
+                        label="Main Hand"
+                        title={mainHandName}
+                        subtitle={currentSet?.mainHand.item?.attribute}
+                        effects={mainHandEffects}
+                      />
+                    )}
+
+                    {/* Off-Hand (only if not two-handed) */}
+                    {!isTwoHanded && offHandName && (
+                      <EquipmentCard
+                        icon={ShieldIcon}
+                        label="Off-Hand"
+                        title={offHandName}
+                        subtitle={currentSet?.offHand.item?.attribute}
+                        effects={offHandEffects}
+                      />
+                    )}
+                  </div>
                 </div>
 
                 {/* Right column: Armor */}

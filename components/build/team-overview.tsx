@@ -267,7 +267,7 @@ function TeamOverviewRow({
       >
         {/* Equipment indicator - green dot only */}
         {bar.equipment && hasEquipment(bar.equipment) && (
-          <Tooltip content="Click to view equipment" position="top" offsetClass="mb-4">
+          <Tooltip content="Equipment Added" position="top" offset={12} offsetX={-16}>
             <span
               role="button"
               tabIndex={0}

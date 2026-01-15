@@ -25,7 +25,34 @@ export interface ShareableBar {
   p?: number
   /** Variants */
   w?: ShareableVariant[]
+  /** Equipment (compact format) */
+  e?: ShareableEquipment
 }
+
+/**
+ * Shareable equipment format - compact encoding
+ * Uses arrays of IDs to minimize URL size
+ */
+export interface ShareableEquipment {
+  /** Weapon sets: [[mainId, [prefixId, suffixId, inscriptionId], offId?, [offMods]?], ...] */
+  s?: ShareableWeaponSet[]
+  /** Armor: [headRune, headInsig, chestRune, chestInsig, handsRune, handsInsig, legsRune, legsInsig, feetRune, feetInsig] */
+  a?: number[]
+  /** Head attribute name (if set) */
+  h?: string
+}
+
+/**
+ * Compact weapon set format: [mainHandItemId, mainHandMods, offHandItemId?, offHandMods?]
+ * - 0 means empty/none
+ * - Omit off-hand entirely if empty
+ */
+export type ShareableWeaponSet = [
+  number, // main hand item ID (0 = empty)
+  number[], // main hand modifier IDs [prefix, suffix, inscription]
+  number?, // off hand item ID (0 or omit = empty)
+  number[]?, // off hand modifier IDs
+]
 
 /** Shareable variant format */
 export interface ShareableVariant {

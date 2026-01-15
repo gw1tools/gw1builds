@@ -7,7 +7,9 @@ import { cn } from '@/lib/utils'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
 import { SkillIcon } from '@/components/ui/skill-icon'
 import { Badge } from '@/components/ui/badge'
+import { Tooltip } from '@/components/ui/tooltip'
 import { MAX_NAME_LENGTH } from '@/lib/constants'
+import { hasEquipment } from '@/components/build/equipment-display'
 import type { SkillBar } from '@/types/database'
 import type { ProfessionKey } from '@/types/gw1'
 
@@ -179,6 +181,13 @@ function TeamSummaryRow({ bar, index }: { bar: SkillBar; index: number }) {
           <span className="text-xs text-text-muted">({bar.hero})</span>
         )}
       </div>
+
+      {/* Equipment indicator */}
+      {bar.equipment && hasEquipment(bar.equipment) && (
+        <Tooltip content="Equipment Added" position="top">
+          <span className="w-2.5 h-2.5 rounded-full bg-accent-green shrink-0" />
+        </Tooltip>
+      )}
 
       {/* Skill icons */}
       <div

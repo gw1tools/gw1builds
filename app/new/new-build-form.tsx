@@ -158,11 +158,25 @@ export function NewBuildForm() {
     setShowDraftPrompt(false)
   }
 
-  // Load shared build from URL params (once on mount)
+  // Load from template (highest priority) or URL params (once on mount)
   useEffect(() => {
     if (urlChecked.current) return
     urlChecked.current = true
 
+    // Check for template data first (from "Use as Template" feature)
+    try {
+      const templateData = localStorage.getItem('build-template')
+      if (templateData) {
+        localStorage.removeItem('build-template')
+        const parsed = JSON.parse(templateData) as DraftData
+        applyDraft(parsed)
+        return
+      }
+    } catch {
+      // Invalid template data, continue to URL params check
+    }
+
+    // Fall back to URL params (shared build links)
     const shared = decodeShareableUrl(new URLSearchParams(window.location.search))
     if (shared) {
       setTeamName(shared.name)

@@ -4,7 +4,6 @@ import { forwardRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Star, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { hoverLiftVariants } from '@/lib/motion'
 
 export interface StarButtonProps {
   /** Total star count */
@@ -124,13 +123,9 @@ export const StarButton = forwardRef<HTMLButtonElement, StarButtonProps>(
     const isDisabled = disabled || isLoading
 
     return (
-      <motion.button
+      <button
         ref={ref}
         type="button"
-        variants={hoverLiftVariants}
-        initial="rest"
-        whileHover={isDisabled ? undefined : 'hover'}
-        whileTap={isDisabled ? undefined : 'tap'}
         onClick={handleClick}
         disabled={isDisabled}
         className={cn(
@@ -141,7 +136,7 @@ export const StarButton = forwardRef<HTMLButtonElement, StarButtonProps>(
           // Starred state
           isStarred
             ? 'bg-accent-gold/15 text-accent-gold border-accent-gold/40 hover:bg-accent-gold/25 hover:border-accent-gold/60'
-            : 'bg-bg-card text-zinc-500 hover:text-accent-gold hover:bg-bg-hover border-border hover:border-accent-gold/40',
+            : 'bg-bg-card text-text-primary hover:text-accent-gold hover:bg-bg-hover border-border hover:border-accent-gold/40',
           // Shadow
           'shadow-sticky',
           sizes.button,
@@ -196,7 +191,7 @@ export const StarButton = forwardRef<HTMLButtonElement, StarButtonProps>(
             </motion.span>
           </AnimatePresence>
         )}
-      </motion.button>
+      </button>
     )
   }
 )

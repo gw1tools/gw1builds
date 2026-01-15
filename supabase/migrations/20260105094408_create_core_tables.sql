@@ -54,7 +54,7 @@ CREATE TABLE builds (
 COMMENT ON TABLE builds IS 'Build submissions with skill bars and metadata';
 COMMENT ON COLUMN builds.id IS '7-character nanoid for URL-friendly IDs';
 COMMENT ON COLUMN builds.notes IS 'Rich text notes as TipTap JSON document';
-COMMENT ON COLUMN builds.bars IS 'Array of 1-8 skill bars (JSON)';
+COMMENT ON COLUMN builds.bars IS 'Array of 1-12 skill bars (JSON)';
 COMMENT ON COLUMN builds.deleted_at IS 'Soft delete timestamp, null if active';
 
 -- ============================================================================

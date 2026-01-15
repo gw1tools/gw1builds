@@ -143,7 +143,7 @@ export interface Build {
   notes: TipTapDocument
   /** Categorization tags, e.g., ["pve", "meta", "mesmer"] */
   tags: string[]
-  /** 1-8 skill bars (1 = single build, 2-8 = team build) */
+  /** 1-12 skill bars (1 = single build, 2+ = team build) */
   bars: SkillBar[]
   /** Denormalized star count for sorting */
   star_count: number

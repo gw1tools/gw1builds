@@ -20,15 +20,17 @@ import {
   FloatingPortal,
   autoUpdate,
 } from '@floating-ui/react'
-import { MoreHorizontal } from 'lucide-react'
+import { MoreHorizontal, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export interface OverflowMenuItem {
   label: string
   icon?: ReactNode
-  onClick: () => void
+  onClick: () => void | Promise<void>
   disabled?: boolean
   variant?: 'default' | 'danger'
+  /** Label to show after successful action (e.g., "Copied!") */
+  successLabel?: string
 }
 
 export interface OverflowMenuProps {
@@ -42,7 +44,7 @@ export interface OverflowMenuProps {
 }
 
 const sizeClasses = {
-  sm: 'w-7 h-7',
+  sm: 'h-7 px-2 sm:h-8 sm:px-2.5',
   md: 'w-9 h-9',
   lg: 'w-11 h-11',
 }
@@ -71,10 +73,14 @@ export function OverflowMenu({
   disabled = false,
 }: OverflowMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [successIndex, setSuccessIndex] = useState<number | null>(null)
 
   const { refs, floatingStyles, context, isPositioned } = useFloating({
     open: isOpen,
-    onOpenChange: setIsOpen,
+    onOpenChange: (open) => {
+      if (!open) setSuccessIndex(null)
+      setIsOpen(open)
+    },
     placement: 'bottom-end',
     strategy: 'fixed',
     middleware: [offset(4), flip(), shift({ padding: 8 })],
@@ -85,10 +91,20 @@ export function OverflowMenu({
   const dismiss = useDismiss(context)
   const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss])
 
-  const handleItemClick = (item: OverflowMenuItem) => {
-    if (item.disabled) return
-    item.onClick()
-    setIsOpen(false)
+  const handleItemClick = async (item: OverflowMenuItem, index: number) => {
+    if (item.disabled || successIndex !== null) return
+
+    await item.onClick()
+
+    if (item.successLabel) {
+      setSuccessIndex(index)
+      setTimeout(() => {
+        setIsOpen(false)
+        setSuccessIndex(null)
+      }, 600)
+    } else {
+      setIsOpen(false)
+    }
   }
 
   return (
@@ -135,29 +151,37 @@ export function OverflowMenu({
             role="menu"
             {...getFloatingProps()}
           >
-            {items.map((item, index) => (
-              <button
-                key={index}
-                type="button"
-                role="menuitem"
-                disabled={item.disabled}
-                onClick={() => handleItemClick(item)}
-                className={cn(
-                  'w-full flex items-center gap-2.5 px-3 py-2 text-left text-sm',
-                  'transition-colors duration-150',
-                  'focus-visible:outline-none focus-visible:bg-bg-hover',
-                  item.variant === 'danger'
-                    ? 'text-accent-red hover:bg-accent-red/10'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover',
-                  'disabled:opacity-50 disabled:cursor-not-allowed'
-                )}
-              >
-                {item.icon && (
-                  <span className="w-4 h-4 shrink-0">{item.icon}</span>
-                )}
-                {item.label}
-              </button>
-            ))}
+            {items.map((item, index) => {
+              const isSuccess = successIndex === index
+              const isBlocked = successIndex !== null && !isSuccess
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  role="menuitem"
+                  disabled={item.disabled || successIndex !== null}
+                  onClick={() => handleItemClick(item, index)}
+                  className={cn(
+                    'w-full flex items-center gap-2.5 px-3 py-2 text-left text-sm',
+                    'transition-colors duration-150',
+                    'focus-visible:outline-none focus-visible:bg-bg-hover',
+                    isSuccess
+                      ? 'text-accent-green bg-accent-green/10'
+                      : item.variant === 'danger'
+                        ? 'text-accent-red hover:bg-accent-red/10'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-bg-hover',
+                    item.disabled && 'opacity-50 cursor-not-allowed',
+                    isBlocked && 'cursor-default',
+                    !item.disabled && !isBlocked && 'cursor-pointer'
+                  )}
+                >
+                  <span className="w-4 h-4 shrink-0">
+                    {isSuccess ? <Check className="w-4 h-4" /> : item.icon}
+                  </span>
+                  {isSuccess ? item.successLabel : item.label}
+                </button>
+              )
+            })}
           </div>
         </FloatingPortal>
       )}

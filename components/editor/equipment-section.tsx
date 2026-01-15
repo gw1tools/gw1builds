@@ -193,110 +193,54 @@ function EquipmentSlot({
 }
 
 /** Weapon set tabs - vertical list */
+/**
+ * Vertical weapon set tabs - always visible on left side
+ * Shows Set 1 by default, add button creates Set 2, 3, 4
+ * Tabs are visually connected with shared borders
+ */
 function WeaponSetTabs({
   sets,
   activeIndex,
   onChange,
   onAdd,
   onDelete,
-  attached = false,
 }: {
   sets: WeaponSet[]
   activeIndex: number
   onChange: (index: number) => void
   onAdd: () => void
   onDelete: (index: number) => void
-  /** When true, renders as attached sidebar tabs */
-  attached?: boolean
 }) {
   const canAdd = sets.length < MAX_WEAPON_SETS
-
-  if (attached) {
-    return (
-      <div className="flex flex-col justify-start">
-        {sets.map((set, index) => {
-          const isActive = index === activeIndex
-          const label = set.name || `Slot ${index + 1}`
-          const canDelete = sets.length > 1
-          const isLast = index === sets.length - 1 && !canAdd
-
-          return (
-            <div key={index} className="group relative">
-              <button
-                type="button"
-                onClick={() => onChange(index)}
-                className={cn(
-                  'w-full px-2 py-2 text-xs font-medium transition-colors cursor-pointer',
-                  'border-y border-l border-r-0',
-                  'first:border-t first:rounded-tl-lg',
-                  isLast && 'rounded-bl-lg',
-                  isActive
-                    ? 'bg-bg-elevated border-border-hover text-accent-gold'
-                    : 'bg-bg-secondary border-border text-text-muted hover:text-text-secondary hover:bg-bg-hover',
-                  canDelete && 'pr-6'
-                )}
-              >
-                {label}
-              </button>
-
-              {canDelete && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onDelete(index)
-                  }}
-                  className={cn(
-                    'absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded transition-colors cursor-pointer',
-                    isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
-                    'text-text-muted hover:text-accent-red hover:bg-accent-red/10'
-                  )}
-                  aria-label={`Delete ${label}`}
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              )}
-            </div>
-          )
-        })}
-
-        {canAdd && (
-          <button
-            type="button"
-            onClick={onAdd}
-            className={cn(
-              'px-2 py-1.5 text-xs transition-colors cursor-pointer',
-              'border-y border-l border-r-0 border-dashed border-border rounded-bl-lg',
-              'text-text-muted hover:text-accent-gold hover:bg-accent-gold/5',
-              sets.length === 0 && 'border-t'
-            )}
-          >
-            <Plus className="w-3.5 h-3.5 mx-auto" />
-          </button>
-        )}
-      </div>
-    )
-  }
+  const canDelete = sets.length > 1
 
   return (
-    <div className="flex sm:flex-col gap-1.5">
+    <div className="flex flex-col shrink-0 mr-3">
       {sets.map((set, index) => {
         const isActive = index === activeIndex
         const label = set.name || `Set ${index + 1}`
-        const canDelete = sets.length > 1
+        const isFirst = index === 0
+        const isLast = index === sets.length - 1
 
         return (
-          <div key={index} className="group relative inline-flex items-center">
+          <div key={index} className="group relative">
             <button
               type="button"
               onClick={() => onChange(index)}
               className={cn(
-                'px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer',
-                'border',
+                'w-full py-2 text-xs font-medium transition-colors cursor-pointer',
+                'border-x border-t',
+                // Add bottom border only on last tab when no add button
+                isLast ? (canAdd ? '' : 'border-b') : '',
+                // Border radius: top on first, bottom on last (only if no add button)
+                isFirst && 'rounded-t-lg',
+                isLast && !canAdd && 'rounded-b-lg',
+                // Padding: more on right when delete button present
+                canDelete ? 'pl-3 pr-7' : 'px-3',
+                // Colors
                 isActive
-                  ? 'bg-accent-gold/15 border-accent-gold/50 text-accent-gold'
-                  : 'bg-bg-card border-border text-text-muted hover:border-border-hover hover:text-text-secondary',
-                canDelete && 'pr-7'
+                  ? 'bg-bg-elevated border-border-hover text-accent-gold'
+                  : 'bg-bg-secondary border-border text-text-muted hover:text-text-secondary hover:bg-bg-hover'
               )}
             >
               {label}
@@ -310,13 +254,13 @@ function WeaponSetTabs({
                   onDelete(index)
                 }}
                 className={cn(
-                  'absolute right-1.5 p-1 rounded transition-colors cursor-pointer',
+                  'absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 rounded transition-colors cursor-pointer',
                   isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
                   'text-text-muted hover:text-accent-red hover:bg-accent-red/10'
                 )}
                 aria-label={`Delete ${label}`}
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3 h-3" />
               </button>
             )}
           </div>
@@ -328,12 +272,14 @@ function WeaponSetTabs({
           type="button"
           onClick={onAdd}
           className={cn(
-            'inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg text-xs transition-colors cursor-pointer',
-            'border border-dashed border-border text-text-muted',
-            'hover:border-accent-gold hover:text-accent-gold hover:bg-accent-gold/5'
+            'px-3 py-1.5 text-xs transition-colors cursor-pointer',
+            'border border-dashed border-border rounded-b-lg',
+            // Remove top border to connect with last tab
+            sets.length > 0 && 'border-t-0',
+            'text-text-muted hover:text-accent-gold hover:bg-accent-gold/5'
           )}
         >
-          <Plus className="w-3.5 h-3.5" />
+          <Plus className="w-3.5 h-3.5 mx-auto" />
         </button>
       )}
     </div>
@@ -568,54 +514,40 @@ export function EquipmentSection({
 
             {/* Equipment grid: Weapons (with tabs) | Armor */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Left column: Weapons with set tabs */}
-              <div className="space-y-3">
-                {/* Main Hand with attached tabs */}
-                <div className="flex">
-                  {/* Set tabs - attached to left of Main Hand */}
-                  <WeaponSetTabs
-                    sets={weaponSets}
-                    activeIndex={activeSetIndex}
-                    onChange={setActiveSetIndex}
-                    onAdd={handleAddSet}
-                    onDelete={handleDeleteSet}
-                    attached
+              {/* Left column: Tabs + Weapons side by side */}
+              <div className="flex items-start">
+                {/* Vertical set tabs - always visible */}
+                <WeaponSetTabs
+                  sets={weaponSets}
+                  activeIndex={activeSetIndex}
+                  onChange={setActiveSetIndex}
+                  onAdd={handleAddSet}
+                  onDelete={handleDeleteSet}
+                />
+
+                {/* Weapon cards stacked vertically */}
+                <div className="flex-1 min-w-0 space-y-3">
+                  <EquipmentSlot
+                    icon={Sword}
+                    label="Main Hand"
+                    isConfigured={!!mainHandName}
+                    title={mainHandName ?? undefined}
+                    subtitle={currentSet.mainHand.item?.attribute ?? undefined}
+                    effects={mainHandEffects}
+                    emptyText="Select weapon"
+                    onClick={() => setActiveSlot('mainHand')}
                   />
-
-                  <div className={cn(
-                    'flex-1 min-w-0',
-                    weaponSets.length > 1 && '[&>button]:rounded-tl-none'
-                  )}>
-                    <EquipmentSlot
-                      icon={Sword}
-                      label="Main Hand"
-                      isConfigured={!!mainHandName}
-                      title={mainHandName ?? undefined}
-                      subtitle={currentSet.mainHand.item?.attribute ?? undefined}
-                      effects={mainHandEffects}
-                      emptyText="Select weapon"
-                      onClick={() => setActiveSlot('mainHand')}
-                    />
-                  </div>
-                </div>
-
-                {/* Off-Hand - same width as Main Hand */}
-                <div className="flex">
-                  {/* Spacer to match Main Hand width when tabs present */}
-                  {weaponSets.length > 1 && <div className="w-[52px] shrink-0" />}
-                  <div className="flex-1 min-w-0">
-                    <EquipmentSlot
-                      icon={Sword}
-                      label="Off-Hand"
-                      isConfigured={!!offHandName}
-                      title={offHandName ?? undefined}
-                      subtitle={currentSet.offHand.item?.attribute ?? undefined}
-                      effects={offHandEffects}
-                      emptyText="Select off-hand"
-                      disabled={isTwoHanded}
-                      onClick={() => setActiveSlot('offHand')}
-                    />
-                  </div>
+                  <EquipmentSlot
+                    icon={Shield}
+                    label="Off-Hand"
+                    isConfigured={!!offHandName}
+                    title={offHandName ?? undefined}
+                    subtitle={currentSet.offHand.item?.attribute ?? undefined}
+                    effects={offHandEffects}
+                    emptyText="Select off-hand"
+                    disabled={isTwoHanded}
+                    onClick={() => setActiveSlot('offHand')}
+                  />
                 </div>
               </div>
 
