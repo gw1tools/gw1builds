@@ -152,6 +152,17 @@ export function NotesEditor({ value, onChange, footer }: NotesEditorProps) {
     },
   })
 
+  // Sync editor content when value changes externally (e.g., from template or draft restore)
+  // Only update if content actually differs to avoid cursor jumps during normal editing
+  useEffect(() => {
+    if (!editor) return
+    const currentContent = JSON.stringify(editor.getJSON())
+    const newContent = JSON.stringify(value)
+    if (currentContent !== newContent) {
+      editor.commands.setContent(value)
+    }
+  }, [editor, value])
+
   const setLink = useCallback(() => {
     if (!editor) return
 

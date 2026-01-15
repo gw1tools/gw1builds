@@ -137,18 +137,18 @@ export function NewBuildForm() {
   }>({})
   const [showDraftPrompt, setShowDraftPrompt] = useState(false)
   const [shareMessage, setShareMessage] = useState<string | null>(null)
-  const [shouldAutoSubmit, setShouldAutoSubmit] = useState(false)
   const [showCollaboratorsModal, setShowCollaboratorsModal] = useState(false)
   const [barsWithInvalidSkills, setBarsWithInvalidSkills] = useState<Set<number>>(new Set())
-  const draftChecked = useRef(false)
-  const urlChecked = useRef(false)
+  // Track pending auto-submit after OAuth (waiting for auth to complete)
+  const [pendingAutoSubmit, setPendingAutoSubmit] = useState(false)
+  const initialized = useRef(false)
   const formRef = useRef<HTMLFormElement>(null)
 
   const totalTeamPlayers = bars.reduce((sum, bar) => sum + (bar.playerCount || 1), 0)
   const isTeamBuild = bars.length > 1 || totalTeamPlayers > 1
 
   // Helper to populate form from draft data
-  const applyDraft = (draft: DraftData) => {
+  const applyDraft = useCallback((draft: DraftData) => {
     setTeamName(draft.name)
     setBars(draft.bars)
     setNotes(draft.notes)
@@ -156,73 +156,66 @@ export function NewBuildForm() {
     setIsPrivate(draft.is_private ?? false)
     setPendingCollaborators(draft.collaborators ?? [])
     setShowDraftPrompt(false)
-  }
+  }, [])
 
-  // Load from template (highest priority) or URL params (once on mount)
+  // Single initialization effect - handles all sources of initial data
+  // Priority: pending publish > template > URL params > saved draft prompt
   useEffect(() => {
-    if (urlChecked.current) return
-    urlChecked.current = true
+    if (initialized.current) return
+    initialized.current = true
 
-    // Check for template data first (from "Use as Template" feature)
+    // Priority 1: Pending publish after OAuth - restore draft and prepare to submit
+    const pendingPublish = localStorage.getItem(PENDING_PUBLISH_KEY)
+    if (pendingPublish) {
+      localStorage.removeItem(PENDING_PUBLISH_KEY)
+      const draft = loadDraft()
+      if (draft && draftIsMeaningful(draft)) {
+        applyDraft(draft)
+        setPendingAutoSubmit(true) // Will submit when auth is ready
+        return
+      }
+    }
+
+    // Priority 2: Template data (from "Use as Template" feature)
     try {
       const templateData = localStorage.getItem('build-template')
       if (templateData) {
         localStorage.removeItem('build-template')
-        const parsed = JSON.parse(templateData) as DraftData
-        applyDraft(parsed)
+        applyDraft(JSON.parse(templateData) as DraftData)
         return
       }
     } catch {
-      // Invalid template data, continue to URL params check
+      // Invalid template data, continue
     }
 
-    // Fall back to URL params (shared build links)
+    // Priority 3: URL params (shared build links)
     const shared = decodeShareableUrl(new URLSearchParams(window.location.search))
     if (shared) {
       setTeamName(shared.name)
       setBars(shared.bars)
       setTags(shared.tags)
-      setShowDraftPrompt(false)
       window.history.replaceState({}, '', '/new')
+      return
     }
-  }, [])
 
-  // Check for saved draft on mount (once)
-  useEffect(() => {
-    if (draftChecked.current) return
-    draftChecked.current = true
-
-    const draft = loadDraft()
-    if (!draft || !draftIsMeaningful(draft)) return
-
-    const currentData = { name: teamName, bars, notes, tags, is_private: isPrivate }
-    if (JSON.stringify(draft) !== JSON.stringify(currentData)) {
-      setShowDraftPrompt(true)
-    }
-  }, [loadDraft, teamName, bars, notes, tags, isPrivate])
-
-  // Handle pending publish after OAuth callback - wait for username to be set
-  useEffect(() => {
-    if (!user || !profile?.username) return
-
-    const pendingPublish = localStorage.getItem(PENDING_PUBLISH_KEY)
-    if (!pendingPublish) return
-
-    localStorage.removeItem(PENDING_PUBLISH_KEY)
-
+    // Priority 4: Saved draft - show recovery prompt
     const draft = loadDraft()
     if (draft && draftIsMeaningful(draft)) {
-      applyDraft(draft)
-      setShouldAutoSubmit(true)
+      setShowDraftPrompt(true)
     }
-  }, [user, profile?.username, loadDraft])
+  }, [loadDraft, applyDraft])
 
-  // Auto-submit when flag is set (after draft is restored)
+  // Auto-submit when auth is ready and we have pending submit
   useEffect(() => {
-    if (!shouldAutoSubmit) return
-    setShouldAutoSubmit(false)
-    formRef.current?.requestSubmit()
-  }, [shouldAutoSubmit])
+    if (!pendingAutoSubmit) return
+    if (!user || !profile?.username) return
+
+    setPendingAutoSubmit(false)
+    // Ensure form is mounted before submitting
+    if (formRef.current) {
+      formRef.current.requestSubmit()
+    }
+  }, [user, profile?.username, pendingAutoSubmit])
 
   // Save draft on blur/visibility change
   useEffect(() => {
