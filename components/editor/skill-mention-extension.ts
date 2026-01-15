@@ -6,7 +6,7 @@
  * Triggered by [[ and searches skills via searchSkills()
  */
 
-import { Node, mergeAttributes, type Editor } from '@tiptap/core'
+import { mergeAttributes, type Editor } from '@tiptap/core'
 import { ReactRenderer } from '@tiptap/react'
 import { PluginKey } from '@tiptap/pm/state'
 import Mention from '@tiptap/extension-mention'

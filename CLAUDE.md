@@ -501,6 +501,11 @@ Keep these synchronized:
 - Store secrets in environment variables only
 - Use HTTPS in production
 
+## Plan Mode
+- Make the plan extremely concise. Sacrifice grammar for the sake of concision.
+- At the end of each plan, give me a list of unresolved questions to answer, if any.
+
+
 ---
 
 **Version:** 1.3.0

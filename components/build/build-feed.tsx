@@ -46,7 +46,7 @@ export function BuildFeed({
     popular: initialTab === 'popular' ? initialBuilds : [],
     recent: initialTab === 'recent' ? initialBuilds : [],
   })
-  const [nextOffsets, setNextOffsets] = useState<Record<BuildSortType, number | null>>({
+  const [_nextOffsets, setNextOffsets] = useState<Record<BuildSortType, number | null>>({
     popular: initialTab === 'popular' ? initialNextOffset : null,
     recent: initialTab === 'recent' ? initialNextOffset : null,
   })

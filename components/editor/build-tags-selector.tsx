@@ -62,21 +62,11 @@ function parseTagsToState(tags: string[]): TagsState {
   const tagSet = new Set(tags)
 
   return {
-    modes: new Set(
-      GAME_MODES.filter(m => tagSet.has(m))
-    ) as Set<GameMode>,
-    pveActivities: new Set(
-      PVE_CONTEXT.activities.filter(t => tagSet.has(t))
-    ),
-    eliteAreas: new Set(
-      PVE_CONTEXT.eliteAreas.filter(t => tagSet.has(t))
-    ),
-    pvpFormats: new Set(
-      PVP_FORMATS.filter(t => tagSet.has(t))
-    ),
-    characteristics: new Set(
-      CHARACTERISTICS.filter(t => tagSet.has(t))
-    ),
+    modes: new Set(GAME_MODES.filter(m => tagSet.has(m))) as Set<GameMode>,
+    pveActivities: new Set(PVE_CONTEXT.activities.filter(t => tagSet.has(t))),
+    eliteAreas: new Set(PVE_CONTEXT.eliteAreas.filter(t => tagSet.has(t))),
+    pvpFormats: new Set(PVP_FORMATS.filter(t => tagSet.has(t))),
+    characteristics: new Set(CHARACTERISTICS.filter(t => tagSet.has(t))),
   }
 }
 
@@ -250,10 +240,7 @@ export function BuildTagsSelector({
     <div className={cn('space-y-4', className)}>
       {/* Mode Selection */}
       <div>
-        <p className="text-xs font-medium text-text-muted mb-2">
-          Game Mode
-          <span className="text-accent-red ml-1">*</span>
-        </p>
+        <p className="text-xs font-medium text-text-muted mb-2">Game Mode</p>
         <div className="flex flex-wrap gap-2">
           {GAME_MODES.map(mode => (
             <TagPill

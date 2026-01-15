@@ -9,13 +9,12 @@
 
 import { memo } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { Star, Eye, Users, AlertTriangle, ExternalLink } from 'lucide-react'
+import { Star, Eye, Users, AlertTriangle, ExternalLink, Lock, UserPlus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ProfessionBadge } from '@/components/ui/profession-badge'
 import { Badge } from '@/components/ui/badge'
 import { Tag, TagGroup } from '@/components/ui/tag'
-import { getSkillIconUrlById } from '@/lib/gw/icons'
+import { SkillIcon } from '@/components/ui/skill-icon'
 import { MAX_DISPLAYED_TAGS, TAG_LABELS } from '@/lib/constants'
 import type { BuildListItem } from '@/types/database'
 import type { ProfessionKey } from '@/types/gw1'
@@ -73,58 +72,19 @@ const SkillPreview = memo(function SkillPreview({ skills, size = 'default' }: { 
   return (
     <div className="overflow-x-auto scrollbar-none -mx-4 px-4" aria-label="Skill bar preview">
       <div className="flex gap-0.5 w-fit">
-        {normalizedSkills.slice(0, 8).map((skillId, index) => {
-          const iconUrl = skillId > 0 ? getSkillIconUrlById(skillId) : null
-          const isEmpty = skillId === 0
-
-          return (
-            <div
-              key={`slot-${index}-${skillId}`}
-              className={cn(
-                'relative flex shrink-0 items-center justify-center overflow-hidden',
-                size === 'lg' ? 'w-[52px] h-[52px]' : 'w-11 h-11',
-                isEmpty
-                  ? 'bg-black/50'
-                  : 'bg-bg-card'
-              )}
-            >
-              {iconUrl ? (
-                <Image
-                  src={iconUrl}
-                  alt=""
-                  width={iconSize}
-                  height={iconSize}
-                  className="w-full h-full object-cover"
-                  unoptimized
-                />
-              ) : (
-                <EmptySlotGhost size={size} />
-              )}
-            </div>
-          )
-        })}
+        {normalizedSkills.slice(0, 8).map((skillId, index) => (
+          <SkillIcon
+            key={`slot-${index}-${skillId}`}
+            skillId={skillId}
+            size={iconSize}
+            showEmptyGhost
+            emptyVariant="viewer"
+          />
+        ))}
       </div>
     </div>
   )
 })
-
-/**
- * Ghost placeholder for empty skill slots (matches detail page)
- */
-function EmptySlotGhost({ size = 'default' }: { size?: 'default' | 'lg' }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={cn(
-        'text-text-muted/15',
-        size === 'lg' ? 'w-5 h-5' : 'w-4 h-4'
-      )}
-      fill="currentColor"
-    >
-      <path d="M12 2L2 12l10 10 10-10L12 2zm0 3.5L18.5 12 12 18.5 5.5 12 12 5.5z" />
-    </svg>
-  )
-}
 
 /**
  * Build card for feeds and lists
@@ -159,9 +119,14 @@ export const BuildFeedCard = memo(function BuildFeedCard({
   onClick,
   className,
 }: BuildFeedCardProps) {
-  const isTeamBuild = build.bars.length > 1
-  const heroCount = build.bars.length
+  // Calculate total players (sum of playerCount across all bars)
+  const totalPlayers = build.bars.reduce(
+    (sum, bar) => sum + (bar.playerCount || 1),
+    0
+  )
+  const isTeamBuild = build.bars.length > 1 || totalPlayers > 1
   const isDelisted = build.moderation_status === 'delisted'
+  const isPrivate = build.is_private === true
   const isPvxBuild = isPvxBuildId(build.id)
 
   // Check if a tag matches any highlighted tag (by key or label)
@@ -216,11 +181,23 @@ export const BuildFeedCard = memo(function BuildFeedCard({
             </span>
           )}
         </div>
-        {isDelisted && (
-          <Badge variant="danger" size="sm" icon={<AlertTriangle className="w-3 h-3" />}>
-            Delisted
-          </Badge>
-        )}
+        <div className="flex items-center gap-1.5">
+          {isPrivate && (
+            <Badge variant="default" size="sm" icon={<Lock className="w-3 h-3" />}>
+              Private
+            </Badge>
+          )}
+          {build.collaborator_count && (
+            <Badge variant="default" size="sm" icon={<UserPlus className="w-3 h-3" />}>
+              +{build.collaborator_count}
+            </Badge>
+          )}
+          {isDelisted && (
+            <Badge variant="danger" size="sm" icon={<AlertTriangle className="w-3 h-3" />}>
+              Delisted
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Badge row - Profession/Team + Variants */}
@@ -229,7 +206,7 @@ export const BuildFeedCard = memo(function BuildFeedCard({
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-accent-gold/30 bg-accent-gold/10">
             <Users className="w-3 h-3 text-accent-gold" />
             <span className="text-[11px] font-semibold text-accent-gold">
-              Team ({heroCount})
+              Team ({totalPlayers})
             </span>
           </div>
         ) : (

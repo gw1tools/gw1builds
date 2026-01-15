@@ -8,6 +8,9 @@
  * @see PRD-01 for database schema
  */
 
+import type { EquipmentItem } from '@/lib/gw/equipment/items'
+import type { Modifier } from '@/lib/gw/equipment/modifiers'
+
 // ============================================================================
 // BRANDED TYPES
 // These add compile-time safety for validated data
@@ -36,22 +39,42 @@ export function asValidTemplateCode(code: string): ValidTemplateCode {
 // ============================================================================
 
 /**
- * User profile from Google OAuth
+ * User profile from OAuth or email authentication
  * Created on first login via auth callback
  */
 export interface User {
   /** UUID from Supabase Auth */
   id: string
-  /** Google OAuth subject ID */
-  google_id: string
+  /** OAuth provider subject ID (Google/Discord). Null for email-authenticated users. */
+  provider_id: string | null
   /** Username (Reddit-style: 3-20 chars, alphanumeric + _ -). Null until set in auth modal. */
   username: string | null
-  /** Google profile picture URL */
+  /** Profile picture URL from OAuth provider */
   avatar_url: string | null
   /** ISO 8601 timestamp */
   created_at: string
   /** ISO 8601 timestamp */
   updated_at: string
+}
+
+/**
+ * Alternative configuration for a skill bar (variant)
+ *
+ * Variants allow builds to show alternative skill/attribute setups,
+ * e.g., "Anti-Caster" or "Budget" versions of the same build.
+ *
+ * @see https://wiki.guildwars.com/wiki/Skill_bar
+ */
+export interface SkillBarVariant {
+  /** Optional display name, e.g., "Anti-Caster" (max 30 chars) */
+  name?: string
+  /** Template code for copying */
+  template: string
+  /** 8 skill IDs (0 = empty slot) */
+  skills: number[]
+  /** Attribute point distribution */
+  attributes: Record<string, number>
+  // Note: equipment support can be added later when equipment is stored per-bar
 }
 
 /**
@@ -85,6 +108,21 @@ export interface SkillBar {
    * First slot is typically elite (but not enforced)
    */
   skills: number[]
+  /**
+   * Number of players/heroes using this build in a team (default: 1)
+   * Allows "×3" notation instead of duplicating cards
+   */
+  playerCount?: number
+  /**
+   * Alternative configurations for this bar (max 4, since base is variant 0)
+   * Each variant has its own skills, attributes, and template
+   */
+  variants?: SkillBarVariant[]
+  /**
+   * Optional equipment configuration (weapons + armor)
+   * Stored separately from skill template code
+   */
+  equipment?: Equipment
 }
 
 /** Moderation status for builds */
@@ -105,7 +143,7 @@ export interface Build {
   notes: TipTapDocument
   /** Categorization tags, e.g., ["pve", "meta", "mesmer"] */
   tags: string[]
-  /** 1-8 skill bars (1 = single build, 2-8 = team build) */
+  /** 1-12 skill bars (1 = single build, 2+ = team build) */
   bars: SkillBar[]
   /** Denormalized star count for sorting */
   star_count: number
@@ -121,6 +159,8 @@ export interface Build {
   moderation_status?: ModerationStatus
   /** Reason for delisting (if delisted) */
   moderation_reason?: string | null
+  /** When true, build is hidden from search/feeds but accessible via direct link */
+  is_private?: boolean
 }
 
 /**
@@ -164,6 +204,29 @@ export interface Report {
   reason: string
   details: string | null
   status: 'pending' | 'reviewed' | 'dismissed'
+  created_at: string
+}
+
+/**
+ * Build collaborator record
+ * Allows multiple users to edit a single build
+ */
+export interface BuildCollaborator {
+  id: string
+  build_id: string
+  user_id: string
+  added_by: string | null
+  created_at: string
+}
+
+/**
+ * Collaborator with user details (for display)
+ */
+export interface CollaboratorWithUser {
+  id: string
+  user_id: string
+  username: string
+  avatar_url: string | null
   created_at: string
 }
 
@@ -229,7 +292,7 @@ export type ReportInsert = Omit<Report, 'id' | 'status' | 'created_at'>
 
 /** Fields that can be updated on a build */
 export type BuildUpdate = Partial<
-  Pick<Build, 'name' | 'notes' | 'tags' | 'bars'>
+  Pick<Build, 'name' | 'notes' | 'tags' | 'bars' | 'is_private'>
 >
 
 // ============================================================================
@@ -242,6 +305,8 @@ export interface BuildWithAuthor extends Build {
   author: Pick<User, 'id' | 'username' | 'avatar_url'> | null
   /** Whether the current user has starred this build */
   starred_by_user?: boolean
+  /** Collaborators who can edit this build (optional, loaded separately) */
+  collaborators?: CollaboratorWithUser[]
 }
 
 /** Simplified build for list views (homepage feed, search results) */
@@ -255,6 +320,7 @@ export interface BuildListItem {
     secondary: string | null
     name: string
     skills: number[]
+    playerCount?: number
   }>
   star_count: number
   view_count: number
@@ -265,4 +331,91 @@ export interface BuildListItem {
   } | null
   /** Moderation status (only included for author's own builds in My Builds) */
   moderation_status?: ModerationStatus
+  /** Whether this build is private (only shown in My Builds/Starred/Shared) */
+  is_private?: boolean
+  /** Number of collaborators (only loaded for My Builds Created tab) */
+  collaborator_count?: number
+}
+
+// ============================================================================
+// EQUIPMENT TYPES
+// Weapon and modifier configuration for build equipment
+// Note: EquipmentItem and Modifier types are defined in lib/gw/equipment/
+// ============================================================================
+
+/** Complete weapon configuration with item and modifiers */
+export interface WeaponConfig {
+  item: EquipmentItem | null
+  prefix: Modifier | null
+  suffix: Modifier | null
+  inscription: Modifier | null
+}
+
+/** Empty weapon config constant */
+export const EMPTY_WEAPON_CONFIG: WeaponConfig = {
+  item: null,
+  prefix: null,
+  suffix: null,
+  inscription: null,
+}
+
+/** Configuration for a single armor slot (rune + insignia) */
+export interface ArmorSlotConfig {
+  runeId: number | null
+  insigniaId: number | null
+}
+
+/** Full armor set configuration (5 slots) */
+export interface ArmorSetConfig {
+  head: ArmorSlotConfig
+  chest: ArmorSlotConfig
+  hands: ArmorSlotConfig
+  legs: ArmorSlotConfig
+  feet: ArmorSlotConfig
+  /** Headpiece attribute bonus (+1 to selected attribute) */
+  headAttribute: string | null
+}
+
+/** Empty armor slot constant */
+export const EMPTY_ARMOR_SLOT: ArmorSlotConfig = {
+  runeId: null,
+  insigniaId: null,
+}
+
+/** Empty armor set constant */
+export const EMPTY_ARMOR_SET: ArmorSetConfig = {
+  head: { ...EMPTY_ARMOR_SLOT },
+  chest: { ...EMPTY_ARMOR_SLOT },
+  hands: { ...EMPTY_ARMOR_SLOT },
+  legs: { ...EMPTY_ARMOR_SLOT },
+  feet: { ...EMPTY_ARMOR_SLOT },
+  headAttribute: null,
+}
+
+/** A weapon set (main hand + off-hand) */
+export interface WeaponSet {
+  name?: string
+  mainHand: WeaponConfig
+  offHand: WeaponConfig
+}
+
+/** Empty weapon set constant */
+export const EMPTY_WEAPON_SET: WeaponSet = {
+  mainHand: { ...EMPTY_WEAPON_CONFIG },
+  offHand: { ...EMPTY_WEAPON_CONFIG },
+}
+
+/** Maximum weapon sets (matches GW1's F1-F4) */
+export const MAX_WEAPON_SETS = 4
+
+/** Full equipment loadout for a skill bar */
+export interface Equipment {
+  weaponSets: WeaponSet[]
+  armor: ArmorSetConfig
+}
+
+/** Empty equipment constant */
+export const EMPTY_EQUIPMENT: Equipment = {
+  weaponSets: [{ ...EMPTY_WEAPON_SET }],
+  armor: { ...EMPTY_ARMOR_SET },
 }

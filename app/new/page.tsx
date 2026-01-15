@@ -6,7 +6,7 @@
  * - Auth check (redirects to auth modal if not logged in)
  * - Draft auto-save and recovery
  * - Mobile-first responsive layout
- * - Skill bar editors (1-8 bars)
+ * - Skill bar editors (1-12 bars)
  * - Rich text notes editor
  * - Tag selector
  * - Form validation

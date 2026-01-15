@@ -10,7 +10,7 @@
 
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import { getUserBuilds, getUserStarredBuilds } from '@/lib/services/builds'
+import { getUserBuilds, getUserStarredBuilds, getCollaboratedBuilds } from '@/lib/services/builds'
 import { createClient } from '@/lib/supabase/server'
 import { MyBuildsPageClient } from './client'
 
@@ -35,10 +35,11 @@ export default async function MyBuildsPage() {
   }
 
   // Fetch user's builds
-  const [builds, starredBuilds] = await Promise.all([
+  const [builds, starredBuilds, sharedBuilds] = await Promise.all([
     getUserBuilds(user.id),
     getUserStarredBuilds(user.id),
+    getCollaboratedBuilds(user.id),
   ])
 
-  return <MyBuildsPageClient builds={builds} starredBuilds={starredBuilds} />
+  return <MyBuildsPageClient builds={builds} starredBuilds={starredBuilds} sharedBuilds={sharedBuilds} />
 }

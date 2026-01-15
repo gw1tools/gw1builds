@@ -10,7 +10,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, FileEdit, PenLine, Star } from 'lucide-react'
+import { FileEdit, PenLine, Star, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Container, PageWrapper, Header } from '@/components/layout'
 import { BuildFeedCard } from '@/components/build/build-feed-card'
@@ -21,26 +21,85 @@ import { formatRelativeTime } from '@/lib/utils'
 import { gridContainerVariants, gridItemVariants } from '@/lib/motion'
 import type { BuildListItem } from '@/types/database'
 
-type TabType = 'created' | 'starred'
+type TabType = 'created' | 'shared' | 'starred'
 
 const BUILDS_PER_PAGE = 10
 
 interface MyBuildsPageClientProps {
   builds: BuildListItem[]
   starredBuilds: BuildListItem[]
+  sharedBuilds: BuildListItem[]
 }
 
 export function MyBuildsPageClient({
   builds,
   starredBuilds,
+  sharedBuilds,
 }: MyBuildsPageClientProps) {
   const [activeTab, setActiveTab] = useState<TabType>('created')
   const [displayCounts, setDisplayCounts] = useState({
     created: BUILDS_PER_PAGE,
+    shared: BUILDS_PER_PAGE,
     starred: BUILDS_PER_PAGE,
   })
 
-  const currentBuilds = activeTab === 'created' ? builds : starredBuilds
+  function getBuildsForTab(tab: TabType): BuildListItem[] {
+    switch (tab) {
+      case 'created':
+        return builds
+      case 'shared':
+        return sharedBuilds
+      case 'starred':
+        return starredBuilds
+    }
+  }
+
+  function getEmptyStateConfig(tab: TabType): {
+    icon: string
+    title: string
+    description: string
+    action: React.ReactNode
+  } {
+    switch (tab) {
+      case 'created':
+        return {
+          icon: '📝',
+          title: 'No builds yet',
+          description: 'Create your first build to see it here.',
+          action: (
+            <Link
+              href="/new"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-accent-gold text-bg-primary hover:bg-accent-gold-bright transition-colors"
+            >
+              Create Build
+            </Link>
+          ),
+        }
+      case 'shared':
+        return {
+          icon: '👥',
+          title: 'No shared builds',
+          description: 'Builds shared with you by others will appear here.',
+          action: null,
+        }
+      case 'starred':
+        return {
+          icon: '⭐',
+          title: 'No starred builds',
+          description: 'Star builds you like to save them here.',
+          action: (
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-bg-card border border-border hover:border-border-hover text-text-primary transition-colors"
+            >
+              Browse Builds
+            </Link>
+          ),
+        }
+    }
+  }
+
+  const currentBuilds = getBuildsForTab(activeTab)
   const displayedBuilds = currentBuilds.slice(0, displayCounts[activeTab])
   const hasMore = displayCounts[activeTab] < currentBuilds.length
 
@@ -71,6 +130,15 @@ export function MyBuildsPageClient({
           >
             Created
           </TabButton>
+          {sharedBuilds.length > 0 && (
+            <TabButton
+              active={activeTab === 'shared'}
+              onClick={() => setActiveTab('shared')}
+              icon={<Users className="w-3.5 h-3.5" />}
+            >
+              Shared
+            </TabButton>
+          )}
           <TabButton
             active={activeTab === 'starred'}
             onClick={() => setActiveTab('starred')}
@@ -90,34 +158,10 @@ export function MyBuildsPageClient({
               exit={{ opacity: 0 }}
             >
               <EmptyState
-                icon={activeTab === 'created' ? '📝' : '⭐'}
-                title={
-                  activeTab === 'created'
-                    ? 'No builds yet'
-                    : 'No starred builds'
-                }
-                description={
-                  activeTab === 'created'
-                    ? 'Create your first build to see it here.'
-                    : 'Star builds you like to save them here.'
-                }
-                action={
-                  activeTab === 'created' ? (
-                    <Link
-                      href="/new"
-                      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-accent-gold text-bg-primary hover:bg-accent-gold-bright transition-colors"
-                    >
-                      Create Build
-                    </Link>
-                  ) : (
-                    <Link
-                      href="/"
-                      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-bg-card border border-border hover:border-border-hover text-text-primary transition-colors"
-                    >
-                      Browse Builds
-                    </Link>
-                  )
-                }
+                icon={getEmptyStateConfig(activeTab).icon}
+                title={getEmptyStateConfig(activeTab).title}
+                description={getEmptyStateConfig(activeTab).description}
+                action={getEmptyStateConfig(activeTab).action}
               />
             </motion.div>
           ) : (
@@ -224,10 +268,10 @@ function useDraft() {
   } | null>(null)
 
   // Read localStorage after mount - this is the proper pattern for client-only state
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     const recentDraft = getMostRecentDraft()
     if (recentDraft) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage only available client-side
       setDraft(recentDraft)
     }
   }, [])

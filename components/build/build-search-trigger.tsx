@@ -91,6 +91,7 @@ export function BuildSearchTrigger({
     if (isMobile) return // Don't show shortcut on mobile
 
     const isMac = navigator.platform.toUpperCase().includes('MAC')
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- navigator only available client-side
     setShortcutKey(isMac ? '⌘' : 'Ctrl+')
   }, [])
 

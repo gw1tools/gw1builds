@@ -265,3 +265,78 @@ export function getAttributesForBuild(
 
   return [...primaryAttrs, ...secondaryAttrs]
 }
+
+// ============================================================================
+// ENCODER FUNCTIONS
+// ============================================================================
+
+/** Reverse lookup: profession name -> ID */
+const PROFESSION_TO_ID: Record<string, number> = Object.entries(
+  PROFESSION_BY_ID
+).reduce(
+  (acc, [id, name]) => {
+    acc[name] = parseInt(id, 10)
+    return acc
+  },
+  {} as Record<string, number>
+)
+
+/** Reverse lookup: attribute name -> ID */
+const ATTRIBUTE_TO_ID: Record<string, number> = Object.entries(
+  ATTRIBUTE_BY_ID
+).reduce(
+  (acc, [id, name]) => {
+    acc[name] = parseInt(id, 10)
+    return acc
+  },
+  {} as Record<string, number>
+)
+
+/**
+ * Encodes build data into a GW1 template code
+ *
+ * @param primary - Primary profession name (e.g., "Mesmer")
+ * @param secondary - Secondary profession name (e.g., "Necromancer") or "None"
+ * @param attributes - Attribute name -> point value mapping
+ * @param skills - Array of 8 skill IDs
+ * @returns Encoded template string, or null if encoding fails
+ *
+ * @example
+ * const code = encodeTemplate("Mesmer", "Necromancer", { "Domination Magic": 12 }, [152, 234, ...])
+ * // Returns "OQhkAqCalIPvQLDBbSXjHOgbNA"
+ */
+export function encodeTemplate(
+  primary: string,
+  secondary: string,
+  attributes: Record<string, number>,
+  skills: number[]
+): string | null {
+  try {
+    const encoder = new SkillTemplate()
+
+    // Convert profession names to IDs
+    const primaryId = PROFESSION_TO_ID[primary] || 0
+    const secondaryId =
+      secondary && secondary !== 'None' ? PROFESSION_TO_ID[secondary] || 0 : 0
+
+    // Convert attribute names to IDs
+    const attributeIds: Record<number, number> = {}
+    for (const [name, value] of Object.entries(attributes)) {
+      const attrId = ATTRIBUTE_TO_ID[name]
+      if (attrId !== undefined && value > 0) {
+        attributeIds[attrId] = value
+      }
+    }
+
+    // Ensure 8 skills
+    const skillArray = [...skills]
+    while (skillArray.length < 8) {
+      skillArray.push(0)
+    }
+
+    return encoder.encode(primaryId, secondaryId, attributeIds, skillArray.slice(0, 8))
+  } catch (e) {
+    console.error('[encodeTemplate] Encode failed:', e)
+    return null
+  }
+}

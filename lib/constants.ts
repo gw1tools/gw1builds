@@ -416,15 +416,31 @@ export const TAGS = {
 
 /**
  * Maximum skill bars in a team build
- * GW1 allows 1 player + 7 heroes = 8 total characters
+ * Standard party is 8 (1 player + 7 heroes), but 12-man areas exist
+ * (e.g., Alliance Battles, some elite areas with multiple players)
  */
-export const MAX_BARS = 8
+export const MAX_BARS = 12
 
 /** Minimum skill bars (at least 1 required) */
 export const MIN_BARS = 1
 
 /** Skills per bar (always exactly 8 in GW1) */
 export const SKILLS_PER_BAR = 8
+
+/**
+ * Maximum total players in a GW1 party
+ * Standard party is 8, but 12-man areas (e.g., Alliance Battles) allow 12
+ */
+export const MAX_TEAM_PLAYERS = 12
+
+/**
+ * Maximum variants per skill bar (including the base bar)
+ * Allows "Default", "Anti-Caster", "Budget", etc. variations
+ */
+export const MAX_VARIANTS = 5
+
+/** Maximum character length for variant names */
+export const MAX_VARIANT_NAME_LENGTH = 30
 
 // ============================================================================
 // INPUT VALIDATION LIMITS

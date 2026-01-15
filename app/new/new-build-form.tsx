@@ -5,32 +5,39 @@
  * @module app/new/new-build-form
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus } from 'lucide-react'
+import { Plus, Share2, Users } from 'lucide-react'
 import { trackBuildCreated } from '@/lib/analytics'
 import { useAuth } from '@/components/providers/auth-provider'
 import { useAuthModal } from '@/components/auth/auth-modal'
 import { useBuildDraft } from '@/hooks/use-build-draft'
 import { SkillBarEditor } from '@/components/editor/skill-bar-editor'
+import { TeamSummary } from '@/components/editor/team-summary'
 import { NotesEditor } from '@/components/editor/notes-editor'
-import { BuildTagsSelector } from '@/components/editor/build-tags-selector'
+import { TagsSection } from '@/components/editor/tags-section'
+import { PrivacyToggle } from '@/components/editor/privacy-toggle'
+import { CollaboratorsModal, type PendingCollaborator } from '@/components/editor/collaborators-modal'
 import { Button } from '@/components/ui/button'
-import { ProfessionSpinner } from '@/components/ui/profession-spinner'
+import { OverflowMenu } from '@/components/ui/overflow-menu'
+import { SubmitOverlay } from '@/components/ui/submit-overlay'
 import { pageTransitionVariants, listContainerVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import {
   MAX_BARS,
   MIN_BARS,
-  MAX_NAME_LENGTH,
   MIN_NAME_LENGTH,
+  MAX_NAME_LENGTH,
+  MAX_BAR_NAME_LENGTH,
   MIN_MEANINGFUL_TEMPLATE_LENGTH,
   MIN_MEANINGFUL_NAME_LENGTH,
   MIN_MEANINGFUL_NOTES_LENGTH,
   MIN_MEANINGFUL_TAG_COUNT,
+  MAX_TEAM_PLAYERS,
 } from '@/lib/constants'
 import { extractTextFromTiptap } from '@/lib/search/text-utils'
+import { encodeShareableUrl, decodeShareableUrl } from '@/lib/share'
 import type { SkillBar, TipTapDocument } from '@/types/database'
 
 const EMPTY_SKILL_BAR: SkillBar = {
@@ -48,11 +55,16 @@ const EMPTY_NOTES: TipTapDocument = {
   content: [],
 }
 
+// Stored in localStorage to survive OAuth page reload
+const PENDING_PUBLISH_KEY = 'gw1builds:pendingPublish'
+
 type DraftData = {
   name: string
   bars: SkillBar[]
   notes: TipTapDocument
   tags: string[]
+  is_private?: boolean
+  collaborators?: PendingCollaborator[]
 }
 
 /**
@@ -104,52 +116,124 @@ function draftIsMeaningful(data: DraftData): boolean {
 
 export function NewBuildForm() {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
+  const { user, profile } = useAuth()
   const { openModal } = useAuthModal()
 
   const [teamName, setTeamName] = useState('')
   const [bars, setBars] = useState<SkillBar[]>([{ ...EMPTY_SKILL_BAR }])
   const [notes, setNotes] = useState<TipTapDocument>(EMPTY_NOTES)
   const [tags, setTags] = useState<string[]>([])
+  const [isPrivate, setIsPrivate] = useState(false)
+  const [pendingCollaborators, setPendingCollaborators] = useState<PendingCollaborator[]>([])
 
   const { saveDraft, loadDraft, clearDraft } =
     useBuildDraft<DraftData>('new-build')
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<{
+    teamName?: boolean
+    barNames?: number[] // indices of bars with missing names
+  }>({})
   const [showDraftPrompt, setShowDraftPrompt] = useState(false)
+  const [shareMessage, setShareMessage] = useState<string | null>(null)
+  const [shouldAutoSubmit, setShouldAutoSubmit] = useState(false)
+  const [showCollaboratorsModal, setShowCollaboratorsModal] = useState(false)
+  const [barsWithInvalidSkills, setBarsWithInvalidSkills] = useState<Set<number>>(new Set())
   const draftChecked = useRef(false)
+  const urlChecked = useRef(false)
+  const formRef = useRef<HTMLFormElement>(null)
 
-  const isTeamBuild = bars.length > 1
+  const totalTeamPlayers = bars.reduce((sum, bar) => sum + (bar.playerCount || 1), 0)
+  const isTeamBuild = bars.length > 1 || totalTeamPlayers > 1
 
-  // Auth check
+  // Helper to populate form from draft data
+  const applyDraft = (draft: DraftData) => {
+    setTeamName(draft.name)
+    setBars(draft.bars)
+    setNotes(draft.notes)
+    setTags(draft.tags)
+    setIsPrivate(draft.is_private ?? false)
+    setPendingCollaborators(draft.collaborators ?? [])
+    setShowDraftPrompt(false)
+  }
+
+  // Load from template (highest priority) or URL params (once on mount)
   useEffect(() => {
-    if (!authLoading && !user) {
-      openModal()
+    if (urlChecked.current) return
+    urlChecked.current = true
+
+    // Check for template data first (from "Use as Template" feature)
+    try {
+      const templateData = localStorage.getItem('build-template')
+      if (templateData) {
+        localStorage.removeItem('build-template')
+        const parsed = JSON.parse(templateData) as DraftData
+        applyDraft(parsed)
+        return
+      }
+    } catch {
+      // Invalid template data, continue to URL params check
     }
-  }, [authLoading, user, openModal])
 
-  // Check for draft on mount (once)
+    // Fall back to URL params (shared build links)
+    const shared = decodeShareableUrl(new URLSearchParams(window.location.search))
+    if (shared) {
+      setTeamName(shared.name)
+      setBars(shared.bars)
+      setTags(shared.tags)
+      setShowDraftPrompt(false)
+      window.history.replaceState({}, '', '/new')
+    }
+  }, [])
+
+  // Check for saved draft on mount (once)
   useEffect(() => {
-    if (draftChecked.current || authLoading || !user) return
+    if (draftChecked.current) return
     draftChecked.current = true
 
     const draft = loadDraft()
-    if (draft && draftIsMeaningful(draft)) {
-      // Only show prompt if draft differs from current (empty) form
-      const currentData = { name: teamName, bars, notes, tags }
-      const isDifferent = JSON.stringify(draft) !== JSON.stringify(currentData)
-      if (isDifferent) {
-        setShowDraftPrompt(true)
-      }
+    if (!draft || !draftIsMeaningful(draft)) return
+
+    const currentData = { name: teamName, bars, notes, tags, is_private: isPrivate }
+    if (JSON.stringify(draft) !== JSON.stringify(currentData)) {
+      setShowDraftPrompt(true)
     }
-  }, [authLoading, user, loadDraft, teamName, bars, notes, tags])
+  }, [loadDraft, teamName, bars, notes, tags, isPrivate])
+
+  // Handle pending publish after OAuth callback - wait for username to be set
+  useEffect(() => {
+    if (!user || !profile?.username) return
+
+    const pendingPublish = localStorage.getItem(PENDING_PUBLISH_KEY)
+    if (!pendingPublish) return
+
+    localStorage.removeItem(PENDING_PUBLISH_KEY)
+
+    const draft = loadDraft()
+    if (draft && draftIsMeaningful(draft)) {
+      applyDraft(draft)
+      setShouldAutoSubmit(true)
+    }
+  }, [user, profile?.username, loadDraft])
+
+  // Auto-submit when flag is set (after draft is restored)
+  useEffect(() => {
+    if (!shouldAutoSubmit) return
+    setShouldAutoSubmit(false)
+    formRef.current?.requestSubmit()
+  }, [shouldAutoSubmit])
 
   // Save draft on blur/visibility change
   useEffect(() => {
-    if (!user) return
-
-    const currentData = { name: teamName, bars, notes, tags }
+    const currentData = {
+      name: teamName,
+      bars,
+      notes,
+      tags,
+      is_private: isPrivate,
+      collaborators: pendingCollaborators,
+    }
 
     const handleSave = () => {
       if (draftIsMeaningful(currentData)) {
@@ -157,32 +241,45 @@ export function NewBuildForm() {
       }
     }
 
-    window.addEventListener('blur', handleSave)
-    document.addEventListener('visibilitychange', () => {
+    const handleVisibilityChange = () => {
       if (document.hidden) handleSave()
-    })
+    }
+
+    window.addEventListener('blur', handleSave)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
 
     return () => {
       window.removeEventListener('blur', handleSave)
-      document.removeEventListener('visibilitychange', handleSave)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [teamName, bars, notes, tags, user, saveDraft])
+  }, [teamName, bars, notes, tags, isPrivate, pendingCollaborators, saveDraft])
 
   const restoreDraft = () => {
     const draft = loadDraft()
-    if (draft) {
-      setTeamName(draft.name)
-      setBars(draft.bars)
-      setNotes(draft.notes)
-      setTags(draft.tags)
-      setShowDraftPrompt(false)
-    }
+    if (draft) applyDraft(draft)
   }
 
   const dismissDraft = () => {
     clearDraft()
     setShowDraftPrompt(false)
   }
+
+  const handleShareDraft = useCallback(async () => {
+    setError(null)
+    const buildName = isTeamBuild ? teamName.trim() : bars[0]?.name.trim() || ''
+    const { url, truncated, truncationMessage } = encodeShareableUrl(buildName, bars, tags)
+
+    try {
+      await navigator.clipboard.writeText(url)
+      const message = truncated && truncationMessage
+        ? `Link copied! (${truncationMessage})`
+        : 'Link copied to clipboard!'
+      setShareMessage(message)
+      setTimeout(() => setShareMessage(null), 3000)
+    } catch {
+      setError('Failed to copy link. Please copy manually from the address bar.')
+    }
+  }, [isTeamBuild, teamName, bars, tags])
 
   const addBar = () => {
     if (bars.length < MAX_BARS) {
@@ -193,6 +290,25 @@ export function NewBuildForm() {
   const removeBar = (index: number) => {
     if (bars.length > MIN_BARS) {
       setBars(bars.filter((_, i) => i !== index))
+      // Adjust fieldErrors.barNames indices after removal
+      if (fieldErrors.barNames?.length) {
+        setFieldErrors(prev => ({
+          ...prev,
+          barNames: prev.barNames
+            ?.filter(i => i !== index) // Remove the deleted bar's error
+            .map(i => (i > index ? i - 1 : i)), // Shift indices down
+        }))
+      }
+      // Adjust barsWithInvalidSkills indices after removal
+      setBarsWithInvalidSkills(prev => {
+        const next = new Set<number>()
+        for (const i of prev) {
+          if (i < index) next.add(i)
+          else if (i > index) next.add(i - 1)
+          // Skip i === index (removed bar)
+        }
+        return next
+      })
     }
   }
 
@@ -217,6 +333,9 @@ export function NewBuildForm() {
   }
 
   const validateForm = (): string | null => {
+    const newFieldErrors: typeof fieldErrors = {}
+    let errorMessage: string | null = null
+
     if (bars.length < MIN_BARS) {
       return 'At least one skill bar is required'
     }
@@ -229,42 +348,95 @@ export function NewBuildForm() {
 
     // For single builds, the first bar needs a name
     if (!isTeamBuild) {
-      if (!bars[0].name.trim()) {
-        return 'Build name is required'
-      }
-      if (bars[0].name.trim().length < MIN_NAME_LENGTH) {
-        return `Build name must be at least ${MIN_NAME_LENGTH} characters`
+      const barName = bars[0].name.trim()
+      if (!barName) {
+        newFieldErrors.barNames = [0]
+        errorMessage = 'Build name is required'
+      } else if (barName.length < MIN_NAME_LENGTH) {
+        newFieldErrors.barNames = [0]
+        errorMessage = `Build name must be at least ${MIN_NAME_LENGTH} characters`
+      } else if (barName.length > MAX_BAR_NAME_LENGTH) {
+        newFieldErrors.barNames = [0]
+        errorMessage = `Build name must be at most ${MAX_BAR_NAME_LENGTH} characters`
       }
     } else {
       // For team builds, need team name and all bars need names
-      if (!teamName.trim()) {
-        return 'Team build name is required'
+      const trimmedTeamName = teamName.trim()
+      if (!trimmedTeamName) {
+        newFieldErrors.teamName = true
+        errorMessage = 'Team build name is required'
+      } else if (trimmedTeamName.length < MIN_NAME_LENGTH) {
+        newFieldErrors.teamName = true
+        errorMessage = `Team build name must be at least ${MIN_NAME_LENGTH} characters`
+      } else if (trimmedTeamName.length > MAX_NAME_LENGTH) {
+        newFieldErrors.teamName = true
+        errorMessage = `Team build name must be at most ${MAX_NAME_LENGTH} characters`
       }
-      if (teamName.trim().length < MIN_NAME_LENGTH) {
-        return `Team build name must be at least ${MIN_NAME_LENGTH} characters`
-      }
-      // Check each bar has a name
+
+      // Check each bar has a valid name
+      const barsWithInvalidNames: number[] = []
       for (let i = 0; i < bars.length; i++) {
-        if (!bars[i].name.trim()) {
-          return `Build ${i + 1} needs a name`
+        const barName = bars[i].name.trim()
+        if (!barName || barName.length < MIN_NAME_LENGTH) {
+          barsWithInvalidNames.push(i)
+        }
+      }
+      if (barsWithInvalidNames.length > 0) {
+        newFieldErrors.barNames = barsWithInvalidNames
+        if (!errorMessage) {
+          const barName = bars[barsWithInvalidNames[0]].name.trim()
+          errorMessage = !barName
+            ? `Build ${barsWithInvalidNames[0] + 1} needs a name`
+            : `Build ${barsWithInvalidNames[0] + 1} name must be at least ${MIN_NAME_LENGTH} characters`
         }
       }
     }
 
-    return null
+    // Validate total player count (applies to all builds)
+    const totalPlayers = bars.reduce(
+      (sum, bar) => sum + (bar.playerCount || 1),
+      0
+    )
+    if (totalPlayers > MAX_TEAM_PLAYERS) {
+      errorMessage = `Total players (${totalPlayers}) exceeds maximum of ${MAX_TEAM_PLAYERS}`
+    }
+
+    // Check for invalid skills (skills that don't match profession)
+    if (barsWithInvalidSkills.size > 0) {
+      const firstInvalidBar = Math.min(...barsWithInvalidSkills)
+      errorMessage = errorMessage || `Build ${firstInvalidBar + 1} has skills that don't match its professions`
+    }
+
+    setFieldErrors(newFieldErrors)
+    return errorMessage
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!user) {
-      openModal()
-      return
-    }
-
+    // Validate BEFORE auth check so users see errors immediately
     const validationError = validateForm()
     if (validationError) {
       setError(validationError)
+      return
+    }
+
+    // Auth-on-save: if not signed in, save draft and open auth modal
+    if (!user) {
+      const currentData = {
+        name: teamName,
+        bars,
+        notes,
+        tags,
+        is_private: isPrivate,
+        collaborators: pendingCollaborators,
+      }
+      if (draftIsMeaningful(currentData)) {
+        saveDraft(currentData)
+      }
+      // Set pending publish flag in localStorage (survives OAuth page reload)
+      localStorage.setItem(PENDING_PUBLISH_KEY, 'true')
+      openModal()
       return
     }
 
@@ -283,6 +455,8 @@ export function NewBuildForm() {
           bars,
           notes,
           tags,
+          is_private: isPrivate,
+          collaborators: pendingCollaborators.map(c => c.username),
         }),
       })
 
@@ -314,31 +488,9 @@ export function NewBuildForm() {
     }
   }
 
-  // Show loading while checking auth
-  if (authLoading) {
-    return (
-      <div className="min-h-[calc(100dvh-3.5rem)] flex items-center justify-center">
-        <ProfessionSpinner />
-      </div>
-    )
-  }
-
-  // Don't render form if not authenticated
-  if (!user) {
-    return (
-      <div className="min-h-[calc(100dvh-3.5rem)] flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <p className="text-text-secondary">
-            Please sign in to create a build
-          </p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <motion.div
-      className="min-h-[calc(100dvh-3.5rem)] w-full max-w-4xl mx-auto px-4 py-6 sm:py-8"
+      className="min-h-[calc(100dvh-3.5rem)] w-full max-w-3xl mx-auto px-4 py-6 sm:py-8"
       variants={pageTransitionVariants}
       initial="initial"
       animate="animate"
@@ -374,43 +526,18 @@ export function NewBuildForm() {
       </AnimatePresence>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Tags - what is this build for? */}
-        <BuildTagsSelector value={tags} onChange={setTags} />
-
-        {/* Team build name - only shown for 2+ builds */}
-        <AnimatePresence>
-          {isTeamBuild && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="flex items-center gap-3 pt-2"
-            >
-              <input
-                type="text"
-                placeholder="Team build name..."
-                value={teamName}
-                onChange={e => setTeamName(e.target.value)}
-                maxLength={MAX_NAME_LENGTH}
-                className={cn(
-                  'flex-1 h-10 px-3 rounded-lg',
-                  'bg-bg-primary border border-border',
-                  'text-text-primary placeholder:text-text-muted',
-                  'transition-colors duration-150',
-                  'hover:border-border-hover',
-                  'focus:outline-none focus:border-accent-gold'
-                )}
-              />
-              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-accent-gold/15 text-accent-gold whitespace-nowrap">
-                {bars.length} builds
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Skill bars */}
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        onKeyDown={e => {
+          // Never submit form via Enter - only via submit button click
+          if (e.key === 'Enter') {
+            e.preventDefault()
+          }
+        }}
+        className="space-y-5"
+      >
+        {/* Skill bars - primary content */}
         <motion.div
           className="space-y-4"
           variants={listContainerVariants}
@@ -418,38 +545,90 @@ export function NewBuildForm() {
           animate="visible"
         >
           {bars.map((bar, index) => (
-            <SkillBarEditor
-              key={index}
-              index={index}
-              totalBars={bars.length}
-              data={bar}
-              onChange={bar => updateBar(index, bar)}
-              onRemove={
-                bars.length > MIN_BARS ? () => removeBar(index) : undefined
-              }
-              onMoveUp={() => moveBarUp(index)}
-              onMoveDown={() => moveBarDown(index)}
-              canRemove={bars.length > MIN_BARS}
-            />
+            <div key={index} id={`skill-bar-${index}`}>
+              <SkillBarEditor
+                index={index}
+                totalBars={bars.length}
+                data={bar}
+                onChange={updatedBar => {
+                  updateBar(index, updatedBar)
+                  // Clear bar name error when user starts typing
+                  if (fieldErrors.barNames?.includes(index) && updatedBar.name !== bar.name) {
+                    setFieldErrors(prev => ({
+                      ...prev,
+                      barNames: prev.barNames?.filter(i => i !== index),
+                    }))
+                  }
+                  // Clear template error when a template is added
+                  if (updatedBar.template && updatedBar.template !== bar.template && error) {
+                    setError(null)
+                  }
+                }}
+                onRemove={
+                  bars.length > MIN_BARS ? () => removeBar(index) : undefined
+                }
+                onMoveUp={() => moveBarUp(index)}
+                onMoveDown={() => moveBarDown(index)}
+                canRemove={bars.length > MIN_BARS}
+                totalTeamPlayers={totalTeamPlayers}
+                maxTeamPlayers={MAX_TEAM_PLAYERS}
+                nameError={fieldErrors.barNames?.includes(index)}
+                onValidationChange={(hasErrors) => {
+                  setBarsWithInvalidSkills(prev => {
+                    const next = new Set(prev)
+                    if (hasErrors) {
+                      next.add(index)
+                    } else {
+                      next.delete(index)
+                    }
+                    return next
+                  })
+                }}
+              />
+            </div>
           ))}
         </motion.div>
 
         {/* Add bar button */}
         {bars.length < MAX_BARS && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="md"
-            onClick={addBar}
-            leftIcon={<Plus className="w-4 h-4" />}
-            noLift
-          >
-            Add Team Member
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              onClick={addBar}
+              leftIcon={<Plus className="w-4 h-4" />}
+            >
+              Add Team Member
+            </Button>
+          </div>
         )}
 
+        {/* Team summary - name input + overview (appears after adding team members) */}
+        <TeamSummary
+          bars={bars}
+          teamName={teamName}
+          onTeamNameChange={name => {
+            setTeamName(name)
+            // Clear team name error when user starts typing
+            if (fieldErrors.teamName) {
+              setFieldErrors(prev => ({ ...prev, teamName: false }))
+            }
+          }}
+          hasError={fieldErrors.teamName}
+        />
+
         {/* Notes Editor */}
-        <NotesEditor value={notes} onChange={setNotes} />
+        <div>
+          <h3 className="text-sm font-medium text-text-secondary mb-2">Notes</h3>
+          <NotesEditor value={notes} onChange={setNotes} />
+        </div>
+
+        {/* Tags Section - collapsible */}
+        <TagsSection value={tags} onChange={setTags} />
+
+        {/* Privacy Toggle */}
+        <PrivacyToggle isPrivate={isPrivate} onChange={setIsPrivate} />
 
         {/* Error message */}
         {error && (
@@ -458,49 +637,90 @@ export function NewBuildForm() {
           </div>
         )}
 
-        {/* Submit button */}
-        <div className="flex gap-3 pt-4">
+        {/* Share success message */}
+        <AnimatePresence>
+          {shareMessage && (
+            <motion.div
+              role="status"
+              aria-live="polite"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="p-3 rounded-lg bg-accent-green/10 border border-accent-green/20"
+            >
+              <p className="text-sm text-accent-green">{shareMessage}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Action buttons */}
+        {/* Mobile: Publish full-width, then Cancel + ... row */}
+        {/* Desktop: All three in one row, right-aligned */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 pt-4">
           <Button
             type="submit"
             variant="primary"
             size="lg"
             isLoading={isSubmitting}
             disabled={isSubmitting}
-            className="flex-1 sm:flex-initial sm:min-w-[200px]"
+            className="w-full sm:w-auto sm:min-w-[200px]"
           >
-            {isSubmitting ? 'Publishing...' : 'Publish Build'}
+            {isSubmitting
+              ? 'Publishing...'
+              : user
+                ? 'Publish Build'
+                : 'Sign in to Publish'}
           </Button>
 
-          <Button
-            type="button"
-            variant="secondary"
-            size="lg"
-            onClick={() => router.push('/')}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
+          {/* Secondary actions - row on mobile, inline on desktop */}
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              onClick={() => router.push('/')}
+              disabled={isSubmitting}
+              className="flex-1 sm:flex-none"
+            >
+              Cancel
+            </Button>
+
+            <OverflowMenu
+              disabled={isSubmitting}
+              items={[
+                {
+                  label: 'Share Draft',
+                  icon: <Share2 className="w-4 h-4" />,
+                  onClick: handleShareDraft,
+                },
+                ...(user
+                  ? [
+                      {
+                        label: pendingCollaborators.length > 0
+                          ? `Collaborators (${pendingCollaborators.length})`
+                          : 'Add Collaborators...',
+                        icon: <Users className="w-4 h-4" />,
+                        onClick: () => setShowCollaboratorsModal(true),
+                      },
+                    ]
+                  : []),
+              ]}
+            />
+          </div>
         </div>
       </form>
 
+      {/* Collaborators Modal */}
+      <CollaboratorsModal
+        mode="draft"
+        isOpen={showCollaboratorsModal}
+        onClose={() => setShowCollaboratorsModal(false)}
+        pendingCollaborators={pendingCollaborators}
+        onPendingChange={setPendingCollaborators}
+      />
+
       {/* Loading overlay */}
-      <AnimatePresence>
-        {isSubmitting && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          >
-            <div className="bg-bg-card border-2 border-accent-gold rounded-[var(--radius-lg)] p-6 text-center">
-              <ProfessionSpinner className="mx-auto mb-3" />
-              <p className="text-text-primary font-medium">
-                Creating your build...
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <SubmitOverlay isVisible={isSubmitting} message="Creating your build..." />
 
       {/* Unsaved changes warning */}
       {typeof window !== 'undefined' && (
