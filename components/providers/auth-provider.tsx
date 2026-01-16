@@ -58,12 +58,13 @@ export function AuthProvider({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      // Only handle actual auth events
-      if (
-        event === 'SIGNED_IN' ||
-        event === 'SIGNED_OUT' ||
-        event === 'TOKEN_REFRESHED'
-      ) {
+      // Only handle actual auth state changes, NOT token refreshes
+      // TOKEN_REFRESHED is excluded because:
+      // 1. The user object doesn't change on token refresh (just the JWT)
+      // 2. Supabase syncs TOKEN_REFRESHED across tabs via localStorage
+      // 3. This causes unwanted re-renders that wipe unsaved component state
+      // See: https://github.com/supabase/supabase/issues/35754
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
         const currentUser = session?.user ?? null
         setUser(currentUser)
 

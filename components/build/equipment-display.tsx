@@ -23,6 +23,8 @@ import {
   getRuneById,
   getInsigniaById,
 } from '@/lib/gw/equipment/armor'
+import { getProfessionForAttribute } from '@/lib/gw/attributes'
+import { ProfessionIcon } from '@/components/ui/profession-icon'
 import { formatRuneLabel, formatInsigniaLabel } from '@/components/equipment/armor-picker-modal'
 import {
   encodeArmorItems,
@@ -148,6 +150,7 @@ function EquipmentCard({
   onClick,
   showDetailsHint,
   titleBold = true,
+  topContent,
 }: {
   icon: typeof Sword
   label: string
@@ -157,6 +160,7 @@ function EquipmentCard({
   onClick?: () => void
   showDetailsHint?: boolean
   titleBold?: boolean
+  topContent?: React.ReactNode
 }) {
   const Wrapper = onClick ? 'button' : 'div'
   return (
@@ -183,6 +187,9 @@ function EquipmentCard({
 
       {/* Content */}
       <div className="px-3.5 py-3">
+        {topContent && (
+          <div className="mb-1.5">{topContent}</div>
+        )}
         <div className={cn(
           'text-sm text-text-primary leading-snug',
           titleBold && 'font-medium'
@@ -246,9 +253,14 @@ function ArmorDetailModal({
               </div>
               <div className="space-y-1.5">
                 {headAttr && (
-                  <div>
+                  <div className="flex items-center gap-1.5">
+                    {getProfessionForAttribute(headAttr) && (
+                      <ProfessionIcon
+                        profession={getProfessionForAttribute(headAttr)!}
+                        size="sm"
+                      />
+                    )}
                     <span className="text-sm text-accent-gold font-medium">+1 {headAttr}</span>
-                    <span className="text-xs text-text-muted ml-2">Headpiece bonus</span>
                   </div>
                 )}
                 {rune && (
@@ -479,6 +491,17 @@ export function EquipmentDisplay({ equipment, equipmentId, className }: Equipmen
                       titleBold={false}
                       showDetailsHint
                       onClick={() => setShowArmorModal(true)}
+                      topContent={equipment.armor.headAttribute && (
+                        <div className="flex items-center gap-1.5 text-sm text-accent-gold">
+                          {getProfessionForAttribute(equipment.armor.headAttribute) && (
+                            <ProfessionIcon
+                              profession={getProfessionForAttribute(equipment.armor.headAttribute)!}
+                              size="sm"
+                            />
+                          )}
+                          <span>+1 {equipment.armor.headAttribute}</span>
+                        </div>
+                      )}
                     />
                   )}
                 </div>

@@ -42,6 +42,8 @@ import { getRuneById, getInsigniaById } from '@/lib/gw/equipment/armor'
 import type { InvalidEquipmentItem } from '@/lib/gw/equipment/validation'
 import { formatRuneLabel, formatInsigniaLabel } from '@/components/equipment/armor-picker-modal'
 import { TemplateInput } from '@/components/editor/template-input'
+import { getProfessionForAttribute } from '@/lib/gw/attributes'
+import { ProfessionIcon } from '@/components/ui/profession-icon'
 
 export interface EquipmentSectionProps {
   value?: Equipment
@@ -61,6 +63,9 @@ function hasEquipment(equipment: Equipment | undefined): boolean {
     set => set.mainHand.item || set.offHand.item
   )
   if (hasWeapons) return true
+
+  // Check for headpiece attribute
+  if (equipment.armor.headAttribute) return true
 
   const { head, chest, hands, legs, feet } = equipment.armor
   return [head, chest, hands, legs, feet].some(slot => slot.runeId || slot.insigniaId)
@@ -114,18 +119,21 @@ function EquipmentSlot({
   emptyText,
   disabled,
   onClick,
+  topContent,
 }: {
   icon: typeof Sword
   label: string
   isConfigured: boolean
   hasError?: boolean
   title?: string
-  /** Subtitle shown above title (e.g., weapon attribute like "Earth Magic") */
+  /** Subtitle shown below title (e.g., insignias for armor) */
   subtitle?: string
   effects?: string[]
   emptyText: string
   disabled?: boolean
   onClick: () => void
+  /** Content shown above the title (e.g., headpiece bonus) */
+  topContent?: React.ReactNode
 }) {
   return (
     <button
@@ -168,13 +176,18 @@ function EquipmentSlot({
 
       {/* Content area */}
       <div className="px-3.5 py-3">
-        {isConfigured && title ? (
+        {isConfigured && (title || topContent) ? (
           <>
-            <div className="text-sm font-medium text-text-primary leading-snug">
-              {title}
-            </div>
+            {topContent && (
+              <div className="mb-1.5">{topContent}</div>
+            )}
+            {title && (
+              <div className="text-sm font-medium text-text-primary leading-snug">
+                {title}
+              </div>
+            )}
             {subtitle && (
-              <div className="text-xs text-accent-gold mt-0.5">
+              <div className="text-xs text-text-secondary mt-0.5">
                 {subtitle}
               </div>
             )}
@@ -320,7 +333,8 @@ export function EquipmentSection({
   const offHandEffects = currentSet.offHand.item ? getWeaponEffects(currentSet.offHand) : undefined
 
   const [runeSummary, insigniaSummary] = value?.armor ? getArmorSummary(value.armor) : [null, null]
-  const hasArmor = !!(runeSummary || insigniaSummary)
+  const headAttribute = value?.armor?.headAttribute
+  const hasArmor = !!(runeSummary || insigniaSummary || headAttribute)
 
   const generatedCode = useMemo(() => {
     if (!currentSet.mainHand.item) return null
@@ -572,6 +586,17 @@ export function EquipmentSection({
                   subtitle={insigniaSummary ?? undefined}
                   emptyText="Configure runes & insignias"
                   onClick={() => setActiveSlot('armor')}
+                  topContent={headAttribute && (
+                    <div className="flex items-center gap-1.5 text-sm text-accent-gold">
+                      {getProfessionForAttribute(headAttribute) && (
+                        <ProfessionIcon
+                          profession={getProfessionForAttribute(headAttribute)!}
+                          size="sm"
+                        />
+                      )}
+                      <span>+1 {headAttribute}</span>
+                    </div>
+                  )}
                 />
               </div>
             </div>

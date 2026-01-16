@@ -179,7 +179,8 @@ export function EditBuildForm({ buildId }: EditBuildFormProps) {
     }
 
     fetchBuild()
-  }, [buildId, user, openModal, router])
+    // Only re-fetch when user ID changes (sign in/out), not on user object reference changes
+  }, [buildId, user?.id, openModal, router])
 
   const hasChanges = () => {
     if (!originalData) return false
