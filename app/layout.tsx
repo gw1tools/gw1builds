@@ -6,6 +6,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { createClient } from '@/lib/supabase/server'
 import { AuthProvider } from '@/components/providers/auth-provider'
 import { AuthModalProvider } from '@/components/auth/auth-modal'
+import { ThankYouModal } from '@/components/thank-you-modal'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from '@/lib/constants'
@@ -89,6 +90,7 @@ export default async function RootLayout({
             <Header />
             <main className="pt-16 flex-1">{children}</main>
             <Footer />
+            <ThankYouModal />
             <Toaster
               position="bottom-right"
               theme="dark"
