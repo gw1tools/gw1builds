@@ -774,6 +774,8 @@ function SkillRowContent({
 function SkillCostStats({ skill }: { skill: Skill }) {
   return (
     <div className="flex items-center gap-1.5 flex-shrink-0 text-xs text-text-primary">
+      {skill.overcast > 0 && <CostStat type="overcast" value={skill.overcast} />}
+      {skill.upkeep !== 0 && <CostStat type="upkeep" value={skill.upkeep} />}
       {skill.energy > 0 && <CostStat type="energy" value={skill.energy} />}
       {skill.adrenaline > 0 && <CostStat type="adrenaline" value={skill.adrenaline} />}
       {skill.sacrifice > 0 && <CostStat type="sacrifice" value={skill.sacrifice} showUnit />}
