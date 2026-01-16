@@ -457,7 +457,7 @@ export function SpotlightSkillPicker({
             className="fixed top-[3%] sm:top-[10%] left-1/2 -translate-x-1/2 w-[98%] sm:w-[95%] max-w-xl z-50"
           >
             <div className="bg-bg-elevated border border-border rounded-xl shadow-2xl overflow-hidden">
-              <div className="relative flex items-center">
+              <div className="relative flex items-center flex-wrap gap-y-2">
                 <Search className="absolute left-4 w-5 h-5 text-text-muted pointer-events-none" />
 
                 {activeFilter && (
@@ -465,7 +465,7 @@ export function SpotlightSkillPicker({
                     type="button"
                     onClick={clearFilter}
                     className={cn(
-                      'ml-12 flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer',
+                      'ml-12 shrink-0 flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer',
                       activeFilter.type === 'profession'
                         ? 'bg-accent-gold/20 text-accent-gold hover:bg-accent-gold/30'
                         : 'bg-accent-purple/20 text-accent-purple hover:bg-accent-purple/30'
@@ -494,7 +494,7 @@ export function SpotlightSkillPicker({
                   onKeyDown={handleKeyDown}
                   placeholder={activeFilter ? 'Search...' : 'Search skills...'}
                   className={cn(
-                    'flex-1 bg-transparent text-text-primary py-4 pr-14 sm:pr-10 text-lg placeholder:text-text-muted focus:outline-none',
+                    'flex-1 min-w-0 bg-transparent text-text-primary py-4 pr-14 sm:pr-10 text-lg placeholder:text-text-muted focus:outline-none',
                     activeFilter ? 'pl-2' : 'pl-12'
                   )}
                 />

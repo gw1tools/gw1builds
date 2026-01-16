@@ -5,6 +5,7 @@
 - Hover over skills in the picker to preview their full details
 - Equipment now validates against your profession — mismatched runes and insignias are flagged
 - Added PvE-only weapon upgrades like "Of the Warrior" suffix mods
+- Fixed PvE-only skills not appearing in the skill picker
 - Fixed incorrect data for some runes and insignias
 - Faster build search results
 - Fixed an issue when creating builds without being logged in

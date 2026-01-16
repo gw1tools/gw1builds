@@ -17,12 +17,10 @@ import { Button } from '@/components/ui/button'
 import {
   type ArmorSlot,
   type Rune,
+  type RuneCategory,
   getRuneById,
   getInsigniaById,
-  VIGOR_RUNES,
-  UNIVERSAL_RUNES,
-  ABSORPTION_RUNES,
-  ATTRIBUTE_RUNES_BY_PROFESSION,
+  getRunesForProfession,
   UNIVERSAL_INSIGNIAS,
   INSIGNIAS_BY_PROFESSION,
 } from '@/lib/gw/equipment/armor'
@@ -80,16 +78,120 @@ export function formatRuneLabel(rune: Rune): string {
       return 'Attunement'
     case 'absorption':
       return `${tier} Absorption`
+    case 'condition-reduction':
+      // e.g., "Rune of Recovery" -> "Recovery"
+      return rune.name.replace('Rune of ', '')
     case 'attribute':
       return rune.attribute ? `${tier} ${rune.attribute}` : rune.name.replace('Rune of ', '')
-    default:
-      return rune.name.replace('Rune of ', '')
   }
 }
 
 /** Format insignia name for display (without "Insignia" suffix) */
 export function formatInsigniaLabel(insignia: { name: string }): string {
   return insignia.name.replace(' Insignia', '')
+}
+
+// ============================================================================
+// RUNE GROUPING (Functional approach - single source of truth)
+// ============================================================================
+
+/** Rune group for rendering */
+interface RuneGroup {
+  key: string
+  label: string
+  runes: Rune[]
+  infoText: string
+  category: RuneCategory
+}
+
+/** Grouped runes split by type for UI sections */
+interface GroupedRunes {
+  general: RuneGroup[]   // vigor, vitae, attunement, condition, absorption
+  attribute: RuneGroup[] // profession attributes (separated visually)
+}
+
+/** Display order for rune categories */
+const RUNE_CATEGORY_ORDER: RuneCategory[] = [
+  'vigor', 'vitae', 'attunement', 'condition-reduction', 'absorption', 'attribute'
+]
+
+/** Labels for simple rune categories (condition/attribute derive from rune data) */
+const RUNE_CATEGORY_LABELS: Partial<Record<RuneCategory, string>> = {
+  vigor: 'Vigor',
+  vitae: 'Vitae',
+  attunement: 'Attunement',
+  absorption: 'Absorption',
+}
+
+/** Info text by category */
+const RUNE_INFO_TEXT: Record<RuneCategory, string> = {
+  vigor: '+30/41/50 HP',
+  vitae: '+10 HP',
+  attunement: '+2 Energy',
+  'condition-reduction': '', // Uses rune.effect directly
+  absorption: '-1/2/3 phys dmg',
+  attribute: '+1/2/3',
+}
+
+/** Empty result for when no profession selected */
+const EMPTY_GROUPED_RUNES: GroupedRunes = { general: [], attribute: [] }
+
+/**
+ * Groups runes by category for display.
+ * Returns general runes and attribute runes separately for UI sections.
+ * Uses getRunesForProfession as single source of truth.
+ */
+function groupRunesForDisplay(profession: ProfessionKey | undefined): GroupedRunes {
+  if (!profession) return EMPTY_GROUPED_RUNES
+
+  const allRunes = getRunesForProfession(profession)
+  const result: GroupedRunes = { general: [], attribute: [] }
+
+  for (const category of RUNE_CATEGORY_ORDER) {
+    const categoryRunes = allRunes.filter((r) => r.category === category)
+    if (categoryRunes.length === 0) continue
+
+    if (category === 'attribute') {
+      // Sub-group by attribute name, maintain insertion order
+      const byAttribute = new Map<string, Rune[]>()
+      for (const rune of categoryRunes) {
+        const attr = rune.attribute || 'Other'
+        if (!byAttribute.has(attr)) byAttribute.set(attr, [])
+        byAttribute.get(attr)!.push(rune)
+      }
+      for (const [attr, runes] of byAttribute) {
+        result.attribute.push({
+          key: `attribute-${attr}`,
+          label: attr,
+          runes,
+          infoText: RUNE_INFO_TEXT.attribute,
+          category,
+        })
+      }
+    } else if (category === 'condition-reduction') {
+      // Each condition rune is its own row
+      for (const rune of categoryRunes) {
+        result.general.push({
+          key: `condition-${rune.id}`,
+          label: rune.name.replace('Rune of ', ''),
+          runes: [rune],
+          infoText: rune.effect,
+          category,
+        })
+      }
+    } else {
+      // Single group: vigor, vitae, attunement, absorption
+      result.general.push({
+        key: category,
+        label: RUNE_CATEGORY_LABELS[category] || category,
+        runes: categoryRunes,
+        infoText: RUNE_INFO_TEXT[category],
+        category,
+      })
+    }
+  }
+
+  return result
 }
 
 // ============================================================================
@@ -349,33 +451,36 @@ function InsigniaRow({
 }) {
   return (
     <div className={cn(
-      'px-3 py-2 rounded-lg border transition-all',
+      'px-3 py-2.5 rounded-lg border transition-all',
       selected
         ? 'border-accent-gold/60 bg-accent-gold/10'
         : 'border-border/50 hover:border-border'
     )}>
-      {/* Top row: Name + Button */}
-      <div className="flex items-center gap-2">
+      {/* Row: Name + Effect + Button */}
+      <div className="flex items-center gap-3">
         <span className={cn(
-          'flex-1 text-[13px] font-medium',
+          'text-[13px] font-medium shrink-0 min-w-[90px]',
           selected ? 'text-accent-gold' : 'text-text-primary'
         )}>
           {label}
         </span>
 
-        {/* Desktop: show effect inline */}
+        {/* Desktop: show effect inline with flex-1 to fill space */}
         {effect && (
           <span className={cn(
-            'text-[11px] hidden sm:inline',
+            'text-[11px] hidden sm:block flex-1',
             selected ? 'text-accent-gold/70' : 'text-text-muted'
           )}>{effect}</span>
         )}
+
+        {/* Mobile: spacer to push button right */}
+        <span className="flex-1 sm:hidden" />
 
         <button
           type="button"
           onClick={onClick}
           className={cn(
-            'px-3 py-1 text-[11px] font-medium rounded transition-colors cursor-pointer',
+            'px-3 py-1 text-[11px] font-medium rounded transition-colors cursor-pointer shrink-0',
             selected
               ? 'bg-accent-gold text-black'
               : 'bg-bg-secondary hover:bg-bg-hover text-text-secondary'
@@ -388,7 +493,7 @@ function InsigniaRow({
       {/* Mobile: show effect on second line */}
       {effect && (
         <div className={cn(
-          'text-[11px] mt-1 sm:hidden',
+          'text-[11px] mt-2 sm:hidden',
           selected ? 'text-accent-gold/70' : 'text-text-muted'
         )}>{effect}</div>
       )}
@@ -481,12 +586,12 @@ function SlotRow({
     }
   }, [expanded, config.runeId, headAttribute, isHeadSlot])
 
-  // Get profession-specific options (memoized to avoid re-renders)
-  const attributeRunes = useMemo(
-    () => profession ? ATTRIBUTE_RUNES_BY_PROFESSION[profession] || [] : [],
+  // Get rune groups using functional approach (single source of truth)
+  const { general: generalRuneGroups, attribute: attributeRuneGroups } = useMemo(
+    () => groupRunesForDisplay(profession),
     [profession]
   )
-  const absorptionRunes = profession === 'warrior' ? ABSORPTION_RUNES : []
+
   const professionInsignias = profession ? INSIGNIAS_BY_PROFESSION[profession] || [] : []
 
   // Check what non-stacking runes are already equipped on OTHER slots
@@ -494,6 +599,7 @@ function SlotRow({
     const used = {
       vigor: false,
       absorption: false,
+      conditionRunes: new Set<number>(), // Track by rune ID
       attributes: new Set<string>(),
     }
 
@@ -505,6 +611,7 @@ function SlotRow({
         if (r) {
           if (r.category === 'vigor') used.vigor = true
           if (r.category === 'absorption') used.absorption = true
+          if (r.category === 'condition-reduction') used.conditionRunes.add(r.id)
           if (r.category === 'attribute' && r.attribute) {
             used.attributes.add(r.attribute)
           }
@@ -514,28 +621,26 @@ function SlotRow({
     return used
   }, [allSlots, slot])
 
-  const isRuneDisabled = useCallback((r: Rune): { disabled: boolean; reason?: string } => {
-    if (r.category === 'vigor' && usedNonStacking.vigor) {
+  /** Check if a rune group should be disabled (non-stacking already equipped elsewhere) */
+  const isGroupDisabled = useCallback((group: RuneGroup): { disabled: boolean; reason?: string } => {
+    const firstRune = group.runes[0]
+    if (!firstRune) return { disabled: false }
+
+    // Non-stacking categories
+    if (group.category === 'vigor' && usedNonStacking.vigor) {
       return { disabled: true, reason: "Doesn't stack" }
     }
-    if (r.category === 'absorption' && usedNonStacking.absorption) {
+    if (group.category === 'absorption' && usedNonStacking.absorption) {
       return { disabled: true, reason: "Doesn't stack" }
     }
-    if (r.category === 'attribute' && r.attribute && usedNonStacking.attributes.has(r.attribute)) {
+    if (group.category === 'condition-reduction' && usedNonStacking.conditionRunes.has(firstRune.id)) {
+      return { disabled: true, reason: "Doesn't stack" }
+    }
+    if (group.category === 'attribute' && firstRune.attribute && usedNonStacking.attributes.has(firstRune.attribute)) {
       return { disabled: true, reason: "Doesn't stack" }
     }
     return { disabled: false }
   }, [usedNonStacking])
-
-  const attributeGroups = useMemo(() => {
-    const groups: Record<string, Rune[]> = {}
-    for (const r of attributeRunes) {
-      const attr = r.attribute || 'Other'
-      if (!groups[attr]) groups[attr] = []
-      groups[attr].push(r)
-    }
-    return groups
-  }, [attributeRunes])
 
   // Handle headpiece attribute selection with auto-advance to rune tab
   const handleHeadpieceSelect = useCallback((attr: string | null) => {
@@ -701,7 +806,7 @@ function SlotRow({
                       )}
                     </motion.div>
                   ) : activeTab === 'rune' ? (
-                    /* RUNE TAB */
+                    /* RUNE TAB - Functional approach using groupRunesForDisplay */
                     <motion.div
                       key="rune"
                       initial={{ opacity: 0, y: 8 }}
@@ -710,57 +815,38 @@ function SlotRow({
                       transition={{ duration: 0.15, ease: 'easeOut' }}
                       className="space-y-2"
                     >
-                      <RuneRow
-                        label="Vigor"
-                        runes={VIGOR_RUNES}
-                        selectedRuneId={config.runeId}
-                        onSelect={handleRuneSelect}
-                        disabled={usedNonStacking.vigor}
-                        disabledReason="Doesn't stack"
-                        infoText="+30/41/50 HP"
-                      />
-                      <RuneRow
-                        label="Vitae"
-                        runes={UNIVERSAL_RUNES.filter(r => r.category === 'vitae')}
-                        selectedRuneId={config.runeId}
-                        onSelect={handleRuneSelect}
-                        infoText="+10 HP"
-                      />
-                      <RuneRow
-                        label="Attunement"
-                        runes={UNIVERSAL_RUNES.filter(r => r.category === 'attunement')}
-                        selectedRuneId={config.runeId}
-                        onSelect={handleRuneSelect}
-                        infoText="+2 Energy"
-                      />
-                      {absorptionRunes.length > 0 && (
-                        <RuneRow
-                          label="Absorption"
-                          runes={absorptionRunes}
-                          selectedRuneId={config.runeId}
-                          onSelect={handleRuneSelect}
-                          disabled={usedNonStacking.absorption}
-                          disabledReason="Doesn't stack"
-                          infoText="-1/2/3 phys dmg"
-                        />
-                      )}
+                      {/* General runes (vigor, vitae, attunement, condition, absorption) */}
+                      {generalRuneGroups.map((group) => {
+                        const { disabled, reason } = isGroupDisabled(group)
+                        return (
+                          <RuneRow
+                            key={group.key}
+                            label={group.label}
+                            runes={group.runes}
+                            selectedRuneId={config.runeId}
+                            onSelect={handleRuneSelect}
+                            disabled={disabled}
+                            disabledReason={reason}
+                            infoText={group.infoText}
+                          />
+                        )
+                      })}
 
                       {/* Attribute runes - separated by whitespace */}
-                      {profession && Object.keys(attributeGroups).length > 0 && (
+                      {attributeRuneGroups.length > 0 && (
                         <div className="pt-3 space-y-2">
-                          {Object.entries(attributeGroups).map(([attr, attrRunes]) => {
-                            const firstRune = attrRunes[0]
-                            const { disabled, reason } = isRuneDisabled(firstRune)
+                          {attributeRuneGroups.map((group) => {
+                            const { disabled, reason } = isGroupDisabled(group)
                             return (
                               <RuneRow
-                                key={attr}
-                                label={attr}
-                                runes={attrRunes}
+                                key={group.key}
+                                label={group.label}
+                                runes={group.runes}
                                 selectedRuneId={config.runeId}
                                 onSelect={handleRuneSelect}
                                 disabled={disabled}
                                 disabledReason={reason}
-                                infoText="+1/2/3"
+                                infoText={group.infoText}
                               />
                             )
                           })}
