@@ -56,6 +56,7 @@ const TAG_GROUPS: Record<string, string[]> = {
   'PvP Formats': ['gvg', 'ha', 'ra', 'ab', 'fa', 'jq', 'ca'],
   'Build Type': ['player', 'hero', 'team'],
   'Characteristics': ['meta', 'beginner', 'budget', 'alternative', 'niche', 'meme'],
+  'PvX Status': ['great', 'good', 'testing'],
 }
 
 // ============================================================================
