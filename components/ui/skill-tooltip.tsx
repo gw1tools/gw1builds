@@ -103,16 +103,14 @@ export function SkillTooltipContent({
   const elite = eliteOverride ?? skill.elite ?? false
   const iconUrl = showIcon ? getSkillIconUrlById(skill.id) : null
 
-  const hasBasicCosts =
-    (skill.energy !== undefined && skill.energy >= 0) ||
+  const hasCosts =
+    (skill.overcast !== undefined && skill.overcast > 0) ||
+    (skill.upkeep !== undefined && skill.upkeep !== 0) ||
+    (skill.energy !== undefined && skill.energy > 0) ||
     (skill.adrenaline !== undefined && skill.adrenaline > 0) ||
+    (skill.sacrifice !== undefined && skill.sacrifice > 0) ||
     (skill.activation !== undefined && skill.activation > 0) ||
     (skill.recharge !== undefined && skill.recharge > 0)
-
-  const hasAdditionalCosts =
-    (skill.sacrifice !== undefined && skill.sacrifice > 0) ||
-    (skill.upkeep !== undefined && skill.upkeep !== 0) ||
-    (skill.overcast !== undefined && skill.overcast > 0)
 
   // Filter out "No Attribute" and "None" profession
   const displayAttribute =
@@ -230,44 +228,36 @@ export function SkillTooltipContent({
       )}
 
       {/* Stats */}
-      {(hasBasicCosts || hasAdditionalCosts) && (
+      {hasCosts && (
         <div
           className={cn(
-            'border-t border-border pt-2 space-y-1.5',
+            'border-t border-border pt-2',
             showIcon ? 'mt-3' : 'mt-2'
           )}
         >
-          {/* Basic costs row */}
-          {hasBasicCosts && (
-            <div className="flex gap-3 text-xs text-text-secondary">
-              {skill.adrenaline !== undefined && skill.adrenaline > 0 ? (
-                <CostStat type="adrenaline" value={skill.adrenaline} />
-              ) : skill.energy !== undefined && skill.energy > 0 ? (
-                <CostStat type="energy" value={skill.energy} />
-              ) : null}
-              {skill.activation !== undefined && skill.activation > 0 && (
-                <CostStat type="activation" value={skill.activation} showUnit />
-              )}
-              {skill.recharge !== undefined && skill.recharge > 0 && (
-                <CostStat type="recharge" value={skill.recharge} showUnit />
-              )}
-            </div>
-          )}
-
-          {/* Additional costs row */}
-          {hasAdditionalCosts && (
-            <div className="flex gap-3 text-xs text-text-secondary">
-              {skill.sacrifice !== undefined && skill.sacrifice > 0 && (
-                <CostStat type="sacrifice" value={skill.sacrifice} showUnit />
-              )}
-              {skill.upkeep !== undefined && skill.upkeep !== 0 && (
-                <CostStat type="upkeep" value={skill.upkeep} />
-              )}
-              {skill.overcast !== undefined && skill.overcast > 0 && (
-                <CostStat type="overcast" value={skill.overcast} />
-              )}
-            </div>
-          )}
+          <div className="flex gap-3 text-xs text-text-secondary">
+            {skill.overcast !== undefined && skill.overcast > 0 && (
+              <CostStat type="overcast" value={skill.overcast} />
+            )}
+            {skill.upkeep !== undefined && skill.upkeep !== 0 && (
+              <CostStat type="upkeep" value={skill.upkeep} />
+            )}
+            {skill.energy !== undefined && skill.energy > 0 && (
+              <CostStat type="energy" value={skill.energy} />
+            )}
+            {skill.adrenaline !== undefined && skill.adrenaline > 0 && (
+              <CostStat type="adrenaline" value={skill.adrenaline} />
+            )}
+            {skill.sacrifice !== undefined && skill.sacrifice > 0 && (
+              <CostStat type="sacrifice" value={skill.sacrifice} showUnit />
+            )}
+            {skill.activation !== undefined && skill.activation > 0 && (
+              <CostStat type="activation" value={skill.activation} showUnit />
+            )}
+            {skill.recharge !== undefined && skill.recharge > 0 && (
+              <CostStat type="recharge" value={skill.recharge} showUnit />
+            )}
+          </div>
         </div>
       )}
 

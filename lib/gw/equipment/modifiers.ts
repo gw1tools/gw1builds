@@ -364,49 +364,49 @@ export const COMBAT_PREFIXES: Modifier[] = [
     name: 'Vampiric Axe Haft',
     category: 'prefix',
     weaponTypes: ['axe'],
-    effect: 'Life stealing 1-5, -1 health regen',
+    effect: 'Life draining: 1-3, Health regeneration -1',
   },
   {
     id: 120,
     name: 'Vampiric Hammer Haft',
     category: 'prefix',
     weaponTypes: ['hammer'],
-    effect: 'Life stealing 1-5, -1 health regen',
+    effect: 'Life draining: 1-5, Health regeneration -1',
   },
   {
     id: 121,
     name: 'Vampiric Bow String',
     category: 'prefix',
     weaponTypes: ['bow'],
-    effect: 'Life stealing 1-5, -1 health regen',
+    effect: 'Life draining: 1-5, Health regeneration -1',
   },
   {
     id: 122,
     name: 'Vampiric Sword Hilt',
     category: 'prefix',
     weaponTypes: ['sword'],
-    effect: 'Life stealing 1-5, -1 health regen',
+    effect: 'Life draining: 1-3, Health regeneration -1',
   },
   {
     id: 191,
     name: 'Vampiric Dagger Tang',
     category: 'prefix',
     weaponTypes: ['dagger'],
-    effect: 'Life stealing 1-3, -1 health regen',
+    effect: 'Life draining: 1-3, Health regeneration -1',
   },
   {
     id: 235,
     name: 'Vampiric Scythe Snathe',
     category: 'prefix',
     weaponTypes: ['scythe'],
-    effect: 'Life stealing 1-5, -1 health regen',
+    effect: 'Life draining: 1-5, Health regeneration -1',
   },
   {
     id: 252,
     name: 'Vampiric Spearhead',
     category: 'prefix',
     weaponTypes: ['spear'],
-    effect: 'Life stealing 1-3, -1 health regen',
+    effect: 'Life draining: 1-3, Health regeneration -1',
   },
 
   // Zealous (energy gain)
@@ -2364,7 +2364,7 @@ export const ALL_WEAPON_MODIFIERS: Modifier[] = [
  * Convert range values to max values in effect strings.
  * e.g., "Health +10-30" -> "Health +30"
  * e.g., "Halves skill recharge (5-10%)" -> "Halves skill recharge (10%)"
- * e.g., "Life stealing 1-5" -> "Life stealing 5"
+ * e.g., "Life draining: 1-5" -> "Life draining 5"
  */
 export function formatEffectMaxValue(effect: string): string {
   // Replace parenthesized ranges like "(5-10%)" with max value "(10%)"
