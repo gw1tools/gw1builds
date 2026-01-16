@@ -47,4 +47,4 @@ BuildCard.displayName = 'BuildCard'
 /**
  * Animated version with enter/exit transitions
  */
-export const BuildCardAnimated = motion(BuildCard)
+export const BuildCardAnimated = motion.create(BuildCard)
