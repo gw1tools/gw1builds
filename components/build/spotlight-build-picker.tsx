@@ -101,7 +101,7 @@ export function SpotlightBuildPicker({
   const [allBuilds, setAllBuilds] = useState<SearchableBuild[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [showHelp, setShowHelp] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const selectedItemRef = useRef<HTMLElement | null>(null)
   const router = useRouter()
@@ -204,6 +204,13 @@ export function SpotlightBuildPicker({
       block: 'nearest',
     })
   }, [selectedIndex])
+
+  // Reset textarea height when query is cleared
+  useEffect(() => {
+    if (query === '' && inputRef.current) {
+      inputRef.current.style.height = 'auto'
+    }
+  }, [query])
 
   // Search results
   const searchResults = useMemo((): SearchResponse => {
@@ -528,16 +535,21 @@ export function SpotlightBuildPicker({
                     )
                   })}
 
-                  {/* Input */}
-                  <input
+                  {/* Input - uses textarea for text wrapping on mobile */}
+                  <textarea
                     ref={inputRef}
-                    type="text"
+                    rows={1}
                     value={query}
-                    onChange={e => setQuery(e.target.value)}
+                    onChange={e => {
+                      setQuery(e.target.value)
+                      // Auto-resize height
+                      e.target.style.height = 'auto'
+                      e.target.style.height = `${e.target.scrollHeight}px`
+                    }}
                     onKeyDown={handleKeyDown}
                     placeholder={activeFilters.length > 0 ? 'Add...' : 'Mo/Me, #meta, skill...'}
                     aria-label="Search builds by profession, tag, or skill"
-                    className="flex-1 min-w-[60px] h-9 sm:h-10 bg-transparent text-base text-text-primary placeholder:text-text-muted focus:outline-none font-mono"
+                    className="flex-1 min-w-[60px] min-h-[36px] sm:min-h-[40px] py-2 bg-transparent text-base text-text-primary placeholder:text-text-muted focus:outline-none font-mono resize-none overflow-hidden leading-normal"
                   />
 
                   {/* Action buttons - grouped so they stay together when wrapping */}

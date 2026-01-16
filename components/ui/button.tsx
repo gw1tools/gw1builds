@@ -1,7 +1,8 @@
 'use client'
 
-import { forwardRef } from 'react'
+import { forwardRef, useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion, type HTMLMotionProps } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -43,6 +44,8 @@ export interface ButtonProps extends Omit<
   noLift?: boolean
   /** When provided, renders as a Next.js Link instead of button */
   href?: string
+  /** Show loading spinner during navigation (only works with href) */
+  showNavigationLoading?: boolean
 }
 
 /**
@@ -67,11 +70,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       noLift = false,
       href,
+      showNavigationLoading = false,
       ...props
     },
     ref
   ) => {
-    const isDisabled = disabled || isLoading
+    const router = useRouter()
+    const [isPending, startTransition] = useTransition()
+    const [isNavigating, setIsNavigating] = useState(false)
+
+    const showLoading = isLoading || (showNavigationLoading && (isPending || isNavigating))
+    const isDisabled = disabled || showLoading
 
     const sharedClassName = cn(
       // Base styles
@@ -92,14 +101,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const content = (
       <>
-        {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-        {!isLoading && leftIcon && (
+        {showLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+        {!showLoading && leftIcon && (
           <span className="shrink-0 inline-flex items-center justify-center">
             {leftIcon}
           </span>
         )}
         {children && <span>{children}</span>}
-        {!isLoading && rightIcon && (
+        {!showLoading && rightIcon && (
           <span className="shrink-0 inline-flex items-center justify-center">
             {rightIcon}
           </span>
@@ -109,6 +118,31 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     // Render as Link when href is provided
     if (href) {
+      // When showNavigationLoading is enabled, use programmatic navigation
+      if (showNavigationLoading) {
+        const handleNavigation = () => {
+          if (isDisabled) return
+          setIsNavigating(true)
+          startTransition(() => {
+            router.push(href)
+          })
+        }
+
+        return (
+          <motion.button
+            variants={noLift ? undefined : hoverLiftVariants}
+            initial="rest"
+            whileHover={isDisabled ? undefined : 'hover'}
+            whileTap={isDisabled ? undefined : 'tap'}
+            disabled={isDisabled}
+            onClick={handleNavigation}
+            className={sharedClassName}
+          >
+            {content}
+          </motion.button>
+        )
+      }
+
       return (
         <MotionLink
           href={href}

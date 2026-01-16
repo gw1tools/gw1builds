@@ -115,7 +115,7 @@ export function SpotlightSkillPicker({
   const [allSkills, setAllSkills] = useState<Skill[]>([])
   const [activeFilter, setActiveFilter] = useState<{ type: 'profession' | 'attribute'; value: string } | null>(null)
   const [collapsedAttributes, setCollapsedAttributes] = useState<Set<string>>(new Set())
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
 
   // Hover tooltip state (desktop only)
@@ -216,6 +216,13 @@ export function SpotlightSkillPicker({
       setCollapsedAttributes(new Set())
     }
   }, [isOpen])
+
+  // Reset textarea height when query is cleared
+  useEffect(() => {
+    if (query === '' && inputRef.current) {
+      inputRef.current.style.height = 'auto'
+    }
+  }, [query])
 
   const smartSearchResults = useMemo(() => {
     const emptyResult = { categories: [], skills: [], groupedByAttribute: [] as AttributeGroup[], searchQuery: '', descriptionMatchIds: new Set<number>() }
@@ -486,30 +493,38 @@ export function SpotlightSkillPicker({
                   </button>
                 )}
 
-                <input
+                <textarea
                   ref={inputRef}
-                  type="text"
+                  rows={1}
                   value={query}
-                  onChange={e => { setQuery(e.target.value); setSelectedIndex(0) }}
+                  onChange={e => {
+                    setQuery(e.target.value)
+                    setSelectedIndex(0)
+                    // Auto-resize height
+                    e.target.style.height = 'auto'
+                    e.target.style.height = `${e.target.scrollHeight}px`
+                  }}
                   onKeyDown={handleKeyDown}
                   placeholder={activeFilter ? 'Search...' : 'Search skills...'}
                   className={cn(
-                    'flex-1 min-w-0 bg-transparent text-text-primary py-4 pr-14 sm:pr-10 text-lg placeholder:text-text-muted focus:outline-none',
+                    'flex-1 min-w-0 bg-transparent text-text-primary py-4 pr-16 sm:pr-4 text-lg placeholder:text-text-muted focus:outline-none resize-none overflow-hidden leading-normal',
                     activeFilter ? 'pl-2' : 'pl-12'
                   )}
                 />
-                {query && (
-                  <button type="button" onClick={() => setQuery('')} className="absolute right-12 sm:right-4 text-text-muted hover:text-text-primary cursor-pointer">
+                {/* X button to clear query, or Close button on mobile when empty */}
+                {query ? (
+                  <button type="button" onClick={() => setQuery('')} className="absolute right-3 p-1 text-text-muted hover:text-text-primary cursor-pointer">
                     <X className="w-5 h-5" />
                   </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="sm:hidden absolute right-3 px-2 py-1 text-sm text-text-muted hover:text-text-primary cursor-pointer"
+                  >
+                    Close
+                  </button>
                 )}
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="sm:hidden absolute right-3 p-1 text-text-muted hover:text-text-primary cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
               </div>
 
               <div className="h-px bg-border" />
@@ -698,10 +713,12 @@ function SkillRowContent({
   skill,
   isInBar,
   attributes,
+  searchQuery,
 }: {
   skill: Skill
   isInBar: boolean
   attributes?: Record<string, number>
+  searchQuery?: string
 }) {
   return (
     <>
@@ -746,6 +763,7 @@ function SkillRowContent({
           <ScaledDescription
             description={skill.description}
             attributeLevel={attributes?.[skill.attribute] ?? 0}
+            highlightQuery={searchQuery}
           />
         </p>
       )}
@@ -899,7 +917,7 @@ function GroupedSkillRow({
       {compactMode ? (
         <CompactSkillRow skill={skill} isInBar={isInBar} descriptionSnippet={descriptionSnippet} />
       ) : (
-        <SkillRowContent skill={skill} isInBar={isInBar} attributes={attributes} />
+        <SkillRowContent skill={skill} isInBar={isInBar} attributes={attributes} searchQuery={descriptionSnippet} />
       )}
     </button>
   )
@@ -1034,7 +1052,7 @@ function SkillResultRow({
       {compactMode ? (
         <CompactSkillRow skill={skill} isInBar={isInBar} descriptionSnippet={descriptionSnippet} />
       ) : (
-        <SkillRowContent skill={skill} isInBar={isInBar} attributes={attributes} />
+        <SkillRowContent skill={skill} isInBar={isInBar} attributes={attributes} searchQuery={descriptionSnippet} />
       )}
     </button>
   )
