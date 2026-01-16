@@ -55,6 +55,8 @@ export interface User {
   created_at: string
   /** ISO 8601 timestamp */
   updated_at: string
+  /** Admin-triggered flag to show thank you modal on next login */
+  show_thank_you: boolean | null
 }
 
 /**
