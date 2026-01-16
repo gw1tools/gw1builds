@@ -29,6 +29,13 @@ const stickyColors = {
 /** Tags that automatically get gold styling */
 const META_TAGS = ['meta', 'beginner', 'budget', 'recommended'] as const
 
+/** PvX build status tags with distinct colors (using existing theme colors) */
+const PVX_STATUS_TAGS = {
+  great: 'bg-sticky-green/20 border-sticky-green/40 text-sticky-green',
+  good: 'bg-accent-green/20 border-accent-green/40 text-accent-green',
+  testing: 'bg-accent-purple/20 border-accent-purple/40 text-accent-purple',
+} as const
+
 export interface TagProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: keyof typeof tagVariants
   size?: keyof typeof tagSizes
@@ -70,9 +77,11 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(
     },
     ref
   ) => {
-    // Check if this is a meta tag that should auto-highlight
+    // Check if this is a special tag that should auto-style
     const content = label || (typeof children === 'string' ? children : '')
-    const isMetaTag = META_TAGS.includes(content.toLowerCase() as typeof META_TAGS[number])
+    const contentLower = content.toLowerCase()
+    const isPvxStatusTag = contentLower in PVX_STATUS_TAGS
+    const isMetaTag = META_TAGS.includes(contentLower as (typeof META_TAGS)[number])
     const effectiveVariant = isMetaTag ? 'gold' : variant
 
     // Generate rotation if enabled
@@ -85,6 +94,10 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(
 
     // Get variant-specific classes
     const getVariantClasses = () => {
+      // PvX status tags get priority styling
+      if (isPvxStatusTag) {
+        return PVX_STATUS_TAGS[contentLower as keyof typeof PVX_STATUS_TAGS]
+      }
       if (effectiveVariant === 'profession' && profession) {
         return `border-${profession} text-${profession} bg-${profession}/10`
       }

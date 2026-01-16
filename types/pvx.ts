@@ -89,7 +89,7 @@ export interface PvxBuild {
 export const PVX_CATEGORIES = [
   'Great_working_builds',
   'Good_working_builds',
-  'Testing_trial_builds',
+  'Testing_builds',
 ] as const
 
 export type PvxCategory = (typeof PVX_CATEGORIES)[number]
@@ -98,7 +98,7 @@ export type PvxCategory = (typeof PVX_CATEGORIES)[number]
 export const CATEGORY_TO_STATUS: Record<string, PvxBuildStatus> = {
   Great_working_builds: 'great',
   Good_working_builds: 'good',
-  Testing_trial_builds: 'testing',
+  Testing_builds: 'testing',
 }
 
 /** PvX Wiki base URL */

@@ -175,8 +175,8 @@ export const ATTRIBUTE_BY_ID: Record<number, string> = {
   105: 'Kurzick Title', // Factions campaign
   106: 'Asura Title', // Eye of the North
   107: 'Deldrimor Title', // Eye of the North
-  108: 'Norn Title', // Eye of the North
-  109: 'Ebon Vanguard Title', // Eye of the North
+  108: 'Ebon Vanguard Title', // Eye of the North
+  109: 'Norn Title', // Eye of the North
 }
 
 /**
@@ -308,6 +308,12 @@ export const CHARACTERISTICS = [
 ] as const
 
 /**
+ * PvX Wiki build status tags
+ * Applied to builds imported from PvX Wiki based on their vetting status
+ */
+export const PVX_STATUS = ['great', 'good', 'testing'] as const
+
+/**
  * Build type - stored as separate field, not a tag
  * Determines if this is for player, hero AI, or full team
  */
@@ -357,6 +363,10 @@ export const TAG_LABELS: Record<string, string> = {
   player: 'Player',
   hero: 'Hero',
   team: 'Team',
+  // PvX status tags
+  great: 'Great',
+  good: 'Good',
+  testing: 'Testing',
 }
 
 /**
@@ -396,6 +406,7 @@ export const ALL_TAGS = [
   ...PVE_CONTEXT.eliteAreas,
   ...PVP_FORMATS,
   ...CHARACTERISTICS,
+  ...PVX_STATUS,
 ] as const
 
 /** Type for any valid tag */
