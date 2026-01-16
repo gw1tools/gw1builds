@@ -18,12 +18,19 @@ export interface WeaponSummaryProps {
   className?: string
 }
 
-/** Get weapon effects in consistent order: prefix, inscription, suffix (max values) */
+/**
+ * Get all weapon effects in display order:
+ * 1. Prefix effect
+ * 2. Suffix effect
+ * 3. Inscription name (e.g., Inscription: "Strength and Honor")
+ * 4. Inscription effect
+ */
 export function getWeaponEffects(config: WeaponConfig): string[] {
   const effects: string[] = []
   if (config.prefix?.effect) effects.push(formatEffectMaxValue(config.prefix.effect))
-  if (config.inscription?.effect) effects.push(formatEffectMaxValue(config.inscription.effect))
   if (config.suffix?.effect) effects.push(formatEffectMaxValue(config.suffix.effect))
+  if (config.inscription) effects.push(`Inscription: ${config.inscription.name}`)
+  if (config.inscription?.effect) effects.push(formatEffectMaxValue(config.inscription.effect))
   return effects
 }
 
@@ -62,7 +69,7 @@ export function WeaponSummary({
         </div>
       )}
 
-      {/* Effects */}
+      {/* Effects: prefix, suffix, inscription name, inscription effect */}
       {effects.length > 0 && (
         <div className={cn(
           'space-y-0.5',
@@ -79,13 +86,6 @@ export function WeaponSummary({
               {effect}
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Inscription name (detailed only) */}
-      {!isCompact && config.inscription && (
-        <div className="text-xs text-text-muted mt-2 italic">
-          {config.inscription.name}
         </div>
       )}
     </div>

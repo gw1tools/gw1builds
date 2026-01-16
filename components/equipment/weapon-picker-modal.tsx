@@ -34,7 +34,6 @@ import { WeaponSummary } from './weapon-summary'
 
 // Re-export for backwards compatibility
 export type { WeaponConfig } from '@/types/database'
-export { getWeaponEffects } from './weapon-summary'
 
 interface WeaponPickerModalProps {
   isOpen: boolean
@@ -114,18 +113,26 @@ function ModSelector({
   onToggle,
 }: {
   label: string
-  options: { id: number; name: string; effect?: string }[]
+  options: { id: number; name: string; effect?: string; pveOnly?: boolean }[]
   selectedId: number | null
   onSelect: (id: number | null) => void
   isOpen: boolean
   onToggle: () => void
 }) {
-  const selected = options.find(o => o.id === selectedId)
+  // Sort options: non-PvE first, then PvE-only at bottom
+  const sortedOptions = useMemo(() => {
+    return [...options].sort((a, b) => {
+      if (a.pveOnly && !b.pveOnly) return 1
+      if (!a.pveOnly && b.pveOnly) return -1
+      return 0
+    })
+  }, [options])
 
-  const getDisplayName = (option: { name: string }) => {
-    // Strip quotes from inscription names and return full name
-    return option.name.replace(/^"|"$/g, '')
-  }
+  const selected = options.find(o => o.id === selectedId)
+  const isInscription = label === 'Inscription'
+
+  // Format display name - inscriptions get "Inscription: " prefix
+  const formatDisplayName = (name: string) => isInscription ? `Inscription: ${name}` : name
 
   return (
     <div className="space-y-1.5">
@@ -160,7 +167,7 @@ function ModSelector({
           {selected && (
             <Check className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
           )}
-          {selected ? getDisplayName(selected) : 'None'}
+          {selected ? formatDisplayName(selected.name) : 'None'}
         </span>
         <ChevronDown className={cn('w-4 h-4 text-text-muted transition-transform', isOpen && 'rotate-180')} />
       </button>
@@ -174,8 +181,8 @@ function ModSelector({
             transition={{ duration: 0.15 }}
             className="overflow-hidden"
           >
-            <div className="grid grid-cols-2 gap-1 pt-1">
-              {options.map((option) => {
+            <div className="flex flex-col gap-1 pt-1">
+              {sortedOptions.map((option) => {
                 const isSelected = selectedId === option.id
                 return (
                   <button
@@ -193,11 +200,16 @@ function ModSelector({
                       {isSelected && (
                         <Check className="w-3 h-3 text-text-muted flex-shrink-0" />
                       )}
-                      <span className="font-medium truncate">{getDisplayName(option)}</span>
+                      <span className="font-medium truncate">{formatDisplayName(option.name)}</span>
+                      {option.pveOnly && (
+                        <span className="ml-auto text-[9px] px-1.5 py-0.5 bg-accent-purple/20 text-accent-purple rounded flex-shrink-0">
+                          PvE
+                        </span>
+                      )}
                     </div>
                     {option.effect && (
                       <div className={cn(
-                        "text-[10px] truncate",
+                        "text-[10px]",
                         isSelected ? "text-text-secondary ml-[18px]" : "text-text-muted"
                       )}>
                         {formatEffectMaxValue(option.effect)}
@@ -490,7 +502,7 @@ function WeaponPickerContent({
                   {prefixes.length > 0 && (
                     <ModSelector
                       label="Prefix"
-                      options={prefixes.map(p => ({ id: p.id, name: p.name, effect: p.effect }))}
+                      options={prefixes.map(p => ({ id: p.id, name: p.name, effect: p.effect, pveOnly: p.pveOnly }))}
                       selectedId={config.prefix?.id || null}
                       onSelect={handlePrefixSelect}
                       isOpen={expandedSection === 'prefix'}
@@ -500,7 +512,7 @@ function WeaponPickerContent({
                   {suffixes.length > 0 && (
                     <ModSelector
                       label="Suffix"
-                      options={suffixes.map(s => ({ id: s.id, name: s.name, effect: s.effect }))}
+                      options={suffixes.map(s => ({ id: s.id, name: s.name, effect: s.effect, pveOnly: s.pveOnly }))}
                       selectedId={config.suffix?.id || null}
                       onSelect={handleSuffixSelect}
                       isOpen={expandedSection === 'suffix'}
@@ -510,7 +522,7 @@ function WeaponPickerContent({
                   {inscriptions.length > 0 && (
                     <ModSelector
                       label="Inscription"
-                      options={inscriptions.map(i => ({ id: i.id, name: i.name, effect: i.effect }))}
+                      options={inscriptions.map(i => ({ id: i.id, name: i.name, effect: i.effect, pveOnly: i.pveOnly }))}
                       selectedId={config.inscription?.id || null}
                       onSelect={handleInscriptionSelect}
                       isOpen={expandedSection === 'inscription'}

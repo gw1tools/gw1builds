@@ -386,20 +386,7 @@ function EquipmentPreview({
           )}
         </div>
 
-        {/* Inscription */}
-        {config.inscription && (
-          <div className="text-sm">
-            <span className="text-text-muted">Inscription: </span>
-            <span className="text-text-primary">{config.inscription.name}</span>
-            {config.inscription.effect && (
-              <div className="text-xs text-text-secondary mt-0.5">
-                {config.inscription.effect}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Mod effects summary */}
+        {/* Mod effects: prefix, suffix, inscription name, inscription effect */}
         <div className="text-xs text-text-secondary space-y-0.5">
           {config.prefix?.effect && (
             <div className="flex items-center gap-1.5">
@@ -411,6 +398,18 @@ function EquipmentPreview({
             <div className="flex items-center gap-1.5">
               <span className="w-1 h-1 rounded-full bg-accent-gold" />
               {config.suffix.effect}
+            </div>
+          )}
+          {config.inscription && (
+            <div className="flex items-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-accent-gold" />
+              Inscription: {config.inscription.name}
+            </div>
+          )}
+          {config.inscription?.effect && (
+            <div className="flex items-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-accent-gold" />
+              {config.inscription.effect}
             </div>
           )}
         </div>

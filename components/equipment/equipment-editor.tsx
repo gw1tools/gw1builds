@@ -11,21 +11,15 @@
 import { useState, useMemo, useCallback } from 'react'
 import { Swords, Shield, Shirt, Copy, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import {
-  type BowType,
-  BOW_TYPE_LABELS,
-} from '@/lib/gw/equipment/items'
-import { formatEffectMaxValue, type Modifier } from '@/lib/gw/equipment/modifiers'
+import { type BowType, BOW_TYPE_LABELS } from '@/lib/gw/equipment/items'
+import { formatEffectMaxValue } from '@/lib/gw/equipment/modifiers'
 import { getProfessionForAttribute } from '@/lib/gw/attributes'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
 import {
   encodeWeaponSet,
   type EquipmentToEncode,
 } from '@/lib/gw/equipment/template'
-import {
-  getRuneById,
-  getInsigniaById,
-} from '@/lib/gw/equipment/armor'
+import { getRuneById, getInsigniaById } from '@/lib/gw/equipment/armor'
 import {
   type WeaponConfig,
   type ArmorSetConfig,
@@ -33,7 +27,11 @@ import {
 } from '@/types/database'
 import type { ProfessionKey } from '@/types/gw1'
 import { WeaponPickerModal } from './weapon-picker-modal'
-import { ArmorPickerModal, formatRuneLabel, formatInsigniaLabel } from './armor-picker-modal'
+import {
+  ArmorPickerModal,
+  formatRuneLabel,
+  formatInsigniaLabel,
+} from './armor-picker-modal'
 
 // Re-export for backwards compatibility
 export type { WeaponConfig } from '@/types/database'
@@ -57,7 +55,12 @@ export interface EquipmentEditorProps {
 
 type SlotType = 'mainHand' | 'offHand' | 'armor'
 
-const EMPTY_WEAPON: WeaponConfig = { item: null, prefix: null, suffix: null, inscription: null }
+const EMPTY_WEAPON: WeaponConfig = {
+  item: null,
+  prefix: null,
+  suffix: null,
+  inscription: null,
+}
 
 const WEAPON_SLOTS: SlotType[] = ['mainHand', 'offHand']
 
@@ -68,7 +71,9 @@ const PVP_BLUE = '#AAD9FF'
  * Check if a weapon config has any PvE-only mods equipped
  */
 function hasPveOnlyMods(weapon: WeaponConfig): boolean {
-  return [weapon.prefix, weapon.suffix, weapon.inscription].some(mod => mod?.pveOnly)
+  return [weapon.prefix, weapon.suffix, weapon.inscription].some(
+    mod => mod?.pveOnly
+  )
 }
 
 /**
@@ -110,54 +115,57 @@ function WeaponPreviewCard({ weapon }: { weapon: WeaponConfig }) {
 
   const fullName = buildWeaponName(weapon)
   const isTwoHanded = weapon.item.twoHanded
-
-  // Collect all effects to display
-  const effects: string[] = []
-  if (weapon.prefix?.effect) {
-    effects.push(formatEffectMaxValue(weapon.prefix.effect))
-  }
-  if (weapon.inscription?.effect) {
-    effects.push(formatEffectMaxValue(weapon.inscription.effect))
-  }
-  if (weapon.suffix?.effect) {
-    effects.push(formatEffectMaxValue(weapon.suffix.effect))
-  }
+  const profession = weapon.item.attribute
+    ? getProfessionForAttribute(weapon.item.attribute)
+    : null
 
   return (
     <div className="rounded border border-border bg-bg-primary">
       {/* Item Name */}
       <div className="px-2.5 py-1.5 border-b border-border">
-        <div className="text-[13px] font-medium text-text-primary leading-tight">{fullName}</div>
+        <div className="text-[13px] font-medium text-text-primary leading-tight">
+          {fullName}
+        </div>
       </div>
 
-      {/* Stats */}
-      <div className="px-2.5 py-1.5 text-[12px] leading-relaxed" style={{ color: PVP_BLUE }}>
-        {effects.map((effect, i) => (
-          <div key={i}>{effect}</div>
-        ))}
-
-        {/* Inscription name (quoted) */}
+      {/* Stats: prefix, suffix, inscription name, inscription effect */}
+      <div
+        className="px-2.5 py-1.5 text-[12px] leading-relaxed"
+        style={{ color: PVP_BLUE }}
+      >
+        {/* Prefix effect */}
+        {weapon.prefix?.effect && (
+          <div>{formatEffectMaxValue(weapon.prefix.effect)}</div>
+        )}
+        {/* Suffix effect */}
+        {weapon.suffix?.effect && (
+          <div>{formatEffectMaxValue(weapon.suffix.effect)}</div>
+        )}
+        {/* Inscription name */}
         {weapon.inscription && (
-          <div className="text-text-muted mt-1">{weapon.inscription.name}</div>
+          <div className="text-text-muted mt-1">
+            Inscription: {weapon.inscription.name}
+          </div>
+        )}
+        {/* Inscription effect */}
+        {weapon.inscription?.effect && (
+          <div>{formatEffectMaxValue(weapon.inscription.effect)}</div>
         )}
 
         {/* Footer info */}
         <div className="text-text-muted text-[11px] mt-1.5 flex flex-wrap items-center gap-x-2">
           {isTwoHanded && <span>Two-handed</span>}
-          {weapon.item.attribute && (() => {
-            const profession = getProfessionForAttribute(weapon.item.attribute!)
-            return (
-              <span className="flex items-center gap-1">
-                {profession && (
-                  <ProfessionIcon
-                    profession={profession as ProfessionKey}
-                    size="xs"
-                  />
-                )}
-                Req. 9 {weapon.item.attribute}
-              </span>
-            )
-          })()}
+          {weapon.item.attribute && (
+            <span className="flex items-center gap-1">
+              {profession && (
+                <ProfessionIcon
+                  profession={profession as ProfessionKey}
+                  size="xs"
+                />
+              )}
+              Req. 9 {weapon.item.attribute}
+            </span>
+          )}
         </div>
       </div>
     </div>
@@ -200,18 +208,31 @@ function EquipmentSlotButton({
       <div
         className={cn(
           'w-8 h-8 rounded flex items-center justify-center flex-shrink-0',
-          summary ? 'bg-accent-gold/10 text-accent-gold' : 'bg-bg-secondary text-text-muted'
+          summary
+            ? 'bg-accent-gold/10 text-accent-gold'
+            : 'bg-bg-secondary text-text-muted'
         )}
       >
         {isWeapon ? (
-          slot === 'offHand' ? <Shield className="w-3.5 h-3.5" /> : <Swords className="w-3.5 h-3.5" />
+          slot === 'offHand' ? (
+            <Shield className="w-3.5 h-3.5" />
+          ) : (
+            <Swords className="w-3.5 h-3.5" />
+          )
         ) : (
           <Shirt className="w-3.5 h-3.5" />
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-[11px] text-text-muted uppercase tracking-wide leading-tight">{label}</div>
-        <div className={cn('text-sm truncate leading-snug', summary ? 'text-text-primary' : 'text-text-muted')}>
+        <div className="text-[11px] text-text-muted uppercase tracking-wide leading-tight">
+          {label}
+        </div>
+        <div
+          className={cn(
+            'text-sm truncate leading-snug',
+            summary ? 'text-text-primary' : 'text-text-muted'
+          )}
+        >
           {summary || 'None'}
         </div>
       </div>
@@ -219,12 +240,16 @@ function EquipmentSlotButton({
   )
 }
 
-
 // ============================================================================
 // MAIN EQUIPMENT EDITOR
 // ============================================================================
 
-export function EquipmentEditor({ value, onChange, profession, className }: EquipmentEditorProps) {
+export function EquipmentEditor({
+  value,
+  onChange,
+  profession,
+  className,
+}: EquipmentEditorProps) {
   const [activeSlot, setActiveSlot] = useState<SlotType | null>(null)
 
   // Initialize config - component is uncontrolled after mount
@@ -241,48 +266,55 @@ export function EquipmentEditor({ value, onChange, profession, className }: Equi
   const isTwoHanded = config.mainHand.item?.twoHanded ?? false
 
   // Generate armor summary from ArmorSetConfig
-  const getArmorSetSummary = useCallback((armor: ArmorSetConfig): string | null => {
-    const slots = ['head', 'chest', 'hands', 'legs', 'feet'] as const
-    const runeCounts = new Map<string, number>()
-    const insigniaCounts = new Map<string, number>()
+  const getArmorSetSummary = useCallback(
+    (armor: ArmorSetConfig): string | null => {
+      const slots = ['head', 'chest', 'hands', 'legs', 'feet'] as const
+      const runeCounts = new Map<string, number>()
+      const insigniaCounts = new Map<string, number>()
 
-    for (const slot of slots) {
-      const slotConfig = armor[slot]
-      if (slotConfig.runeId) {
-        const rune = getRuneById(slotConfig.runeId)
-        if (rune) {
-          const name = formatRuneLabel(rune)
-          runeCounts.set(name, (runeCounts.get(name) || 0) + 1)
+      for (const slot of slots) {
+        const slotConfig = armor[slot]
+        if (slotConfig.runeId) {
+          const rune = getRuneById(slotConfig.runeId)
+          if (rune) {
+            const name = formatRuneLabel(rune)
+            runeCounts.set(name, (runeCounts.get(name) || 0) + 1)
+          }
+        }
+        if (slotConfig.insigniaId) {
+          const insignia = getInsigniaById(slotConfig.insigniaId)
+          if (insignia) {
+            const name = formatInsigniaLabel(insignia)
+            insigniaCounts.set(name, (insigniaCounts.get(name) || 0) + 1)
+          }
         }
       }
-      if (slotConfig.insigniaId) {
-        const insignia = getInsigniaById(slotConfig.insigniaId)
-        if (insignia) {
-          const name = formatInsigniaLabel(insignia)
-          insigniaCounts.set(name, (insigniaCounts.get(name) || 0) + 1)
+
+      if (runeCounts.size === 0 && insigniaCounts.size === 0) return null
+
+      // Helper to format count map as summary string
+      const formatCounts = (counts: Map<string, number>): string | null => {
+        if (counts.size === 0) return null
+        // Check for full set (all 5 slots same)
+        if (counts.size === 1 && [...counts.values()][0] === 5) {
+          return `Full ${[...counts.keys()][0]}`
         }
+        // Sort by count descending, then alphabetically
+        const sorted = [...counts.entries()].sort(
+          (a, b) => b[1] - a[1] || a[0].localeCompare(b[0])
+        )
+        return sorted
+          .map(([name, count]) => (count > 1 ? `${count}x ${name}` : name))
+          .join(', ')
       }
-    }
 
-    if (runeCounts.size === 0 && insigniaCounts.size === 0) return null
+      const runeSummary = formatCounts(runeCounts)
+      const insigniaSummary = formatCounts(insigniaCounts)
 
-    // Helper to format count map as summary string
-    const formatCounts = (counts: Map<string, number>): string | null => {
-      if (counts.size === 0) return null
-      // Check for full set (all 5 slots same)
-      if (counts.size === 1 && [...counts.values()][0] === 5) {
-        return `Full ${[...counts.keys()][0]}`
-      }
-      // Sort by count descending, then alphabetically
-      const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-      return sorted.map(([name, count]) => count > 1 ? `${count}x ${name}` : name).join(', ')
-    }
-
-    const runeSummary = formatCounts(runeCounts)
-    const insigniaSummary = formatCounts(insigniaCounts)
-
-    return [runeSummary, insigniaSummary].filter(Boolean).join(' · ')
-  }, [])
+      return [runeSummary, insigniaSummary].filter(Boolean).join(' · ')
+    },
+    []
+  )
 
   // Detect if any PvE-only mods are equipped
   const hasPveEquipment = useMemo(() => {
@@ -328,27 +360,35 @@ export function EquipmentEditor({ value, onChange, profession, className }: Equi
   }, [templateCode])
 
   // Update handlers
-  const handleWeaponChange = useCallback((slot: 'mainHand' | 'offHand', weapon: WeaponConfig) => {
-    const newConfig = { ...config, [slot]: weapon }
-    // Clear off-hand if main-hand becomes two-handed
-    if (slot === 'mainHand' && weapon.item?.twoHanded) {
-      newConfig.offHand = EMPTY_WEAPON
-    }
-    setConfig(newConfig)
-    onChange?.(newConfig)
-  }, [config, onChange])
+  const handleWeaponChange = useCallback(
+    (slot: 'mainHand' | 'offHand', weapon: WeaponConfig) => {
+      const newConfig = { ...config, [slot]: weapon }
+      // Clear off-hand if main-hand becomes two-handed
+      if (slot === 'mainHand' && weapon.item?.twoHanded) {
+        newConfig.offHand = EMPTY_WEAPON
+      }
+      setConfig(newConfig)
+      onChange?.(newConfig)
+    },
+    [config, onChange]
+  )
 
-  const handleArmorChange = useCallback((newArmor: ArmorSetConfig) => {
-    const newConfig = { ...config, armor: newArmor }
-    setConfig(newConfig)
-    onChange?.(newConfig)
-  }, [config, onChange])
+  const handleArmorChange = useCallback(
+    (newArmor: ArmorSetConfig) => {
+      const newConfig = { ...config, armor: newArmor }
+      setConfig(newConfig)
+      onChange?.(newConfig)
+    },
+    [config, onChange]
+  )
 
   return (
     <div className={cn('space-y-3', className)}>
       {/* Weapons Section */}
       <div>
-        <div className="text-[11px] text-text-muted uppercase tracking-wide mb-1.5">Weapons</div>
+        <div className="text-[11px] text-text-muted uppercase tracking-wide mb-1.5">
+          Weapons
+        </div>
         <div className="grid grid-cols-2 gap-1.5">
           <EquipmentSlotButton
             slot="mainHand"
@@ -359,7 +399,9 @@ export function EquipmentEditor({ value, onChange, profession, className }: Equi
           <EquipmentSlotButton
             slot="offHand"
             label="Off-Hand"
-            summary={isTwoHanded ? '(Two-handed)' : buildWeaponName(config.offHand)}
+            summary={
+              isTwoHanded ? '(Two-handed)' : buildWeaponName(config.offHand)
+            }
             onClick={() => setActiveSlot('offHand')}
             disabled={isTwoHanded}
           />
@@ -383,7 +425,9 @@ export function EquipmentEditor({ value, onChange, profession, className }: Equi
 
       {/* Armor Section */}
       <div>
-        <div className="text-[11px] text-text-muted uppercase tracking-wide mb-1.5">Armor</div>
+        <div className="text-[11px] text-text-muted uppercase tracking-wide mb-1.5">
+          Armor
+        </div>
         <EquipmentSlotButton
           slot="armor"
           label="Runes & Insignias"
@@ -414,7 +458,11 @@ export function EquipmentEditor({ value, onChange, profession, className }: Equi
                     : 'bg-bg-hover text-text-muted hover:text-text-primary'
                 )}
               >
-                {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? (
+                  <Check className="w-3.5 h-3.5" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
               </button>
             </>
           ) : null}
@@ -428,7 +476,7 @@ export function EquipmentEditor({ value, onChange, profession, className }: Equi
           onClose={() => setActiveSlot(null)}
           slot={activeSlot}
           value={config[activeSlot]}
-          onChange={(weapon) => handleWeaponChange(activeSlot, weapon)}
+          onChange={weapon => handleWeaponChange(activeSlot, weapon)}
         />
       )}
 

@@ -161,6 +161,11 @@ export function decodeEquipmentTemplate(
       // Track if we found at least one recognized item
       if (item) {
         hasRecognizedItem = true
+      } else if (rawItem.slot >= 2 && rawItem.slot <= 6 && rawItem.mods?.length) {
+        // For armor slots (2-6), valid runes/insignias count as recognized items
+        hasRecognizedItem ||= rawItem.mods.some(
+          (modId: number) => getRuneById(modId) || getInsigniaById(modId)
+        )
       }
 
       const decoded: DecodedEquipmentItem = {

@@ -454,7 +454,7 @@ export function SkillBarEditor({
   const invalidSkillIndices = useMemo(() => {
     if (!loadedSkills.length || (!data.primary && !data.secondary)) return []
 
-    const validProfessions = new Set<string>(['No Profession', 'Unknown'])
+    const validProfessions = new Set<string>(['None', 'Unknown'])
     if (data.primary) validProfessions.add(data.primary)
     if (data.secondary && data.secondary !== 'None') validProfessions.add(data.secondary)
 
