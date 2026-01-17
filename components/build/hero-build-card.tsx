@@ -52,10 +52,11 @@ export function HeroBuildCard({
     [currentVariant.skills, skillMap]
   )
 
-  const primaryKey = bar.primary.toLowerCase() as ProfessionKey
+  // Use current variant's profession (falls back to bar's if not set)
+  const primaryKey = currentVariant.primary.toLowerCase() as ProfessionKey
   const secondaryKey =
-    bar.secondary && bar.secondary !== 'None'
-      ? (bar.secondary.toLowerCase() as ProfessionKey)
+    currentVariant.secondary && currentVariant.secondary !== 'None'
+      ? (currentVariant.secondary.toLowerCase() as ProfessionKey)
       : undefined
 
   const handleCopyCode = async () => {
@@ -126,7 +127,7 @@ export function HeroBuildCard({
         <div className="mt-4">
           <AttributeBar
             attributes={currentVariant.attributes}
-            bonusBreakdown={bar.equipment?.armor ? getAttributeBonusBreakdown(bar.equipment.armor) : undefined}
+            bonusBreakdown={currentVariant.equipment?.armor ? getAttributeBonusBreakdown(currentVariant.equipment.armor) : undefined}
           />
         </div>
 
@@ -174,10 +175,10 @@ export function HeroBuildCard({
           </span>
         </button>
 
-        {/* Equipment Display */}
-        {bar.equipment && hasEquipment(bar.equipment) && (
+        {/* Equipment Display (uses current variant's equipment) */}
+        {currentVariant.equipment && hasEquipment(currentVariant.equipment) && (
           <EquipmentDisplay
-            equipment={bar.equipment}
+            equipment={currentVariant.equipment}
             equipmentId={`equipment-${index}`}
             className="mt-3"
           />

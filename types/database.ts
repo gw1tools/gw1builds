@@ -64,6 +64,7 @@ export interface User {
  *
  * Variants allow builds to show alternative skill/attribute setups,
  * e.g., "Anti-Caster" or "Budget" versions of the same build.
+ * Each variant can have its own profession and equipment.
  *
  * @see https://wiki.guildwars.com/wiki/Skill_bar
  */
@@ -76,7 +77,12 @@ export interface SkillBarVariant {
   skills: number[]
   /** Attribute point distribution */
   attributes: Record<string, number>
-  // Note: equipment support can be added later when equipment is stored per-bar
+  /** Primary profession (if different from base bar) */
+  primary?: string
+  /** Secondary profession (if different from base bar) */
+  secondary?: string
+  /** Equipment configuration (blank if not set) */
+  equipment?: Equipment
 }
 
 /**

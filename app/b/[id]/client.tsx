@@ -478,30 +478,30 @@ function SingleBuildView({
 
         {/* Build content */}
         <div className="p-5">
-          {/* Profession Badge - compact */}
+          {/* Profession Badge - compact (uses current variant's profession) */}
           <div
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[11px] font-semibold mb-4"
             style={{
-              borderColor: `${professionColors[bar.primary]}40`,
-              backgroundColor: `${professionColors[bar.primary]}12`,
+              borderColor: `${professionColors[currentVariant.primary]}40`,
+              backgroundColor: `${professionColors[currentVariant.primary]}12`,
             }}
           >
             <ProfessionIcon
-              profession={bar.primary.toLowerCase() as ProfessionKey}
+              profession={currentVariant.primary.toLowerCase() as ProfessionKey}
               size="xs"
             />
-            <span style={{ color: professionColors[bar.primary] }}>
-              {bar.primary}
+            <span style={{ color: professionColors[currentVariant.primary] }}>
+              {currentVariant.primary}
             </span>
-            {bar.secondary !== 'None' && (
+            {currentVariant.secondary !== 'None' && (
               <>
                 <span className="text-text-muted/40 mx-0.5">/</span>
                 <ProfessionIcon
-                  profession={bar.secondary.toLowerCase() as ProfessionKey}
+                  profession={currentVariant.secondary.toLowerCase() as ProfessionKey}
                   size="xs"
                 />
-                <span style={{ color: professionColors[bar.secondary] }}>
-                  {bar.secondary}
+                <span style={{ color: professionColors[currentVariant.secondary] }}>
+                  {currentVariant.secondary}
                 </span>
               </>
             )}
@@ -514,7 +514,7 @@ function SingleBuildView({
           <div className="mt-5">
             <AttributeBar
               attributes={currentVariant.attributes}
-              bonusBreakdown={bar.equipment?.armor ? getAttributeBonusBreakdown(bar.equipment.armor) : undefined}
+              bonusBreakdown={currentVariant.equipment?.armor ? getAttributeBonusBreakdown(currentVariant.equipment.armor) : undefined}
             />
           </div>
 
@@ -564,9 +564,9 @@ function SingleBuildView({
             </span>
           </button>
 
-          {/* Equipment Display */}
-          {bar.equipment && hasEquipment(bar.equipment) && (
-            <EquipmentDisplay equipment={bar.equipment} className="mt-4" />
+          {/* Equipment Display (uses current variant's equipment) */}
+          {currentVariant.equipment && hasEquipment(currentVariant.equipment) && (
+            <EquipmentDisplay equipment={currentVariant.equipment} className="mt-4" />
           )}
         </div>
       </div>

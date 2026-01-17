@@ -317,11 +317,13 @@ export function SkillBarEditor({
           skills: decoded.skills,
         })
       } else {
-        // Update variant
+        // Update variant - include profession from decoded template
         const newVariants = [...(data.variants || [])]
         newVariants[activeVariantIndex - 1] = {
           ...newVariants[activeVariantIndex - 1],
           template: code,
+          primary: decoded.primary,
+          secondary: decoded.secondary,
           attributes: decoded.attributes,
           skills: decoded.skills,
         }
@@ -350,11 +352,14 @@ export function SkillBarEditor({
   }
 
   const handleAddVariant = () => {
-    // Start with empty variant - user can paste their own template
+    // Create new variant with current bar's professions (but blank equipment)
     const newVariant: SkillBarVariant = {
       template: '',
       skills: [],
       attributes: {},
+      primary: data.primary,     // Copy profession from base bar
+      secondary: data.secondary, // Copy profession from base bar
+      // equipment: undefined    // Blank - user can copy-paste equipment code
     }
     const newVariants = [...(data.variants || []), newVariant]
     onChange({ ...data, variants: newVariants })
@@ -450,23 +455,23 @@ export function SkillBarEditor({
   const isLast = index === totalBars - 1
   const showReorderControls = totalBars > 1
 
-  // Validate skills against current professions
+  // Validate skills against current variant's professions
   const invalidSkillIndices = useMemo(() => {
-    if (!loadedSkills.length || (!data.primary && !data.secondary)) return []
+    if (!loadedSkills.length || (!currentVariant.primary && !currentVariant.secondary)) return []
 
     const validProfessions = new Set<string>(['None', 'Unknown'])
-    if (data.primary) validProfessions.add(data.primary)
-    if (data.secondary && data.secondary !== 'None') validProfessions.add(data.secondary)
+    if (currentVariant.primary) validProfessions.add(currentVariant.primary)
+    if (currentVariant.secondary && currentVariant.secondary !== 'None') validProfessions.add(currentVariant.secondary)
 
     return loadedSkills
       .map((skill, index) => (skill?.profession && !validProfessions.has(skill.profession) ? index : -1))
       .filter(index => index !== -1)
-  }, [loadedSkills, data.primary, data.secondary])
+  }, [loadedSkills, currentVariant.primary, currentVariant.secondary])
 
-  // Validate equipment against current primary profession
+  // Validate equipment against current variant's primary profession
   const { invalidItems: invalidEquipmentItems } = useEquipmentValidation(
-    data.equipment,
-    data.primary
+    currentVariant.equipment,
+    currentVariant.primary
   )
 
   // Notify parent of validation changes
@@ -475,43 +480,78 @@ export function SkillBarEditor({
     onValidationChangeRef.current?.(hasErrors)
   }, [invalidSkillIndices.length, invalidEquipmentItems.length])
 
-  // Profession change handlers
+  // Profession change handlers - update current variant only
   const handlePrimaryChange = useCallback((profession: string) => {
     const newTemplate = encodeTemplate(
       profession,
-      data.secondary || 'None',
+      currentVariant.secondary || 'None',
       currentVariant.attributes || {},
       currentVariant.skills || []
     ) || ''
 
-    onChange({
-      ...data,
-      primary: profession,
-      template: newTemplate,
-    })
+    if (activeVariantIndex === 0) {
+      // Update base bar
+      onChange({
+        ...data,
+        primary: profession,
+        template: newTemplate,
+      })
+    } else {
+      // Update variant's profession
+      const newVariants = [...(data.variants || [])]
+      newVariants[activeVariantIndex - 1] = {
+        ...newVariants[activeVariantIndex - 1],
+        primary: profession,
+        template: newTemplate,
+      }
+      onChange({ ...data, variants: newVariants })
+    }
     setTemplateCode(newTemplate)
-  }, [data, currentVariant.attributes, currentVariant.skills, onChange])
+  }, [data, currentVariant.secondary, currentVariant.attributes, currentVariant.skills, activeVariantIndex, onChange])
 
   const handleSecondaryChange = useCallback((profession: string) => {
     const newTemplate = encodeTemplate(
-      data.primary || 'None',
+      currentVariant.primary || 'None',
       profession,
       currentVariant.attributes || {},
       currentVariant.skills || []
     ) || ''
 
-    onChange({
-      ...data,
-      secondary: profession,
-      template: newTemplate,
-    })
+    if (activeVariantIndex === 0) {
+      // Update base bar
+      onChange({
+        ...data,
+        secondary: profession,
+        template: newTemplate,
+      })
+    } else {
+      // Update variant's profession
+      const newVariants = [...(data.variants || [])]
+      newVariants[activeVariantIndex - 1] = {
+        ...newVariants[activeVariantIndex - 1],
+        secondary: profession,
+        template: newTemplate,
+      }
+      onChange({ ...data, variants: newVariants })
+    }
     setTemplateCode(newTemplate)
-  }, [data, currentVariant.attributes, currentVariant.skills, onChange])
+  }, [data, currentVariant.primary, currentVariant.attributes, currentVariant.skills, activeVariantIndex, onChange])
 
-  // Equipment change handler
+  // Equipment change handler - per variant
   const handleEquipmentChange = useCallback((equipment: Equipment | undefined) => {
-    onChange({ ...data, equipment })
-  }, [data, onChange])
+    if (activeVariantIndex === 0) {
+      // Update base bar
+      onChange({ ...data, equipment })
+    } else {
+      // Update variant's equipment
+      const newVariants = [...(data.variants || [])]
+      newVariants[activeVariantIndex - 1] = {
+        ...newVariants[activeVariantIndex - 1],
+        equipment,
+      }
+      onChange({ ...data, variants: newVariants })
+    }
+  }, [data, activeVariantIndex, onChange])
 
   // Clear all invalid items (skills + equipment)
   const handleFixAllInvalid = useCallback(() => {
@@ -522,14 +562,14 @@ export function SkillBarEditor({
 
     // Clear invalid equipment (only if we have equipment and invalid items)
     const newEquipment: Equipment | undefined =
-      data.equipment && invalidEquipmentItems.length > 0
-        ? { ...data.equipment, armor: clearInvalidEquipment(data.equipment.armor, invalidEquipmentItems) }
-        : data.equipment
+      currentVariant.equipment && invalidEquipmentItems.length > 0
+        ? { ...currentVariant.equipment, armor: clearInvalidEquipment(currentVariant.equipment.armor, invalidEquipmentItems) }
+        : currentVariant.equipment
 
-    // Generate new template
+    // Generate new template using current variant's profession
     const newTemplate = encodeTemplate(
-      data.primary || 'None',
-      data.secondary || 'None',
+      currentVariant.primary || 'None',
+      currentVariant.secondary || 'None',
       currentVariant.attributes || {},
       newSkills
     ) || ''
@@ -547,11 +587,11 @@ export function SkillBarEditor({
         ...newVariants[activeVariantIndex - 1],
         skills: newSkills,
         template: newTemplate,
+        equipment: newEquipment,
       }
       onChange({
         ...data,
         variants: newVariants,
-        equipment: newEquipment,
       })
     }
 
@@ -559,6 +599,9 @@ export function SkillBarEditor({
   }, [
     currentVariant.skills,
     currentVariant.attributes,
+    currentVariant.equipment,
+    currentVariant.primary,
+    currentVariant.secondary,
     invalidSkillIndices,
     invalidEquipmentItems,
     data,
@@ -569,11 +612,11 @@ export function SkillBarEditor({
   // Attribute change handler
   const handleAttributeChange = useCallback(
     (newAttributes: Record<string, number>) => {
-      // Generate new template code
+      // Generate new template code using current variant's profession
       const newTemplate =
         encodeTemplate(
-          data.primary || 'None',
-          data.secondary || 'None',
+          currentVariant.primary || 'None',
+          currentVariant.secondary || 'None',
           newAttributes,
           currentVariant.skills || []
         ) || ''
@@ -598,7 +641,7 @@ export function SkillBarEditor({
 
       setTemplateCode(newTemplate)
     },
-    [data, currentVariant.skills, activeVariantIndex, onChange]
+    [data, currentVariant.skills, currentVariant.primary, currentVariant.secondary, activeVariantIndex, onChange]
   )
 
   return (
@@ -680,10 +723,10 @@ export function SkillBarEditor({
 
           {/* Row 2: Professions + Settings */}
           <div className="flex flex-wrap items-center gap-2 mb-6">
-            {/* Profession pickers - pill container */}
+            {/* Profession pickers - pill container (uses current variant's profession) */}
             <ProfessionPickerPill
-              primary={data.primary || 'Warrior'}
-              secondary={data.secondary && data.secondary !== 'None' ? data.secondary : null}
+              primary={currentVariant.primary || 'Warrior'}
+              secondary={currentVariant.secondary && currentVariant.secondary !== 'None' ? currentVariant.secondary : null}
               onPrimaryChange={handlePrimaryChange}
               onSecondaryChange={handleSecondaryChange}
             />
@@ -915,11 +958,11 @@ export function SkillBarEditor({
             )}
           </div>
 
-          {/* Equipment Section - collapsible */}
+          {/* Equipment Section - per variant, collapsible */}
           <EquipmentSection
-            value={data.equipment}
+            value={currentVariant.equipment}
             onChange={handleEquipmentChange}
-            profession={data.primary?.toLowerCase() as ProfessionKey | undefined}
+            profession={currentVariant.primary?.toLowerCase() as ProfessionKey | undefined}
             invalidItems={invalidEquipmentItems}
             className="mt-4"
           />
@@ -1036,11 +1079,11 @@ export function SkillBarEditor({
       <AttributeEditorModal
         isOpen={isAttributeEditorOpen}
         onClose={() => setIsAttributeEditorOpen(false)}
-        primary={data.primary || 'Warrior'}
-        secondary={data.secondary || 'None'}
+        primary={currentVariant.primary || 'Warrior'}
+        secondary={currentVariant.secondary || 'None'}
         attributes={currentVariant.attributes || {}}
         onChange={handleAttributeChange}
-        runeBonuses={data.equipment?.armor ? getAttributeBonusBreakdown(data.equipment.armor) : {}}
+        runeBonuses={currentVariant.equipment?.armor ? getAttributeBonusBreakdown(currentVariant.equipment.armor) : {}}
       />
     </motion.div>
   )

@@ -60,6 +60,12 @@ export interface ShareableVariant {
   n?: string
   /** GW1 template code */
   m: string
+  /** Primary profession (if different from base bar) */
+  p?: string
+  /** Secondary profession (if different from base bar) */
+  s?: string
+  /** Equipment (compact format) */
+  e?: ShareableEquipment
 }
 
 /** Result of encoding a build to URL */

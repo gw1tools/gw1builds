@@ -5,15 +5,24 @@
  * @module components/ui/variant-tabs
  *
  * Used in both editor (with add/delete) and viewer (read-only) modes.
+ * Shows profession icons for each variant when profession data is provided.
  */
 
 import { Plus, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { MAX_VARIANTS } from '@/lib/constants'
+import { ProfessionIcon } from './profession-icon'
+import type { ProfessionKey } from '@/types/gw1'
 
 export interface VariantTabsProps {
-  /** Array of variants with optional names */
-  variants: Array<{ name?: string }>
+  /** Array of variants with optional names and professions */
+  variants: Array<{
+    name?: string
+    /** Primary profession for this variant */
+    primary?: string
+    /** Secondary profession for this variant */
+    secondary?: string
+  }>
   /** Currently active variant index */
   activeIndex: number
   /** Called when a tab is clicked */
@@ -31,13 +40,16 @@ export interface VariantTabsProps {
 /**
  * Tab component for switching between skill bar variants
  *
- * In viewer mode: Simple read-only tabs
+ * In viewer mode: Simple read-only tabs with profession icons
  * In editor mode: Tabs with add button and delete on hover
  *
  * @example
  * // Viewer (read-only)
  * <VariantTabs
- *   variants={[{ name: "Default" }, { name: "Anti-Caster" }]}
+ *   variants={[
+ *     { name: "Default", primary: "Warrior", secondary: "Monk" },
+ *     { name: "Anti-Caster", primary: "Mesmer", secondary: "Elementalist" }
+ *   ]}
  *   activeIndex={0}
  *   onChange={setActiveIndex}
  * />
@@ -69,6 +81,7 @@ export function VariantTabs({
         const isActive = index === activeIndex
         const label = variant.name || (index === 0 ? 'Default' : `Variant ${index + 1}`)
         const canDelete = editable && index > 0
+        const primaryKey = variant.primary?.toLowerCase() as ProfessionKey | undefined
 
         return (
           <div key={index} className="group relative inline-flex items-center">
@@ -84,6 +97,10 @@ export function VariantTabs({
                 canDelete && 'pr-7' // Make room for delete button
               )}
             >
+              {/* Profession icon */}
+              {primaryKey && (
+                <ProfessionIcon profession={primaryKey} size="xs" />
+              )}
               {label}
             </button>
 

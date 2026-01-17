@@ -38,6 +38,7 @@ import {
 } from '@/lib/constants'
 import { extractTextFromTiptap } from '@/lib/search/text-utils'
 import { encodeShareableUrl, decodeShareableUrl } from '@/lib/share'
+import { getSkillsByIds } from '@/lib/gw/skills'
 import type { SkillBar, TipTapDocument } from '@/types/database'
 
 const EMPTY_SKILL_BAR: SkillBar = {
@@ -138,7 +139,6 @@ export function NewBuildForm() {
   const [showDraftPrompt, setShowDraftPrompt] = useState(false)
   const [shareMessage, setShareMessage] = useState<string | null>(null)
   const [showCollaboratorsModal, setShowCollaboratorsModal] = useState(false)
-  const [barsWithInvalidSkills, setBarsWithInvalidSkills] = useState<Set<number>>(new Set())
   // Track pending auto-submit after OAuth (waiting for auth to complete)
   const [pendingAutoSubmit, setPendingAutoSubmit] = useState(false)
   const initialized = useRef(false)
@@ -292,16 +292,6 @@ export function NewBuildForm() {
             .map(i => (i > index ? i - 1 : i)), // Shift indices down
         }))
       }
-      // Adjust barsWithInvalidSkills indices after removal
-      setBarsWithInvalidSkills(prev => {
-        const next = new Set<number>()
-        for (const i of prev) {
-          if (i < index) next.add(i)
-          else if (i > index) next.add(i - 1)
-          // Skip i === index (removed bar)
-        }
-        return next
-      })
     }
   }
 
@@ -394,14 +384,59 @@ export function NewBuildForm() {
       errorMessage = `Total players (${totalPlayers}) exceeds maximum of ${MAX_TEAM_PLAYERS}`
     }
 
-    // Check for invalid skills (skills that don't match profession)
-    if (barsWithInvalidSkills.size > 0) {
-      const firstInvalidBar = Math.min(...barsWithInvalidSkills)
-      errorMessage = errorMessage || `Build ${firstInvalidBar + 1} has skills that don't match its professions`
-    }
+    // Note: Invalid skills are validated async in validateAllVariants() at save time
+    // barsWithInvalidSkills is still used for real-time UI feedback on current variant
 
     setFieldErrors(newFieldErrors)
     return errorMessage
+  }
+
+  /**
+   * Validates ALL variants in ALL bars for profession/skill mismatch.
+   * Called at save time to catch errors in non-active variants.
+   */
+  const validateAllVariants = async (): Promise<string | null> => {
+    for (let barIdx = 0; barIdx < bars.length; barIdx++) {
+      const bar = bars[barIdx]
+
+      // Build list of all variants (base + additional)
+      const variantsToCheck = [
+        { skills: bar.skills, primary: bar.primary, secondary: bar.secondary, name: undefined as string | undefined },
+        ...(bar.variants || []).map(v => ({
+          skills: v.skills,
+          primary: v.primary || bar.primary,
+          secondary: v.secondary || bar.secondary,
+          name: v.name,
+        }))
+      ]
+
+      for (let varIdx = 0; varIdx < variantsToCheck.length; varIdx++) {
+        const variant = variantsToCheck[varIdx]
+
+        // Skip variants without skills
+        if (!variant.skills || variant.skills.length === 0 || variant.skills.every(s => s === 0)) {
+          continue
+        }
+
+        const skills = await getSkillsByIds(variant.skills)
+
+        const validProfessions = new Set<string>(['None', 'Unknown'])
+        if (variant.primary) validProfessions.add(variant.primary)
+        if (variant.secondary && variant.secondary !== 'None') validProfessions.add(variant.secondary)
+
+        const invalidSkills = skills.filter(s =>
+          s && s.profession && !validProfessions.has(s.profession)
+        )
+
+        if (invalidSkills.length > 0) {
+          const variantLabel = varIdx === 0
+            ? 'Default'
+            : (variant.name || `Variant ${varIdx}`)
+          return `Build ${barIdx + 1} "${variantLabel}" has ${invalidSkills.length} skill${invalidSkills.length > 1 ? 's' : ''} that don't match its professions`
+        }
+      }
+    }
+    return null
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -435,6 +470,14 @@ export function NewBuildForm() {
 
     setIsSubmitting(true)
     setError(null)
+
+    // Validate all variants for skill/profession mismatch
+    const variantError = await validateAllVariants()
+    if (variantError) {
+      setError(variantError)
+      setIsSubmitting(false)
+      return
+    }
 
     // For single builds, use the bar name as the build name
     const buildName = isTeamBuild ? teamName.trim() : bars[0].name.trim()
@@ -566,17 +609,6 @@ export function NewBuildForm() {
                 totalTeamPlayers={totalTeamPlayers}
                 maxTeamPlayers={MAX_TEAM_PLAYERS}
                 nameError={fieldErrors.barNames?.includes(index)}
-                onValidationChange={(hasErrors) => {
-                  setBarsWithInvalidSkills(prev => {
-                    const next = new Set(prev)
-                    if (hasErrors) {
-                      next.add(index)
-                    } else {
-                      next.delete(index)
-                    }
-                    return next
-                  })
-                }}
               />
             </div>
           ))}

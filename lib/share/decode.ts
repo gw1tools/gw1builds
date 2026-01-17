@@ -155,7 +155,7 @@ function shareableToArmor(arr: number[], headAttribute: string | null): ArmorSet
 }
 
 /** Convert shareable variant to SkillBarVariant */
-function decodeVariant(v: { n?: string; m: string }): SkillBarVariant {
+function decodeVariant(v: { n?: string; m: string; p?: string; s?: string; e?: ShareableEquipment }): SkillBarVariant {
   const decoded = decodeTemplate(v.m)
   const data = decoded.success ? decoded.data : null
   return {
@@ -163,5 +163,10 @@ function decodeVariant(v: { n?: string; m: string }): SkillBarVariant {
     template: v.m,
     skills: data?.skills ?? [0, 0, 0, 0, 0, 0, 0, 0],
     attributes: data?.attributes ?? {},
+    // Include profession if explicitly set in share URL
+    ...(v.p && { primary: v.p }),
+    ...(v.s && { secondary: v.s }),
+    // Include equipment if present
+    ...(v.e && { equipment: shareableToEquipment(v.e) }),
   }
 }

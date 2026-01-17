@@ -37,6 +37,7 @@ export function encodeShareableUrl(
   // Apply truncation strategies in order until URL fits
   const truncationSteps: Array<{ apply: () => void; message: string }> = [
     { apply: () => dropVariantNames(data), message: 'Variant names removed' },
+    { apply: () => dropVariantEquipment(data), message: 'Variant equipment removed' },
     { apply: () => dropLaterVariants(data), message: 'Some variants removed' },
     { apply: () => dropAllVariants(data), message: 'All variants removed' },
     { apply: () => dropEquipment(data), message: 'Equipment removed' },
@@ -75,10 +76,19 @@ function barToShareable(bar: SkillBar): ShareableBar {
     ...(bar.hero && { h: bar.hero }),
     ...(bar.playerCount && bar.playerCount > 1 && { p: bar.playerCount }),
     ...(bar.variants?.length && {
-      w: bar.variants.map(v => ({
-        m: v.template,
-        ...(v.name && { n: v.name }),
-      })),
+      w: bar.variants.map(v => {
+        const variantEquipment = v.equipment && hasEquipmentData(v.equipment)
+          ? equipmentToShareable(v.equipment)
+          : undefined
+        return {
+          m: v.template,
+          ...(v.name && { n: v.name }),
+          // Include profession if explicitly set on variant
+          ...(v.primary && { p: v.primary }),
+          ...(v.secondary && v.secondary !== 'None' && { s: v.secondary }),
+          ...(variantEquipment && { e: variantEquipment }),
+        }
+      }),
     }),
     ...(equipment && { e: equipment }),
   }
@@ -168,6 +178,10 @@ function armorToShareable(armor: ArmorSetConfig): number[] {
 
 function dropVariantNames(data: ShareableBuild): void {
   data.b.forEach(bar => bar.w?.forEach(v => delete v.n))
+}
+
+function dropVariantEquipment(data: ShareableBuild): void {
+  data.b.forEach(bar => bar.w?.forEach(v => delete v.e))
 }
 
 function dropLaterVariants(data: ShareableBuild): void {
