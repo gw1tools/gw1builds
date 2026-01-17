@@ -14,3 +14,5 @@ export { useCanHover } from './use-can-hover'
 
 export { useEquipmentValidation } from './use-equipment-validation'
 export type { UseEquipmentValidationResult } from './use-equipment-validation'
+
+export { useEffectiveAttributes } from './use-effective-attributes'

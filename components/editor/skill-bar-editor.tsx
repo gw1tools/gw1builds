@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils'
 import { modalOverlayVariants, modalContentVariants } from '@/lib/motion'
 import { MAX_BAR_NAME_LENGTH, MAX_VARIANT_NAME_LENGTH, PROFESSION_COLORS } from '@/lib/constants'
 import { sanitizeSingleLine } from '@/lib/validation'
-import { useVariantData, useEquipmentValidation } from '@/hooks'
+import { useVariantData, useEquipmentValidation, useEffectiveAttributes } from '@/hooks'
 import { encodeTemplate, type DecodedTemplate } from '@/lib/gw/decoder'
 import { TemplateInput } from './template-input'
 import type { Skill } from '@/lib/gw/skills'
@@ -270,6 +270,9 @@ export function SkillBarEditor({
 
   // Use shared hook for variant data
   const { allVariants, currentVariant, hasVariants } = useVariantData(data, activeVariantIndex)
+
+  // Compute effective attributes (base + equipment bonuses) for tooltip scaling
+  const effectiveAttributes = useEffectiveAttributes(currentVariant.attributes, data.equipment)
 
   // Sync template code from current variant
   useEffect(() => {
@@ -831,7 +834,7 @@ export function SkillBarEditor({
                 activeSlot={activeSlotIndex}
                 invalidSlots={invalidSkillIndices}
                 emptyVariant="editor"
-                attributes={currentVariant.attributes}
+                attributes={effectiveAttributes}
               />
             )}
           </div>
@@ -970,7 +973,7 @@ export function SkillBarEditor({
         onClose={handlePickerClose}
         onSelect={handleSkillSelect}
         currentSkills={loadedSkills.filter((s): s is Skill => s !== null)}
-        attributes={currentVariant.attributes}
+        attributes={effectiveAttributes}
       />
 
       {/* Clear Confirmation Modal */}

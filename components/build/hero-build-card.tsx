@@ -12,7 +12,7 @@ import { useMemo, useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { trackTemplateCopied } from '@/lib/analytics'
-import { useVariantData } from '@/hooks'
+import { useVariantData, useEffectiveAttributes } from '@/hooks'
 import { mapSkillsFromIds, type Skill } from '@/lib/gw/skills'
 import { SkillBar } from '@/components/ui/skill-bar'
 import { AttributeBar } from '@/components/ui/attribute-bar'
@@ -51,6 +51,9 @@ export function HeroBuildCard({
     () => mapSkillsFromIds(currentVariant.skills, skillMap),
     [currentVariant.skills, skillMap]
   )
+
+  // Compute effective attributes (base + equipment bonuses) for tooltip scaling
+  const effectiveAttributes = useEffectiveAttributes(currentVariant.attributes, bar.equipment)
 
   const primaryKey = bar.primary.toLowerCase() as ProfessionKey
   const secondaryKey =
@@ -120,7 +123,7 @@ export function HeroBuildCard({
         </div>
 
         {/* Skill Bar */}
-        <SkillBar skills={skills} size="md" attributes={currentVariant.attributes} />
+        <SkillBar skills={skills} size="md" attributes={effectiveAttributes} />
 
         {/* Attributes */}
         <div className="mt-4">
