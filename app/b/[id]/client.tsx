@@ -18,7 +18,7 @@ import {
 } from '@/lib/analytics'
 import { extractTextFromTiptap } from '@/lib/search/text-utils'
 import { cn } from '@/lib/utils'
-import { useVariantData } from '@/hooks'
+import { useVariantData, useEffectiveAttributes } from '@/hooks'
 import { mapSkillsFromIds, type Skill } from '@/lib/gw/skills'
 import { useAuthModal } from '@/components/auth/auth-modal'
 import { SkillMentionTooltip } from '@/components/ui/skill-mention-tooltip'
@@ -438,6 +438,9 @@ function SingleBuildView({
     [currentVariant.skills, skillMap]
   )
 
+  // Compute effective attributes (base + equipment bonuses) for tooltip scaling
+  const effectiveAttributes = useEffectiveAttributes(currentVariant.attributes, bar.equipment)
+
   const handleCopyCode = async () => {
     await navigator.clipboard.writeText(currentVariant.template)
     setCopied(true)
@@ -508,7 +511,7 @@ function SingleBuildView({
           </div>
 
           {/* Skill Bar */}
-          <SkillBar skills={skills} size="lg" attributes={currentVariant.attributes} />
+          <SkillBar skills={skills} size="lg" attributes={effectiveAttributes} />
 
           {/* Attributes */}
           <div className="mt-5">
