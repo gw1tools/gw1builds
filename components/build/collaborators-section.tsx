@@ -282,7 +282,7 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
 
   // Owner view (edit mode) or draft view - full management UI
   return (
-    <div className={cn('bg-bg-card border border-border rounded-xl overflow-hidden', className)}>
+    <div className={cn('bg-bg-card border border-border rounded-xl', className)}>
       {/* Header */}
       <div className="px-4 py-3 border-b border-border bg-bg-secondary/30">
         <div className="flex items-center gap-2">
@@ -373,7 +373,7 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
             {showDropdown && (
               <div
                 role="listbox"
-                className="absolute z-10 w-full mt-1 bg-bg-card border border-border rounded-lg shadow-lg overflow-hidden"
+                className="absolute z-10 w-full mt-1 bg-bg-card border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto"
               >
                 {searchResults.map((user, index) => (
                   <button

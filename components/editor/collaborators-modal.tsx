@@ -62,7 +62,7 @@ export function CollaboratorsModal(props: CollaboratorsModalProps) {
                 type="button"
                 onClick={onClose}
                 className={cn(
-                  'absolute -top-2 -right-2 z-10 p-1.5 rounded-full',
+                  'absolute -top-2 -right-2 z-10 p-1.5 rounded-full cursor-pointer',
                   'bg-bg-card border border-border',
                   'text-text-muted hover:text-text-primary hover:border-border-hover',
                   'transition-colors'
