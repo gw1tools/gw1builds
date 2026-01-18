@@ -35,7 +35,7 @@ import { TeamOverview } from '@/components/build/team-overview'
 import { VariantTabs } from '@/components/ui/variant-tabs'
 import { ReportModal } from '@/components/build/report-modal'
 import { EquipmentDisplay, hasEquipment } from '@/components/build/equipment-display'
-import { getAttributeBonusBreakdown } from '@/lib/gw/equipment/armor'
+import { getCombinedBonusBreakdown } from '@/lib/gw/equipment/armor'
 import type { BuildWithAuthor } from '@/types/database'
 import type { ProfessionKey } from '@/types/gw1'
 
@@ -516,8 +516,8 @@ function SingleBuildView({
           {/* Attributes */}
           <div className="mt-5">
             <AttributeBar
-              attributes={currentVariant.attributes}
-              bonusBreakdown={bar.equipment?.armor ? getAttributeBonusBreakdown(bar.equipment.armor) : undefined}
+              attributes={effectiveAttributes}
+              bonusBreakdown={bar.equipment ? getCombinedBonusBreakdown(bar.equipment.armor, bar.equipment.weaponSets?.[0]) : undefined}
             />
           </div>
 

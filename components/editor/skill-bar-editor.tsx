@@ -44,7 +44,7 @@ import { BuildCard } from './build-card'
 import { SpotlightSkillPicker } from './skill-picker'
 import { EquipmentSection } from './equipment-section'
 import { AttributeEditorModal } from './attribute-editor-modal'
-import { getAttributeBonusBreakdown } from '@/lib/gw/equipment/armor'
+import { getCombinedBonusBreakdown } from '@/lib/gw/equipment/armor'
 import { clearInvalidEquipment } from '@/lib/gw/equipment/validation'
 
 export interface SkillBarData {
@@ -864,10 +864,10 @@ export function SkillBarEditor({
                     <span className="text-xs font-medium">Attributes</span>
                   </button>
                   {/* Attribute values */}
-                  {currentVariant.attributes && Object.keys(currentVariant.attributes).length > 0 ? (
+                  {effectiveAttributes && Object.keys(effectiveAttributes).length > 0 ? (
                     <AttributeBar
-                      attributes={currentVariant.attributes}
-                      bonusBreakdown={data.equipment?.armor ? getAttributeBonusBreakdown(data.equipment.armor) : undefined}
+                      attributes={effectiveAttributes}
+                      bonusBreakdown={data.equipment ? getCombinedBonusBreakdown(data.equipment.armor, data.equipment.weaponSets?.[0]) : undefined}
                       compact
                       className="flex-1 min-w-0"
                     />
@@ -1043,7 +1043,7 @@ export function SkillBarEditor({
         secondary={data.secondary || 'None'}
         attributes={currentVariant.attributes || {}}
         onChange={handleAttributeChange}
-        runeBonuses={data.equipment?.armor ? getAttributeBonusBreakdown(data.equipment.armor) : {}}
+        runeBonuses={data.equipment ? getCombinedBonusBreakdown(data.equipment.armor, data.equipment.weaponSets?.[0]) : {}}
       />
     </motion.div>
   )

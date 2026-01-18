@@ -47,9 +47,27 @@ export function AttributeEditorModal({
   runeBonuses = {},
 }: AttributeEditorModalProps) {
   // Get available attributes for current professions
-  const availableAttributes = useMemo(
+  const professionAttributes = useMemo(
     () => getAvailableAttributes(primary, secondary),
     [primary, secondary]
+  )
+
+  // Extract weapon floor attributes (marked with negative values in runeBonuses)
+  const weaponFloorAttributes = useMemo(() => {
+    const floors: string[] = []
+    for (const [attr, bonuses] of Object.entries(runeBonuses)) {
+      // Check if any bonus is negative (weapon floor marker)
+      if (bonuses.some(b => b < 0) && !professionAttributes.includes(attr)) {
+        floors.push(attr)
+      }
+    }
+    return floors
+  }, [runeBonuses, professionAttributes])
+
+  // Combined list: profession attributes + weapon floor attributes
+  const availableAttributes = useMemo(
+    () => [...professionAttributes, ...weaponFloorAttributes],
+    [professionAttributes, weaponFloorAttributes]
   )
 
   // Calculate remaining points
@@ -168,11 +186,12 @@ export function AttributeEditorModal({
                 const rank = attributes[attrName] || 0
                 const isPrimary = isPrimaryAttribute(attrName, primary)
                 const bonuses = runeBonuses[attrName] || []
+                const isWeaponFloor = weaponFloorAttributes.includes(attrName)
                 const incrementCost = getIncrementalCost(rank)
                 // Refund is the cost that was paid to reach current rank (cost from rank-1 to rank)
                 const decrementRefund = rank > 0 ? getIncrementalCost(rank - 1) : 0
                 const canIncrease =
-                  rank < MAX_BASE_ATTRIBUTE_RANK && remainingPoints >= incrementCost
+                  rank < MAX_BASE_ATTRIBUTE_RANK && remainingPoints >= incrementCost && !isWeaponFloor
 
                 return (
                   <AttributeRow
@@ -184,6 +203,7 @@ export function AttributeEditorModal({
                     incrementCost={incrementCost}
                     decrementRefund={decrementRefund}
                     canIncrease={canIncrease}
+                    isWeaponFloor={isWeaponFloor}
                     onIncrement={() => handleChange(attrName, 1)}
                     onDecrement={() => handleChange(attrName, -1)}
                   />
@@ -212,6 +232,8 @@ interface AttributeRowProps {
   incrementCost: number
   decrementRefund: number
   canIncrease: boolean
+  /** Weapon floor attribute (not a profession attribute - read-only) */
+  isWeaponFloor?: boolean
   onIncrement: () => void
   onDecrement: () => void
 }
@@ -224,16 +246,51 @@ function AttributeRow({
   incrementCost,
   decrementRefund,
   canIncrease,
+  isWeaponFloor = false,
   onIncrement,
   onDecrement,
 }: AttributeRowProps) {
-  const hasBonuses = bonuses.length > 0
-  const totalBonus = bonuses.reduce((sum, b) => sum + b, 0)
-  const displayValue = rank + totalBonus
+  // Separate additive bonuses (positive) from weapon floors (negative)
+  const additiveBonuses = bonuses.filter(b => b > 0)
+  const weaponFloors = bonuses.filter(b => b < 0).map(b => Math.abs(b))
+  const highestFloor = weaponFloors.length > 0 ? Math.max(...weaponFloors) : 0
+
+  const totalAdditiveBonus = additiveBonuses.reduce((sum, b) => sum + b, 0)
+  // Display value: max of (base + additive bonuses) or weapon floor
+  const displayValue = Math.max(rank + totalAdditiveBonus, highestFloor)
+  const hasBonuses = additiveBonuses.length > 0 || weaponFloors.length > 0
   const isEnhanced = hasBonuses
   const isMaxRank = rank >= MAX_BASE_ATTRIBUTE_RANK
   const isMinRank = rank <= 0
   const profession = getProfessionForAttribute(name)
+
+  // Weapon floor attributes: show simplified read-only display
+  if (isWeaponFloor) {
+    return (
+      <div className="flex items-center gap-2 py-1">
+        {/* Attribute name with profession icon */}
+        <div className="flex-1 min-w-0 flex items-center gap-1.5">
+          {profession && <ProfessionIcon profession={profession} size="xs" className="shrink-0" />}
+          <span className="text-sm truncate text-accent-blue">
+            {name}
+          </span>
+          <span className="text-[10px] text-text-muted">(weapon)</span>
+        </div>
+
+        {/* Value display only - no controls */}
+        <div className="flex items-center shrink-0">
+          <div
+            className={cn(
+              'w-[88px] h-7 flex items-center justify-center rounded-md border text-sm font-bold tabular-nums',
+              'border-border bg-bg-card text-accent-blue'
+            )}
+          >
+            {displayValue}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex items-center gap-2 py-1">

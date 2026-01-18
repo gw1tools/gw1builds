@@ -11,7 +11,7 @@
  */
 
 import type { ProfessionKey } from '@/types/gw1'
-import type { ArmorSetConfig } from '@/types/database'
+import type { ArmorSetConfig, WeaponSet } from '@/types/database'
 
 // ============================================================================
 // TYPES
@@ -995,4 +995,108 @@ export function getAttributeBonusBreakdown(
   }
 
   return breakdown
+}
+
+// ============================================================================
+// WEAPON ATTRIBUTE FLOORS
+// "Of the X" weapon upgrades set a minimum attribute rank (floor, not additive)
+// ============================================================================
+
+/**
+ * Extract attribute floors from weapon suffixes.
+ * "Of the X" mods provide a minimum rank for an attribute (not additive).
+ * Returns a map of attribute name -> minimum rank.
+ *
+ * @example
+ * // Axe Grip of the Warrior equipped
+ * getWeaponAttributeFloors(weaponSet) // { "Strength": 5 }
+ */
+export function getWeaponAttributeFloors(
+  weaponSet: WeaponSet | undefined
+): Record<string, number> {
+  if (!weaponSet) return {}
+
+  const floors: Record<string, number> = {}
+
+  // Check mainHand suffix
+  const mainSuffix = weaponSet.mainHand?.suffix
+  if (mainSuffix?.attribute && mainSuffix?.minRank) {
+    floors[mainSuffix.attribute] = Math.max(
+      floors[mainSuffix.attribute] ?? 0,
+      mainSuffix.minRank
+    )
+  }
+
+  // Check offHand suffix
+  const offSuffix = weaponSet.offHand?.suffix
+  if (offSuffix?.attribute && offSuffix?.minRank) {
+    floors[offSuffix.attribute] = Math.max(
+      floors[offSuffix.attribute] ?? 0,
+      offSuffix.minRank
+    )
+  }
+
+  return floors
+}
+
+/**
+ * Get weapon attribute floor breakdown for display.
+ * Returns array format for consistency with armor bonus breakdown.
+ *
+ * @example
+ * // Axe Grip of the Warrior equipped
+ * getWeaponAttributeBreakdown(weaponSet) // { "Strength": [5] }
+ */
+export function getWeaponAttributeBreakdown(
+  weaponSet: WeaponSet | undefined
+): Record<string, number[]> {
+  const floors = getWeaponAttributeFloors(weaponSet)
+  const breakdown: Record<string, number[]> = {}
+
+  for (const [attr, floor] of Object.entries(floors)) {
+    breakdown[attr] = [floor]
+  }
+
+  return breakdown
+}
+
+/**
+ * Merge armor bonuses and weapon floors into a combined breakdown for display.
+ * Armor bonuses are additive (+X), weapon floors are minimums (≥X).
+ *
+ * @returns Combined breakdown with weapon floors marked with negative sign
+ *          (convention: positive = additive, negative = floor/minimum)
+ *
+ * @example
+ * getCombinedBonusBreakdown(armorConfig, weaponSet)
+ * // { "Fast Casting": [1, 3], "Strength": [-5] }
+ * // -5 means "minimum 5" from weapon
+ */
+export function getCombinedBonusBreakdown(
+  armor: ArmorSetConfig | undefined,
+  weaponSet: WeaponSet | undefined
+): Record<string, number[]> {
+  const combined: Record<string, number[]> = {}
+
+  // Get armor bonuses (additive)
+  if (armor) {
+    const armorBreakdown = getAttributeBonusBreakdown(armor)
+    for (const [attr, bonuses] of Object.entries(armorBreakdown)) {
+      combined[attr] = [...bonuses]
+    }
+  }
+
+  // Add weapon floors (marked as negative to distinguish from additive)
+  if (weaponSet) {
+    const weaponFloors = getWeaponAttributeFloors(weaponSet)
+    for (const [attr, floor] of Object.entries(weaponFloors)) {
+      if (!combined[attr]) {
+        combined[attr] = []
+      }
+      // Use negative number to indicate this is a floor, not additive
+      combined[attr].push(-floor)
+    }
+  }
+
+  return combined
 }
