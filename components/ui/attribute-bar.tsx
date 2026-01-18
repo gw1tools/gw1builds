@@ -89,8 +89,12 @@ function AttributeItem({ name, value, compact, bonuses = [] }: AttributeItemProp
   // Shorten common attribute names for compact view
   const shortName = compact ? getShortName(name) : name
 
-  // Check if there are equipment bonuses
-  const hasBonuses = bonuses.length > 0
+  // Separate additive bonuses (positive) from weapon floors (negative)
+  const additiveBonuses = bonuses.filter(b => b > 0)
+  const weaponFloors = bonuses.filter(b => b < 0).map(b => Math.abs(b))
+  const hasAdditive = additiveBonuses.length > 0
+  const hasFloors = weaponFloors.length > 0
+  const hasBonuses = hasAdditive || hasFloors
 
   // Get profession for attribute to show icon
   const profession = getProfessionForAttribute(name)
@@ -113,7 +117,10 @@ function AttributeItem({ name, value, compact, bonuses = [] }: AttributeItemProp
         {value}
         {hasBonuses && (
           <span className="ml-1 font-normal text-accent-blue">
-            {bonuses.map(b => `+${b}`).join('')}
+            {/* Additive bonuses from armor: +1, +3 */}
+            {hasAdditive && additiveBonuses.map(b => `+${b}`).join('')}
+            {/* Weapon floors: ≥5 */}
+            {hasFloors && weaponFloors.map(f => `≥${f}`).join('')}
           </span>
         )}
       </span>
