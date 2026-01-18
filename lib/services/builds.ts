@@ -33,6 +33,10 @@ import {
   containsProfanity,
   extractTextFromTiptap,
 } from '@/lib/validations/profanity'
+import {
+  hydrateBarEquipment,
+  dehydrateBarEquipment,
+} from '@/lib/gw/equipment/normalize'
 
 // ============================================================================
 // ERROR TYPES
@@ -156,8 +160,14 @@ export const getBuildById = cache(async function getBuildById(
   // Fetch collaborators for this build
   const collaborators = await getCollaborators(id)
 
+  // Hydrate equipment in bars (converts ID-only storage to full objects)
+  const hydratedBars = Array.isArray(data.bars)
+    ? data.bars.map(hydrateBarEquipment)
+    : data.bars
+
   return {
     ...data,
+    bars: hydratedBars,
     collaborators,
   } as BuildWithAuthor
 })
@@ -514,13 +524,18 @@ export async function createBuild(build: BuildInsert): Promise<Build> {
   const supabase = await createClient()
   const id = nanoid(BUILD_ID_LENGTH)
 
+  // Dehydrate equipment in bars before saving (converts full objects to ID-only)
+  const dehydratedBars = sanitized.bars.map((bar) =>
+    dehydrateBarEquipment(bar as unknown as import('@/types/database').SkillBar)
+  )
+
   const { data, error } = await supabase
     .from('builds')
     .insert({
       id,
       author_id: build.author_id,
       name: sanitized.name,
-      bars: sanitized.bars,
+      bars: dehydratedBars,
       notes: sanitized.notes,
       tags: sanitized.tags,
       is_private: build.is_private ?? false,
@@ -623,6 +638,13 @@ export async function updateBuild(
     }
   }
 
+  // Dehydrate equipment in bars before saving (converts full objects to ID-only)
+  if (sanitizedUpdates.bars) {
+    sanitizedUpdates.bars = sanitizedUpdates.bars.map((bar) =>
+      dehydrateBarEquipment(bar as unknown as import('@/types/database').SkillBar)
+    ) as unknown as typeof sanitizedUpdates.bars
+  }
+
   const supabase = await createClient()
 
   // First, fetch current build to save version
@@ -631,13 +653,15 @@ export async function updateBuild(
     throw new NotFoundError(id)
   }
 
-  // Save current version to history
+  // Save current version to history (dehydrated for storage consistency)
   const versionData: BuildVersionInsert = {
     build_id: id,
     name: current.name,
     notes: current.notes,
     tags: current.tags,
-    bars: current.bars,
+    bars: current.bars.map((bar) =>
+      dehydrateBarEquipment(bar)
+    ) as unknown as typeof current.bars,
   }
 
   const { error: versionError } = await supabase

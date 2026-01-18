@@ -345,12 +345,23 @@ export interface BuildListItem {
 // Note: EquipmentItem and Modifier types are defined in lib/gw/equipment/
 // ============================================================================
 
-/** Complete weapon configuration with item and modifiers */
+/** Complete weapon configuration with item and modifiers (runtime format) */
 export interface WeaponConfig {
   item: EquipmentItem | null
   prefix: Modifier | null
   suffix: Modifier | null
   inscription: Modifier | null
+}
+
+/**
+ * Normalized weapon configuration for database storage (ID-only)
+ * Full objects are hydrated at runtime from getItemById/getModifierById
+ */
+export interface WeaponConfigStorage {
+  itemId: number | null
+  prefixId: number | null
+  suffixId: number | null
+  inscriptionId: number | null
 }
 
 /** Empty weapon config constant */
