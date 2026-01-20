@@ -5,14 +5,14 @@
  * @module components/editor/collaborators-modal
  */
 
-import { motion, AnimatePresence } from 'framer-motion'
-import { X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Modal } from '@/components/ui/modal'
 import {
   CollaboratorsSection,
   type PendingCollaborator,
 } from '@/components/build/collaborators-section'
 import type { CollaboratorWithUser } from '@/types/database'
+import { Users } from 'lucide-react'
+import { MAX_COLLABORATORS } from '@/components/build/collaborators-section'
 
 // Draft mode props (for new builds)
 interface DraftModeProps {
@@ -40,59 +40,45 @@ type CollaboratorsModalProps = (DraftModeProps | EditModeProps) & {
 export function CollaboratorsModal(props: CollaboratorsModalProps) {
   const { isOpen, onClose, ...sectionProps } = props
 
+  const collaboratorsCount =
+    sectionProps.mode === 'draft'
+      ? sectionProps.pendingCollaborators.length
+      : sectionProps.collaborators.length
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-          onClick={onClose}
-        >
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md"
-          >
-            <div className="relative">
-              <button
-                type="button"
-                onClick={onClose}
-                className={cn(
-                  'absolute -top-2 -right-2 z-10 p-1.5 rounded-full cursor-pointer',
-                  'bg-bg-card border border-border',
-                  'text-text-muted hover:text-text-primary hover:border-border-hover',
-                  'transition-colors'
-                )}
-                aria-label="Close"
-              >
-                <X className="w-4 h-4" />
-              </button>
-              {sectionProps.mode === 'draft' ? (
-                <CollaboratorsSection
-                  mode="draft"
-                  pendingCollaborators={sectionProps.pendingCollaborators}
-                  onPendingChange={sectionProps.onPendingChange}
-                />
-              ) : (
-                <CollaboratorsSection
-                  mode="edit"
-                  buildId={sectionProps.buildId}
-                  isOwner={sectionProps.isOwner}
-                  ownerUsername={sectionProps.ownerUsername}
-                  collaborators={sectionProps.collaborators}
-                  onCollaboratorAdded={sectionProps.onCollaboratorAdded}
-                  onCollaboratorRemoved={sectionProps.onCollaboratorRemoved}
-                />
-              )}
-            </div>
-          </motion.div>
-        </motion.div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      showHeader
+      title="Collaborators"
+      headerContent={
+        <div className="flex gap-2 items-center text-base">
+          <Users className="w-4 h-4 text-accent-gold" />
+          <h2 className="font-semibold text-text-primary">Collaborators</h2>
+          <span className="text-xs text-text-muted">
+            ({collaboratorsCount}/{MAX_COLLABORATORS})
+          </span>
+        </div>
+      }
+    >
+      {sectionProps.mode === 'draft' ? (
+        <CollaboratorsSection
+          mode="draft"
+          pendingCollaborators={sectionProps.pendingCollaborators}
+          onPendingChange={sectionProps.onPendingChange}
+        />
+      ) : (
+        <CollaboratorsSection
+          mode="edit"
+          buildId={sectionProps.buildId}
+          isOwner={sectionProps.isOwner}
+          ownerUsername={sectionProps.ownerUsername}
+          collaborators={sectionProps.collaborators}
+          onCollaboratorAdded={sectionProps.onCollaboratorAdded}
+          onCollaboratorRemoved={sectionProps.onCollaboratorRemoved}
+        />
       )}
-    </AnimatePresence>
+    </Modal>
   )
 }
 
