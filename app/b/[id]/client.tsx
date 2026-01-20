@@ -30,6 +30,7 @@ import { OverflowMenu } from '@/components/ui/overflow-menu'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
 import { Tag, TagGroup } from '@/components/ui/tag'
 import { CollaboratorList } from '@/components/ui/collaborator-list'
+import { UserLink } from '@/components/ui/user-link'
 import { HeroBuildCard } from '@/components/build/hero-build-card'
 import { TeamOverview } from '@/components/build/team-overview'
 import { VariantTabs } from '@/components/ui/variant-tabs'
@@ -459,7 +460,7 @@ function SingleBuildView({
           </h1>
           {authorName && (
             <p className="text-text-muted text-sm mt-1">
-              by <span className="text-text-secondary">{authorName}</span>
+              by <UserLink username={authorName} />
               <CollaboratorList collaborators={collaborators || []} />
             </p>
           )}

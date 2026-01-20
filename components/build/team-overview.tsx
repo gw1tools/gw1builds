@@ -22,6 +22,7 @@ import { SkillSlot } from '@/components/ui/skill-slot'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip } from '@/components/ui/tooltip'
 import { CollaboratorList } from '@/components/ui/collaborator-list'
+import { UserLink } from '@/components/ui/user-link'
 import { hasEquipment } from '@/components/build/equipment-display'
 import type { SkillBar } from '@/types/database'
 import type { Skill } from '@/lib/gw/skills'
@@ -141,7 +142,7 @@ export function TeamOverview({
               </h1>
               {authorName && (
                 <p className="text-sm text-text-muted mt-0.5">
-                  by <span className="text-text-secondary">{authorName}</span>
+                  by <UserLink username={authorName} />
                   <CollaboratorList collaborators={collaborators || []} />
                 </p>
               )}

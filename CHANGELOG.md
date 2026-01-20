@@ -8,6 +8,7 @@
 - Fixed collaborator search dropdown being cut off at edge of modal
 - Build previews in search results are now proper links (cmd/ctrl+click to open in new tab)
 - Star builds directly from spotlight search without leaving the modal
+- Click on usernames to view their public profile and builds
 
 ## January 16, 2026
 

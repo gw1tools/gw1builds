@@ -35,6 +35,7 @@ import {
   EmptyState,
   Tooltip,
   ProfessionSpinner,
+  UserLink,
 } from '@/components/ui'
 import { Header, Container, ActionBar, PageWrapper } from '@/components/layout'
 import { BuildFeedCard, BuildFeedCardSkeleton } from '@/components/build/build-feed-card'
@@ -1008,6 +1009,35 @@ export default function DesignSystemPage() {
                 />
               </Card>
             </div>
+          </section>
+
+          {/* UserLink */}
+          <section>
+            <h2 className="text-2xl font-semibold text-text-primary mb-6">
+              UserLink
+            </h2>
+            <p className="text-sm text-text-secondary mb-4">
+              Inline link to user&apos;s public profile page. Styled to fit naturally in sentences.
+            </p>
+            <Card>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-text-secondary">
+                    Created by <UserLink username="GuildMaster" />
+                  </p>
+                  <p className="text-text-secondary">
+                    Shared with you by <UserLink username="SpeedClear" showAtPrefix />
+                  </p>
+                  <p className="text-text-muted">
+                    Built by <UserLink username="HeroBuilder" /> with contributions from{' '}
+                    <UserLink username="SkillExpert" /> and <UserLink username="MetaGamer" />
+                  </p>
+                </div>
+                <div className="text-xs text-text-muted mt-4 pt-3 border-t border-border">
+                  <p>Props: username (required), showAtPrefix, className</p>
+                </div>
+              </CardContent>
+            </Card>
           </section>
 
           {/* Color Palette */}

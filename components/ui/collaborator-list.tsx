@@ -6,6 +6,8 @@
  * Used in build headers alongside author attribution.
  */
 
+import { UserLink } from './user-link'
+
 interface CollaboratorListProps {
   collaborators: Array<{ username: string }>
   className?: string
@@ -32,7 +34,7 @@ export function CollaboratorList({
       {collaborators.map((c, i) => (
         <span key={c.username}>
           {i > 0 && (i === collaborators.length - 1 ? ' & ' : ', ')}
-          <span className="text-text-secondary">{c.username}</span>
+          <UserLink username={c.username} />
         </span>
       ))}
     </span>

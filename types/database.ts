@@ -60,6 +60,19 @@ export interface User {
 }
 
 /**
+ * Public user profile for profile pages
+ * Excludes sensitive fields like provider_id
+ */
+export interface PublicUserProfile {
+  /** UUID */
+  id: string
+  /** Public username */
+  username: string | null
+  /** ISO 8601 timestamp - when user joined */
+  created_at: string
+}
+
+/**
  * Alternative configuration for a skill bar (variant)
  *
  * Variants allow builds to show alternative skill/attribute setups,
