@@ -16,6 +16,8 @@ export interface StarButtonProps {
   onUnauthenticatedClick?: () => void
   /** Size variant */
   size?: 'sm' | 'md' | 'lg'
+  /** Visual variant - default has border/bg, ghost is minimal for inline use */
+  variant?: 'default' | 'ghost'
   /** Show count even when 0 */
   showZeroCount?: boolean
   /** Disabled state */
@@ -67,6 +69,7 @@ export const StarButton = forwardRef<HTMLButtonElement, StarButtonProps>(
       onStarChange,
       onUnauthenticatedClick,
       size = 'md',
+      variant = 'default',
       showZeroCount = false,
       disabled,
     },
@@ -122,6 +125,8 @@ export const StarButton = forwardRef<HTMLButtonElement, StarButtonProps>(
     const showCount = displayCount > 0 || showZeroCount
     const isDisabled = disabled || isLoading
 
+    const isGhost = variant === 'ghost'
+
     return (
       <button
         ref={ref}
@@ -130,16 +135,25 @@ export const StarButton = forwardRef<HTMLButtonElement, StarButtonProps>(
         disabled={isDisabled}
         className={cn(
           'relative inline-flex items-center justify-center',
-          'rounded-lg border',
           'transition-all duration-150',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary',
-          // Starred state
-          isStarred
-            ? 'bg-accent-gold/15 text-accent-gold border-accent-gold/40 hover:bg-accent-gold/25 hover:border-accent-gold/60'
-            : 'bg-bg-card text-text-primary hover:text-accent-gold hover:bg-bg-hover border-border hover:border-accent-gold/40',
-          // Shadow
-          'shadow-sticky',
-          sizes.button,
+          // Variant-specific styles
+          isGhost ? [
+            // Ghost variant - minimal, for inline use in cards
+            // Padding creates larger touch target while keeping visual minimal
+            'gap-1 -m-1.5 p-1.5 rounded-md',
+            'hover:bg-bg-hover/50 active:bg-bg-hover',
+            isStarred
+              ? 'text-accent-gold'
+              : 'text-text-muted hover:text-accent-gold',
+          ] : [
+            // Default variant - full button with border/bg
+            'rounded-lg border shadow-sticky',
+            sizes.button,
+            isStarred
+              ? 'bg-accent-gold/15 text-accent-gold border-accent-gold/40 hover:bg-accent-gold/25 hover:border-accent-gold/60'
+              : 'bg-bg-card text-text-primary hover:text-accent-gold hover:bg-bg-hover border-border hover:border-accent-gold/40',
+          ],
           isDisabled ? 'cursor-not-allowed' : 'cursor-pointer',
           className
         )}
@@ -158,7 +172,7 @@ export const StarButton = forwardRef<HTMLButtonElement, StarButtonProps>(
               transition={{ duration: 0.1 }}
               className="inline-flex items-center justify-center"
             >
-              <Loader2 className={cn(sizes.icon, 'animate-spin')} />
+              <Loader2 className={cn(isGhost ? 'h-3 w-3' : sizes.icon, 'animate-spin')} />
             </motion.span>
           ) : (
             <motion.span
@@ -170,7 +184,7 @@ export const StarButton = forwardRef<HTMLButtonElement, StarButtonProps>(
               className="inline-flex items-center justify-center"
             >
               <Star
-                className={cn(sizes.icon, isStarred && 'fill-accent-gold')}
+                className={cn(isGhost ? 'h-3 w-3' : sizes.icon, isStarred && 'fill-accent-gold')}
               />
             </motion.span>
           )}
@@ -185,7 +199,7 @@ export const StarButton = forwardRef<HTMLButtonElement, StarButtonProps>(
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 8, opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className={cn('font-medium tabular-nums', sizes.count)}
+              className={cn('font-medium tabular-nums', isGhost ? 'text-xs' : sizes.count)}
             >
               {formatCount(displayCount)}
             </motion.span>

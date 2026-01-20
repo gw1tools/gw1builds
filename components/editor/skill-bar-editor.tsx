@@ -46,6 +46,7 @@ import { EquipmentSection } from './equipment-section'
 import { AttributeEditorModal } from './attribute-editor-modal'
 import { getCombinedBonusBreakdown } from '@/lib/gw/equipment/armor'
 import { clearInvalidEquipment } from '@/lib/gw/equipment/validation'
+import { getAvailableAttributes } from '@/lib/gw/attributes'
 
 export interface SkillBarData {
   name: string
@@ -480,36 +481,76 @@ export function SkillBarEditor({
 
   // Profession change handlers
   const handlePrimaryChange = useCallback((profession: string) => {
+    // Filter attributes to only valid ones for new profession combo
+    const validAttrs = getAvailableAttributes(profession, data.secondary || 'None')
+    const filterAttrs = (attrs: Record<string, number>) =>
+      Object.fromEntries(Object.entries(attrs).filter(([attr]) => validAttrs.includes(attr)))
+
+    const filteredAttributes = filterAttrs(data.attributes || {})
     const newTemplate = encodeTemplate(
       profession,
       data.secondary || 'None',
-      currentVariant.attributes || {},
-      currentVariant.skills || []
+      filteredAttributes,
+      data.skills || []
     ) || ''
+
+    // Also filter attributes in all variants
+    const filteredVariants = data.variants?.map(v => ({
+      ...v,
+      attributes: filterAttrs(v.attributes || {}),
+      template: encodeTemplate(profession, data.secondary || 'None', filterAttrs(v.attributes || {}), v.skills) || '',
+    }))
 
     onChange({
       ...data,
       primary: profession,
+      attributes: filteredAttributes,
       template: newTemplate,
+      variants: filteredVariants,
     })
-    setTemplateCode(newTemplate)
-  }, [data, currentVariant.attributes, currentVariant.skills, onChange])
+
+    // Update template code for active variant
+    const activeTemplate = activeVariantIndex === 0
+      ? newTemplate
+      : (filteredVariants?.[activeVariantIndex - 1]?.template || newTemplate)
+    setTemplateCode(activeTemplate)
+  }, [data, activeVariantIndex, onChange])
 
   const handleSecondaryChange = useCallback((profession: string) => {
+    // Filter attributes to only valid ones for new profession combo
+    const validAttrs = getAvailableAttributes(data.primary || 'None', profession)
+    const filterAttrs = (attrs: Record<string, number>) =>
+      Object.fromEntries(Object.entries(attrs).filter(([attr]) => validAttrs.includes(attr)))
+
+    const filteredAttributes = filterAttrs(data.attributes || {})
     const newTemplate = encodeTemplate(
       data.primary || 'None',
       profession,
-      currentVariant.attributes || {},
-      currentVariant.skills || []
+      filteredAttributes,
+      data.skills || []
     ) || ''
+
+    // Also filter attributes in all variants
+    const filteredVariants = data.variants?.map(v => ({
+      ...v,
+      attributes: filterAttrs(v.attributes || {}),
+      template: encodeTemplate(data.primary || 'None', profession, filterAttrs(v.attributes || {}), v.skills) || '',
+    }))
 
     onChange({
       ...data,
       secondary: profession,
+      attributes: filteredAttributes,
       template: newTemplate,
+      variants: filteredVariants,
     })
-    setTemplateCode(newTemplate)
-  }, [data, currentVariant.attributes, currentVariant.skills, onChange])
+
+    // Update template code for active variant
+    const activeTemplate = activeVariantIndex === 0
+      ? newTemplate
+      : (filteredVariants?.[activeVariantIndex - 1]?.template || newTemplate)
+    setTemplateCode(activeTemplate)
+  }, [data, activeVariantIndex, onChange])
 
   // Equipment change handler
   const handleEquipmentChange = useCallback((equipment: Equipment | undefined) => {
