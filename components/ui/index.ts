@@ -98,6 +98,7 @@ export {
   type CollaboratorListProps,
 } from './collaborator-list'
 export { UserAvatar, type UserAvatarProps } from './user-avatar'
+export { UserLink, type UserLinkProps } from './user-link'
 
 // Tooltips
 export {

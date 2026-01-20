@@ -17,6 +17,7 @@ import { Users, X, Loader2, Search } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { UserAvatar } from '@/components/ui/user-avatar'
+import { UserLink } from '@/components/ui/user-link'
 import type { CollaboratorWithUser } from '@/types/database'
 
 /** Maximum collaborators per build */
@@ -258,7 +259,7 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
           <Users className="w-4 h-4 text-accent-gold" />
           <span>
             Shared with you by{' '}
-            <span className="text-text-primary font-medium">@{props.ownerUsername}</span>
+            <UserLink username={props.ownerUsername || ''} showAtPrefix className="text-text-primary font-medium" />
           </span>
         </div>
       </div>
@@ -311,9 +312,11 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
                     avatarUrl={collab.avatar_url}
                     size="sm"
                   />
-                  <span className="text-sm text-text-primary flex-1 truncate">
-                    @{collab.username}
-                  </span>
+                  <UserLink
+                    username={collab.username}
+                    showAtPrefix
+                    className="text-sm text-text-primary flex-1 truncate"
+                  />
                   <button
                     type="button"
                     onClick={() => handleRemove(collab.id, collab.username)}

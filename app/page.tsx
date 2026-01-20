@@ -21,7 +21,7 @@ export default async function HomePage({
   const initialTab: BuildSortType = tab === 'recent' ? 'recent' : 'popular'
 
   // Fetch builds for the selected tab
-  const { builds, nextOffset } = await getBuilds({ type: initialTab, limit: 6 })
+  const { builds, nextOffset } = await getBuilds({ type: initialTab, limit: 20 })
 
   return (
     <>

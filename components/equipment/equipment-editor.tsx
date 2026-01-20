@@ -99,7 +99,7 @@ export function buildWeaponName(weapon: WeaponConfig): string | null {
 
   // Suffix: extract "of X" portion
   if (weapon.suffix) {
-    const suffixMatch = weapon.suffix.name.match(/of \w+/)
+    const suffixMatch = weapon.suffix.name.match(/of (?:the \w+|\w+)/)
     if (suffixMatch) parts.push(suffixMatch[0])
   }
 
