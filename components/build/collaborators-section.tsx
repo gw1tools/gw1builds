@@ -21,7 +21,7 @@ import { UserLink } from '@/components/ui/user-link'
 import type { CollaboratorWithUser } from '@/types/database'
 
 /** Maximum collaborators per build */
-const MAX_COLLABORATORS = 4
+export const MAX_COLLABORATORS = 4
 
 interface SearchUser {
   id: string
@@ -283,18 +283,7 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
 
   // Owner view (edit mode) or draft view - full management UI
   return (
-    <div className={cn('bg-bg-card border border-border rounded-xl', className)}>
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-border bg-bg-secondary/30">
-        <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-accent-gold" />
-          <span className="text-sm font-medium text-text-primary">Collaborators</span>
-          <span className="text-xs text-text-muted">
-            ({currentCount}/{MAX_COLLABORATORS})
-          </span>
-        </div>
-      </div>
-
+    <div className={cn('h-[90vh] md:h-auto', className)}>
       <div className="p-4 space-y-4">
         {/* Current collaborators */}
         {displayList.length > 0 && (
@@ -322,8 +311,9 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
                     onClick={() => handleRemove(collab.id, collab.username)}
                     disabled={isRemoving}
                     className={cn(
-                      'p-1.5 rounded-md transition-colors',
+                      'p-1.5 rounded-md transition-colors cursor-pointer',
                       'text-text-muted hover:text-accent-red hover:bg-accent-red/10',
+                      'active:opacity-80',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold',
                       'disabled:opacity-50 disabled:cursor-not-allowed'
                     )}
@@ -387,8 +377,9 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
                     onClick={() => handleAddUser(user)}
                     disabled={isAdding === user.id}
                     className={cn(
-                      'w-full flex items-center gap-3 p-2.5 text-left',
+                      'w-full flex items-center gap-3 p-2.5 text-left cursor-pointer',
                       'hover:bg-bg-hover transition-colors',
+                      'active:opacity-80',
                       'disabled:opacity-50 disabled:cursor-not-allowed',
                       index === focusedIndex && 'bg-bg-hover'
                     )}
