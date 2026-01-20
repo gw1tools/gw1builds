@@ -554,14 +554,14 @@ export const MESMER_INSIGNIAS: Insignia[] = [
     condition: 'while activating skills',
   },
   {
-    id: 325,
+    id: 358,
     name: "Artificer's Insignia",
     effect: 'Armor +3 (per equipped Signet)',
     profession: 'mesmer',
     condition: 'per signet equipped',
   },
   {
-    id: 326,
+    id: 359,
     name: "Prodigy's Insignia",
     effect: 'Armor +5/+5/+5 (while recharging 1/3/5+ skills, max +15)',
     profession: 'mesmer',
@@ -600,7 +600,7 @@ export const ELEMENTALIST_INSIGNIAS: Insignia[] = [
     condition: 'vs elemental/lightning',
   },
   {
-    id: 327,
+    id: 361,
     name: 'Prismatic Insignia',
     effect: 'Armor +5 per 9+ in Air/Earth/Fire/Water (max +20)',
     profession: 'elementalist',
