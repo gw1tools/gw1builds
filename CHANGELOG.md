@@ -1,5 +1,14 @@
 # What's New
 
+## January 20, 2026
+
+- Fixed incorrect weapon IDs and attribute mappings for wands
+- Fixed incorrect insignia IDs for armor
+- Updated DB to reflect the fixed IDs (to build authors: please double-check the armor in your builds)
+- Fixed collaborator search dropdown being cut off at edge of modal
+- Build previews in search results are now proper links (cmd/ctrl+click to open in new tab)
+- Star builds directly from spotlight search without leaving the modal
+
 ## January 16, 2026
 
 - Hover over skills in the picker to preview their full details
