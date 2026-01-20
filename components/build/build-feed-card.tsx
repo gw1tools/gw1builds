@@ -15,6 +15,7 @@ import { ProfessionBadge } from '@/components/ui/profession-badge'
 import { Badge } from '@/components/ui/badge'
 import { Tag, TagGroup } from '@/components/ui/tag'
 import { SkillIcon } from '@/components/ui/skill-icon'
+import { StarButton } from '@/components/ui/star-button'
 import { MAX_DISPLAYED_TAGS, TAG_LABELS } from '@/lib/constants'
 import type { BuildListItem } from '@/types/database'
 import type { ProfessionKey } from '@/types/gw1'
@@ -40,8 +41,14 @@ export interface BuildFeedCardProps {
   matchedVariant?: boolean
   /** Card size - lg has larger skills and text */
   size?: 'default' | 'lg'
-  /** Click handler (only used when asLink=false) */
-  onClick?: () => void
+  /** Click handler - works for both button mode (asLink=false) and link mode (asLink=true) */
+  onClick?: (e: React.MouseEvent) => void
+  /** Whether current user has starred this build (enables interactive star button) */
+  isStarred?: boolean
+  /** Callback when star is toggled - if provided, shows interactive star button */
+  onStarChange?: (starred: boolean) => Promise<void> | void
+  /** Callback when unauthenticated user clicks star (e.g., to open auth modal) */
+  onUnauthenticatedStarClick?: () => void
   className?: string
 }
 
@@ -117,6 +124,9 @@ export const BuildFeedCard = memo(function BuildFeedCard({
   matchedVariant = false,
   size = 'default',
   onClick,
+  isStarred,
+  onStarChange,
+  onUnauthenticatedStarClick,
   className,
 }: BuildFeedCardProps) {
   // Calculate total players (sum of playerCount across all bars)
@@ -263,10 +273,36 @@ export const BuildFeedCard = memo(function BuildFeedCard({
         ) : (
           !hideStats && (
             <div className="flex items-center gap-3 shrink-0 text-text-muted text-xs">
-              <span className="flex items-center gap-1">
-                <Star className="w-3 h-3" />
-                {formatCount(build.star_count)}
-              </span>
+              {/* Star - interactive when onStarChange provided, static otherwise */}
+              {onStarChange ? (
+                <div
+                  onClick={(e) => {
+                    // Stop propagation to prevent link/button click
+                    e.stopPropagation()
+                    e.preventDefault()
+                  }}
+                  onKeyDown={(e) => {
+                    // Stop keyboard events from bubbling to prevent link navigation
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.stopPropagation()
+                      e.preventDefault()
+                    }
+                  }}
+                >
+                  <StarButton
+                    count={build.star_count}
+                    isStarred={isStarred}
+                    onStarChange={onStarChange}
+                    onUnauthenticatedClick={onUnauthenticatedStarClick}
+                    variant="ghost"
+                  />
+                </div>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <Star className="w-3 h-3" />
+                  {formatCount(build.star_count)}
+                </span>
+              )}
               <span className="flex items-center gap-1">
                 <Eye className="w-3 h-3" />
                 {formatCount(build.view_count)}
@@ -286,23 +322,7 @@ export const BuildFeedCard = memo(function BuildFeedCard({
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary'
   )
 
-  // PvX builds with external URLs always open in new tab (highest priority)
-  if (isPvxBuild && externalUrl) {
-    return (
-      <div className={cn('group', className)}>
-        <a
-          href={externalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={cn(cardClasses, 'text-left')}
-        >
-          {cardContent}
-        </a>
-      </div>
-    )
-  }
-
-  // Non-link mode (for modals, etc.)
+  // Non-link mode (for modals, pickers, etc.) - takes precedence over link modes
   if (!asLink) {
     // If onClick is provided, make it a clickable button
     if (onClick) {
@@ -326,10 +346,27 @@ export const BuildFeedCard = memo(function BuildFeedCard({
     )
   }
 
+  // Link mode: PvX builds with external URLs open in new tab
+  if (isPvxBuild && externalUrl) {
+    return (
+      <div className={cn('group', className)}>
+        <a
+          href={externalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={onClick}
+          className={cn(cardClasses, 'text-left')}
+        >
+          {cardContent}
+        </a>
+      </div>
+    )
+  }
+
   // Default: internal link
   return (
     <div className={cn('group', className)}>
-      <Link href={href || `/b/${build.id}`} className={cardClasses}>
+      <Link href={href || `/b/${build.id}`} onClick={onClick} className={cardClasses}>
         {cardContent}
       </Link>
     </div>

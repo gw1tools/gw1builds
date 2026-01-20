@@ -22,6 +22,8 @@ import Fuse from 'fuse.js'
 
 import { cn } from '@/lib/utils'
 import { useSearchAnalytics } from '@/hooks'
+import { useAuth } from '@/components/providers/auth-provider'
+import { useAuthModal } from '@/components/auth/auth-modal'
 import { searchSkills, getSkillByName, type Skill } from '@/lib/gw/skills'
 import { getSkillIconUrlById } from '@/lib/gw/icons'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
@@ -102,10 +104,16 @@ export function SpotlightBuildPicker({
   const [allBuilds, setAllBuilds] = useState<SearchableBuild[]>([])
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [showHelp, setShowHelp] = useState(false)
+  const [starredBuildIds, setStarredBuildIds] = useState<Set<string>>(new Set())
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const selectedItemRef = useRef<HTMLElement | null>(null)
   const router = useRouter()
+
+  // Auth state for quick-star feature
+  const { user } = useAuth()
+  const { openModal: openAuthModal } = useAuthModal()
+  const isAuthenticated = !!user
 
   // Defer query to keep input responsive during search
   const deferredQuery = useDeferredValue(query)
@@ -180,6 +188,28 @@ export function SpotlightBuildPicker({
     initSearch()
     return () => { cancelled = true }
   }, [loadBuilds])
+
+  // Load starred build IDs when modal opens (for quick-star feature)
+  useEffect(() => {
+    if (!isOpen || !isAuthenticated) return
+
+    let cancelled = false
+    async function loadStarredIds() {
+      try {
+        const response = await fetch('/api/user/starred-ids')
+        if (response.ok) {
+          const { starredIds } = await response.json()
+          if (!cancelled) {
+            setStarredBuildIds(new Set(starredIds))
+          }
+        }
+      } catch (e) {
+        console.error('[build-search] Failed to load starred IDs:', e)
+      }
+    }
+    loadStarredIds()
+    return () => { cancelled = true }
+  }, [isOpen, isAuthenticated])
 
   // Initialize state when modal opens (e.g., back button navigation)
   useEffect(() => {
@@ -326,25 +356,68 @@ export function SpotlightBuildPicker({
     onClose()
   }, [onClose, trackSearchClose])
 
-  // Handle build selection
-  const handleBuildSelect = useCallback((build: SearchableBuild, positionInResults: number) => {
+  // Handle build selection in picker mode (when onSelect is provided)
+  const handlePickerSelect = useCallback((build: SearchableBuild, positionInResults: number) => {
+    // Track click for analytics (1-based position)
+    trackBuildClick(build.id, positionInResults + 1)
+    onClose()
+    onSelect?.(build)
+  }, [onClose, onSelect, trackBuildClick])
+
+  // Handle link click in navigation mode (when onSelect is NOT provided)
+  // This runs before the link navigates - we track analytics and save state
+  const handleLinkClick = useCallback((e: React.MouseEvent, build: SearchableBuild, positionInResults: number) => {
     // Track click for analytics (1-based position)
     trackBuildClick(build.id, positionInResults + 1)
 
+    // For normal clicks on internal builds, save state for back button navigation
+    // Don't save state for modifier clicks (cmd/ctrl+click) since user is opening new tab
+    // Note: middle-click opens links natively without firing onClick, so no check needed
+    const isNewTabClick = e.metaKey || e.ctrlKey
+    if (!isNewTabClick && !build.externalUrl) {
+      onBeforeNavigate?.(query, activeFilters)
+    }
+    // Don't preventDefault - let the link handle navigation naturally
+  }, [activeFilters, onBeforeNavigate, query, trackBuildClick])
+
+  // Handle star toggle for quick-star feature
+  const handleStarChange = useCallback(async (buildId: string) => {
+    const response = await fetch(`/api/builds/${buildId}/star`, {
+      method: 'POST',
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to toggle star')
+    }
+
+    // Update local state
+    setStarredBuildIds(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(buildId)) {
+        newSet.delete(buildId)
+      } else {
+        newSet.add(buildId)
+      }
+      return newSet
+    })
+  }, [])
+
+  // Handle keyboard Enter on a build (used by keyboard navigation)
+  const handleKeyboardSelect = useCallback((build: SearchableBuild, positionInResults: number) => {
+    // Track click for analytics (1-based position)
+    trackBuildClick(build.id, positionInResults + 1)
+
+    // Picker mode: call onSelect
     if (onSelect) {
       onClose()
       onSelect(build)
       return
     }
 
-    // Default behavior: navigate to build page
+    // Navigation mode: navigate to build
     if (build.externalUrl) {
-      // External links open in new tab, modal stays open
       window.open(build.externalUrl, '_blank', 'noopener,noreferrer')
     } else {
-      // For internal navigation: save state to URL, then navigate
-      // Don't call onClose() - the navigation will unmount the modal
-      // This avoids race conditions on mobile with history.pushState
       onBeforeNavigate?.(query, activeFilters)
       router.push(`/b/${build.id}`)
     }
@@ -383,7 +456,7 @@ export function SpotlightBuildPicker({
           const buildIdx = selectedIndex - categoriesCount - skillsCount
           if (buildIdx >= 0 && buildIdx < resultsCount) {
             const selectedBuild = searchResults.results[buildIdx].build
-            handleBuildSelect(selectedBuild, buildIdx)
+            handleKeyboardSelect(selectedBuild, buildIdx)
           }
         }
         break
@@ -403,7 +476,7 @@ export function SpotlightBuildPicker({
         }
         break
     }
-  }, [activeFilters, addFiltersFromCategory, addSkillFilter, clearAllFilters, handleBuildSelect, handleClose, query, removeFilter, searchResults, selectedIndex, skillSuggestions])
+  }, [activeFilters, addFiltersFromCategory, addSkillFilter, clearAllFilters, handleKeyboardSelect, handleClose, query, removeFilter, searchResults, selectedIndex, skillSuggestions])
 
   // Handle hint clicks
   const handleHintClick = useCallback(async (hint: string) => {
@@ -791,7 +864,8 @@ export function SpotlightBuildPicker({
                             >
                               <BuildFeedCard
                                 build={result.build.original}
-                                asLink={false}
+                                asLink={!onSelect}
+                                href={`/b/${result.build.id}`}
                                 externalUrl={result.build.externalUrl}
                                 variantCount={result.build.variantCount}
                                 matchedVariant={result.matchedVariant}
@@ -801,7 +875,20 @@ export function SpotlightBuildPicker({
                                   .filter(f => f.type === 'tag')
                                   .map(f => f.value)}
                                 className="cursor-pointer"
-                                onClick={() => handleBuildSelect(result.build, index)}
+                                onClick={onSelect
+                                  ? () => handlePickerSelect(result.build, index)
+                                  : (e) => handleLinkClick(e, result.build, index)
+                                }
+                                // Quick-star props (only for community builds, not PvX)
+                                isStarred={!result.build.externalUrl ? starredBuildIds.has(result.build.id) : undefined}
+                                onStarChange={!result.build.externalUrl
+                                  ? () => handleStarChange(result.build.id)
+                                  : undefined
+                                }
+                                onUnauthenticatedStarClick={!result.build.externalUrl && !isAuthenticated
+                                  ? openAuthModal
+                                  : undefined
+                                }
                               />
                             </div>
                           )
