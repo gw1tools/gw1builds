@@ -12,7 +12,8 @@
  * Shows "Shared with you by @owner" for collaborators viewing (edit mode only).
  */
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Users, X, Loader2, Search } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -21,7 +22,7 @@ import { UserLink } from '@/components/ui/user-link'
 import type { CollaboratorWithUser } from '@/types/database'
 
 /** Maximum collaborators per build */
-const MAX_COLLABORATORS = 4
+export const MAX_COLLABORATORS = 4
 
 interface SearchUser {
   id: string
@@ -97,6 +98,7 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
   const [focusedIndex, setFocusedIndex] = useState(-1)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 })
 
   // Get existing usernames/ids to filter from search results
   const existingIds = useMemo(
@@ -146,13 +148,37 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node
+      if (
+        dropdownRef.current && !dropdownRef.current.contains(target) &&
+        inputRef.current && !inputRef.current.contains(target)
+      ) {
         setShowDropdown(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // Update dropdown position when showing - constrained to viewport
+  useLayoutEffect(() => {
+    if (showDropdown && inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect()
+      const dropdownHeight = 192 // max-h-48 = 12rem = 192px
+      const padding = 8
+
+      // Check if dropdown would go off bottom of screen
+      const spaceBelow = window.innerHeight - rect.bottom - padding
+      const spaceAbove = rect.top - padding
+      const showAbove = spaceBelow < dropdownHeight && spaceAbove > spaceBelow
+
+      setDropdownPosition({
+        top: showAbove ? rect.top - dropdownHeight - 4 : rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+      })
+    }
+  }, [showDropdown])
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (!showDropdown || searchResults.length === 0) return
@@ -283,18 +309,7 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
 
   // Owner view (edit mode) or draft view - full management UI
   return (
-    <div className={cn('bg-bg-card border border-border rounded-xl', className)}>
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-border bg-bg-secondary/30">
-        <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-accent-gold" />
-          <span className="text-sm font-medium text-text-primary">Collaborators</span>
-          <span className="text-xs text-text-muted">
-            ({currentCount}/{MAX_COLLABORATORS})
-          </span>
-        </div>
-      </div>
-
+    <div className={cn('min-h-[350px] md:min-h-0', className)}>
       <div className="p-4 space-y-4">
         {/* Current collaborators */}
         {displayList.length > 0 && (
@@ -322,8 +337,9 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
                     onClick={() => handleRemove(collab.id, collab.username)}
                     disabled={isRemoving}
                     className={cn(
-                      'p-1.5 rounded-md transition-colors',
+                      'p-1.5 rounded-md transition-colors cursor-pointer',
                       'text-text-muted hover:text-accent-red hover:bg-accent-red/10',
+                      'active:opacity-80',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold',
                       'disabled:opacity-50 disabled:cursor-not-allowed'
                     )}
@@ -372,11 +388,18 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
               )}
             </div>
 
-            {/* Search results dropdown */}
-            {showDropdown && (
+            {/* Search results dropdown - rendered via portal to escape modal overflow */}
+            {showDropdown && typeof document !== 'undefined' && createPortal(
               <div
+                ref={dropdownRef}
                 role="listbox"
-                className="absolute z-10 w-full mt-1 bg-bg-card border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto"
+                style={{
+                  position: 'fixed',
+                  top: dropdownPosition.top,
+                  left: dropdownPosition.left,
+                  width: dropdownPosition.width,
+                }}
+                className="z-[60] bg-bg-card border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto"
               >
                 {searchResults.map((user, index) => (
                   <button
@@ -387,8 +410,9 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
                     onClick={() => handleAddUser(user)}
                     disabled={isAdding === user.id}
                     className={cn(
-                      'w-full flex items-center gap-3 p-2.5 text-left',
+                      'w-full flex items-center gap-3 p-2.5 text-left cursor-pointer',
                       'hover:bg-bg-hover transition-colors',
+                      'active:opacity-80',
                       'disabled:opacity-50 disabled:cursor-not-allowed',
                       index === focusedIndex && 'bg-bg-hover'
                     )}
@@ -409,7 +433,8 @@ export function CollaboratorsSection(props: CollaboratorsSectionProps) {
                     )}
                   </button>
                 ))}
-              </div>
+              </div>,
+              document.body
             )}
           </div>
         )}
