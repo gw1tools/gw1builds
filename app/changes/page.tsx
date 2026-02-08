@@ -7,10 +7,62 @@ export const metadata: Metadata = {
   description: "See what's new in GW1 Builds",
 }
 
+type DetailsBlock = {
+  summary: string
+  items: string[]
+}
+
 type ReleaseEntry = {
   date: string
   title?: string
   items: string[]
+  details: DetailsBlock[]
+}
+
+function renderInlineMarkdown(text: string): React.ReactNode[] {
+  const nodes: React.ReactNode[] = []
+  // Match **bold**, [text](url), and plain text segments
+  const regex = /(\*\*(.+?)\*\*)|(\[([^\]]+)\]\(([^)]+)\))/g
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = regex.exec(text)) !== null) {
+    // Text before match
+    if (match.index > lastIndex) {
+      nodes.push(text.slice(lastIndex, match.index))
+    }
+
+    if (match[1]) {
+      // Bold text
+      nodes.push(
+        <strong key={match.index} className="font-semibold text-text-primary">
+          {match[2]}
+        </strong>
+      )
+    } else if (match[3]) {
+      // Link
+      nodes.push(
+        <a
+          key={match.index}
+          href={match[5]}
+          className="text-accent-blue hover:underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {match[4]}
+        </a>
+      )
+    }
+
+    lastIndex = match.index + match[0].length
+  }
+
+  // Remaining text
+  if (lastIndex < text.length) {
+    nodes.push(text.slice(lastIndex))
+  }
+
+  return nodes
 }
 
 function parseChangelog(markdown: string): ReleaseEntry[] {
@@ -30,23 +82,56 @@ function parseChangelog(markdown: string): ReleaseEntry[] {
 
     let title: string | undefined
     const items: string[] = []
+    const details: DetailsBlock[] = []
+
+    let inDetails = false
+    let currentSummary = ''
+    let currentDetailItems: string[] = []
 
     for (let i = 1; i < lines.length; i++) {
-      const line = lines[i]?.trim()
-      if (!line) continue
+      const line = lines[i] ?? ''
+      const trimmed = line.trim()
 
-      // Check for **Title** format
-      if (line.startsWith('**') && line.endsWith('**')) {
-        title = line.slice(2, -2)
+      // Handle <details> blocks
+      if (trimmed === '<details>') {
+        inDetails = true
+        currentSummary = ''
+        currentDetailItems = []
+        continue
       }
-      // Check for bullet points
-      else if (line.startsWith('- ')) {
-        items.push(line.slice(2))
+
+      if (trimmed === '</details>') {
+        if (inDetails && currentSummary) {
+          details.push({ summary: currentSummary, items: currentDetailItems })
+        }
+        inDetails = false
+        continue
+      }
+
+      if (inDetails) {
+        const summaryMatch = trimmed.match(/^<summary>(.+?)<\/summary>$/)
+        if (summaryMatch) {
+          currentSummary = summaryMatch[1] ?? ''
+          continue
+        }
+        if (trimmed.startsWith('- ')) {
+          currentDetailItems.push(trimmed.slice(2))
+        }
+        continue
+      }
+
+      // Regular content (outside <details>)
+      if (!trimmed) continue
+
+      if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+        title = trimmed.slice(2, -2)
+      } else if (trimmed.startsWith('- ')) {
+        items.push(trimmed.slice(2))
       }
     }
 
     if (dateLine) {
-      entries.push({ date: dateLine, title, items })
+      entries.push({ date: dateLine, title, items, details })
     }
   }
 
@@ -100,10 +185,45 @@ export default async function ChangesPage() {
                           key={itemIndex}
                           className="text-text-secondary leading-relaxed pl-4 border-l-2 border-border"
                         >
-                          {item}
+                          {renderInlineMarkdown(item)}
                         </li>
                       ))}
                     </ul>
+                  )}
+
+                  {/* Collapsible detail sections */}
+                  {entry.details.length > 0 && (
+                    <div className="mt-6 space-y-2">
+                      {entry.details.map((block, blockIndex) => (
+                        <details
+                          key={blockIndex}
+                          className="group rounded-lg border border-border bg-bg-card overflow-hidden"
+                        >
+                          <summary className="flex cursor-pointer items-center gap-2 px-4 py-3 text-sm font-medium text-text-primary hover:bg-bg-hover transition-colors select-none">
+                            <svg
+                              className="h-4 w-4 shrink-0 text-text-muted transition-transform group-open:rotate-90"
+                              viewBox="0 0 16 16"
+                              fill="currentColor"
+                            >
+                              <path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z" />
+                            </svg>
+                            {renderInlineMarkdown(block.summary)}
+                          </summary>
+                          <div className="border-t border-border px-4 py-3">
+                            <ul className="space-y-2">
+                              {block.items.map((item, itemIndex) => (
+                                <li
+                                  key={itemIndex}
+                                  className="text-sm text-text-secondary leading-relaxed pl-4 border-l-2 border-border"
+                                >
+                                  {renderInlineMarkdown(item)}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </details>
+                      ))}
+                    </div>
                   )}
                 </article>
               ))}
