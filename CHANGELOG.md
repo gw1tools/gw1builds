@@ -1,5 +1,12 @@
 # What's New
 
+## February 8, 2026
+
+- Updated skill data with the [February 5, 2026 game balance patch](https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260205)
+- 97 skills updated across all 10 professions: Warrior, Ranger, Monk, Mesmer, Necromancer, Elementalist, Assassin, Ritualist, Dervish, and Paragon
+- Nature rituals received significant buffs: faster activation times (5s → 3s) and longer durations across the board
+- Many underused skills received energy cost reductions, faster cast times, and improved scaling values
+
 ## January 20, 2026
 
 - Fixed incorrect weapon IDs and attribute mappings for wands
