@@ -7937,8 +7937,8 @@
 		"2803": {
 			"id": 2803,
 			"name": "Mind Freeze (PvP)",
-			"description": "Target foe takes 10...40 cold damage. If you have more Energy than target foe, that foe suffers an additional 10...40 cold damage and moves 90% slower for 1...5 seconds.",
-			"concise": "Deals 10...40 cold damage. If you have more Energy than target foe, deals +10...40 cold damage and causes 90% slower movement (1...5 seconds)."
+			"description": "Target foe takes 10...40 cold damage. If you have more Energy than target foe, that foe suffers an additional 10...60 cold damage and moves 90% slower for 1...5 seconds.",
+			"concise": "Deals 10...40 cold damage. If you have more Energy than target foe, deals +10...60 cold damage and causes 90% slower movement (1...5 seconds)."
 		},
 		"2804": {
 			"id": 2804,
@@ -7997,8 +7997,8 @@
 		"2860": {
 			"id": 2860,
 			"name": "Ether Renewal (PvP)",
-			"description": "For 7 seconds, each time you cast a spell, you gain 1...3 Energy and 5...20 Health for each enchantment on you.",
-			"concise": "(7 seconds.) Each time you cast a spell, you gain 1...3 Energy and 5...20 Health for each enchantment on you."
+			"description": "For 10 seconds, each time you cast a spell, you gain 1...3 Energy and 5...20 Health for each enchantment on you.",
+			"concise": "(10 seconds.) Each time you cast a spell, you gain 1...3 Energy and 5...20 Health for each enchantment on you."
 		},
 		"2861": {
 			"id": 2861,
@@ -8141,8 +8141,8 @@
 		"2895": {
 			"id": 2895,
 			"name": "Smiter's Boon (PvP)",
-			"description": "For 5 seconds, your Smiting Prayers have double the Divine Favor bonus.",
-			"concise": "(5 seconds.) Your Smiting Prayers have double Divine Favor healing bonus."
+			"description": "For 4 seconds, your Smiting Prayers have double the Divine Favor bonus.",
+			"concise": "(4 seconds.) Your Smiting Prayers have double Divine Favor healing bonus."
 		},
 		"2925": {
 			"id": 2925,
@@ -8567,8 +8567,8 @@
 		"3179": {
 			"id": 3179,
 			"name": "Mantra of Signets (PvP)",
-			"description": "For 10...40 seconds, whenever you use a signet, you gain 5...60 Health.",
-			"concise": "(10...40 seconds.) You gain 5...60 Health each time you use a signet."
+			"description": "For 10...40 seconds, you have +3 armor for each signet you have equipped. Whenever you use a signet you gain 5...60 Health.",
+			"concise": "(10...40 seconds.) You have +3 armor for each signet. You gain 5...60 Health each time you use a signet."
 		},
 		"3180": {
 			"id": 3180,
@@ -8603,8 +8603,8 @@
 		"3186": {
 			"id": 3186,
 			"name": "Shared Burden (PvP)",
-			"description": "For 5...20 seconds, target foe and all nearby foes attack, cast spells, and move 33% slower.",
-			"concise": "Also hexes foes near your target (5...20 seconds). These foes attack, cast spells, and move 33% slower."
+			"description": "For 5...20 seconds, target foe and all foes in the area attack, cast spells, and move 33% slower.",
+			"concise": "Also hexes foes in the area of your target (5...20 seconds). These foes attack, cast spells, and move 33% slower."
 		},
 		"3187": {
 			"id": 3187,
