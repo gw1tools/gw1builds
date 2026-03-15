@@ -118,7 +118,6 @@ export const ProfessionDot = forwardRef<HTMLSpanElement, ProfessionDotProps>(
         ref={ref}
         className={cn('rounded-sm shrink-0', dotSizes[size], className)}
         style={{ backgroundColor: color, ...style }}
-        title={prof?.name}
         {...props}
       />
     )

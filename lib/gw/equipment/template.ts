@@ -192,7 +192,7 @@ export function decodeEquipmentTemplate(
       items,
       code: trimmed,
     }
-  } catch (e) {
+  } catch {
     // Silently return null for decode errors (common for invalid input)
     return null
   }

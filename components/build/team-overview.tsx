@@ -254,9 +254,13 @@ function TeamOverviewRow({
     >
       {/* Profession icons - bigger */}
       <div className="flex items-center gap-1 shrink-0">
-        <ProfessionIcon profession={primaryProf} size="md" />
+        <Tooltip content={bar.primary} position="bottom" delay={120} offset={8}>
+          <ProfessionIcon profession={primaryProf} size="md" />
+        </Tooltip>
         {secondaryProf && (
-          <ProfessionIcon profession={secondaryProf} size="md" className="opacity-60" />
+          <Tooltip content={bar.secondary} position="bottom" delay={120} offset={8}>
+            <ProfessionIcon profession={secondaryProf} size="md" className="opacity-60" />
+          </Tooltip>
         )}
       </div>
 
