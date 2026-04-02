@@ -53,7 +53,7 @@ export const ProfessionIcon = forwardRef<HTMLSpanElement, ProfessionIconProps>(
       <span
         ref={ref}
         className={cn(
-          'inline-flex items-center justify-center shrink-0 leading-none',
+          'inline-flex items-center justify-center shrink-0 leading-none buildwars-profession-icon',
           iconSizes[size],
           className
         )}

@@ -13,7 +13,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import { toPng } from 'html-to-image'
+import { toBlob } from 'html-to-image'
 import { Check, ImageIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,7 @@ import { Tooltip } from '@/components/ui/tooltip'
 import { CollaboratorList } from '@/components/ui/collaborator-list'
 import { UserLink } from '@/components/ui/user-link'
 import { hasEquipment } from '@/components/build/equipment-display'
+import { BUILDWARS_FONT_EMBED_CSS } from '@/lib/gw/buildwars-font-embed'
 import type { SkillBar } from '@/types/database'
 import type { Skill } from '@/lib/gw/skills'
 import type { ProfessionKey } from '@/types/gw1'
@@ -70,6 +71,33 @@ export function TeamOverview({
     setIsTouchDevice(!window.matchMedia('(hover: hover)').matches)
   }, [])
 
+  async function renderOverviewBlob(): Promise<Blob> {
+    if (!overviewRef.current) {
+      throw new Error('Team overview is not available')
+    }
+
+    const blob = await toBlob(overviewRef.current, {
+      backgroundColor: '#18181b', // bg-bg-primary
+      pixelRatio: 2, // High resolution for crisp sharing
+      style: {
+        transform: 'none',
+      },
+      // Provide the local profession font directly so html-to-image does not
+      // need to inspect cross-origin stylesheets
+      fontEmbedCSS: BUILDWARS_FONT_EMBED_CSS,
+      // Hide the copy button in the captured image
+      filter: (node: HTMLElement) => {
+        return !node.classList?.contains('copy-image-btn')
+      },
+    })
+
+    if (!blob) {
+      throw new Error('Failed to render team overview image')
+    }
+
+    return blob
+  }
+
   /**
    * Copy image to clipboard (desktop only)
    * Uses html-to-image for a live capture of the current state
@@ -79,21 +107,7 @@ export function TeamOverview({
 
     setCopying(true)
     try {
-      const dataUrl = await toPng(overviewRef.current, {
-        backgroundColor: '#18181b', // bg-bg-primary
-        pixelRatio: 2, // High resolution for crisp sharing
-        style: {
-          transform: 'none',
-        },
-        // Hide the copy button in the captured image
-        filter: (node: HTMLElement) => {
-          return !node.classList?.contains('copy-image-btn')
-        },
-      })
-
-      // Convert data URL to blob
-      const response = await fetch(dataUrl)
-      const blob = await response.blob()
+      const blob = await renderOverviewBlob()
 
       // Copy to clipboard
       await navigator.clipboard.write([
@@ -109,14 +123,13 @@ export function TeamOverview({
       // Fallback: download the image
       if (overviewRef.current) {
         try {
-          const dataUrl = await toPng(overviewRef.current, {
-            backgroundColor: '#18181b',
-            pixelRatio: 2,
-          })
+          const blob = await renderOverviewBlob()
+          const dataUrl = URL.createObjectURL(blob)
           const link = document.createElement('a')
           link.download = `${buildName.replace(/\s+/g, '-').toLowerCase()}-overview.png`
           link.href = dataUrl
           link.click()
+          URL.revokeObjectURL(dataUrl)
         } catch {
           // Silent fail
         }
