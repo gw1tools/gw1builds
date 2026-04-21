@@ -57,6 +57,8 @@ export interface User {
   updated_at: string
   /** Admin-triggered flag to show thank you modal on next login */
   show_thank_you: boolean | null
+  /** Generic announcement flag. Admin bulk-sets true to trigger a campaign; dismissing flips back to false. Client also gates on account age > 7 days. */
+  show_announcement: boolean | null
 }
 
 /**
