@@ -1,10 +1,16 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
+const COOKIE_DOMAIN =
+  process.env.NODE_ENV === 'production' ? '.gw1builds.com' : undefined
+
 /**
  * Creates a Supabase client for server-side operations.
  * Uses the publishable key and handles user session cookies.
  * This client respects Row Level Security (RLS) policies.
+ *
+ * Cookie domain is set to .gw1builds.com in production for
+ * cross-subdomain SSO with tactics.gw1builds.com.
  */
 export async function createClient() {
   const cookieStore = await cookies()
@@ -20,7 +26,10 @@ export async function createClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, {
+                ...options,
+                ...(COOKIE_DOMAIN ? { domain: COOKIE_DOMAIN } : {}),
+              })
             )
           } catch {
             // The `setAll` method was called from a Server Component.

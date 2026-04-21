@@ -39,6 +39,22 @@ export const SITE_NAME = 'GW1 Builds'
  */
 export const SITE_DESCRIPTION = 'A lightweight tool for Guild Wars 1 build sharing.'
 
+/**
+ * GW1 Tactics (sibling product) demo URL — surfaced in the announcement modal
+ * and header nav. Defaults to the production subdomain; override per-env via
+ * NEXT_PUBLIC_TACTICS_URL (e.g. staging or localhost during tactics dev).
+ */
+export const TACTICS_URL =
+  process.env.NEXT_PUBLIC_TACTICS_URL || 'https://tactics.gw1builds.com'
+
+/**
+ * Discord invite link — surfaced in the header and future CTAs.
+ * Defaults to the permanent community invite; override per-env via
+ * NEXT_PUBLIC_DISCORD_INVITE_URL if needed.
+ */
+export const DISCORD_INVITE_URL =
+  process.env.NEXT_PUBLIC_DISCORD_INVITE_URL || 'https://discord.gg/PgavhbaDMh'
+
 // Re-export profession data for convenience
 export { PROFESSIONS } from '@/types/gw1'
 export type { Profession, ProfessionKey } from '@/types/gw1'
