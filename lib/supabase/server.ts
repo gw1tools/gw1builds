@@ -1,8 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-
-const COOKIE_DOMAIN =
-  process.env.NODE_ENV === 'production' ? '.gw1builds.com' : undefined
+import { withSupabaseCookieDomain } from './cookies'
 
 /**
  * Creates a Supabase client for server-side operations.
@@ -26,10 +24,7 @@ export async function createClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, {
-                ...options,
-                ...(COOKIE_DOMAIN ? { domain: COOKIE_DOMAIN } : {}),
-              })
+              cookieStore.set(name, value, withSupabaseCookieDomain(options))
             )
           } catch {
             // The `setAll` method was called from a Server Component.
