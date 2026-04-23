@@ -65,7 +65,10 @@ export function AuthProvider({
       // 3. This causes unwanted re-renders that wipe unsaved component state
       // See: https://github.com/supabase/supabase/issues/35754
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        const currentUser = session?.user ?? null
+        const sessionUser = session?.user ?? null
+        // Treat tactics-created anonymous sessions as not signed in.
+        // Mirrors the server-side filter in lib/supabase/server.ts.
+        const currentUser = sessionUser?.is_anonymous ? null : sessionUser
         setUser(currentUser)
 
         if (currentUser) {

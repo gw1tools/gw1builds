@@ -13,7 +13,7 @@ import { withSupabaseCookieDomain } from './cookies'
 export async function createClient() {
   const cookieStore = await cookies()
 
-  return createServerClient(
+  const client = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
@@ -34,6 +34,25 @@ export async function createClient() {
       },
     }
   )
+
+  // Treat tactics-created anonymous sessions as not signed in.
+  // The shared .gw1builds.com cookie means every gw1builds request can see
+  // those guest sessions; we drop them at the boundary so all `getUser()`
+  // callers (layout, API routes, server pages) behave as they would for a
+  // signed-out visitor -- the sign-in modal still appears, OAuth still works.
+  const originalGetUser = client.auth.getUser.bind(client.auth)
+  // Cast: UserResponse's union forces error != null when user == null, but
+  // Supabase itself returns { user: null, error: null } for empty sessions,
+  // and our anon-filter case has no error to attach. Callers only read user.
+  client.auth.getUser = (async (jwt?: string) => {
+    const result = await originalGetUser(jwt)
+    if (result.data.user?.is_anonymous) {
+      return { data: { user: null }, error: result.error ?? null }
+    }
+    return result
+  }) as typeof client.auth.getUser
+
+  return client
 }
 
 /**
