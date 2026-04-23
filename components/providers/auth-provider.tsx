@@ -153,13 +153,26 @@ export function AuthProvider({
     // Clear all Supabase auth cookies directly
     // This bypasses the Supabase client which can deadlock
     // See: https://github.com/supabase/supabase/issues/35754
+    //
+    // Clears three scopes: no-domain, exact host, and .gw1builds.com in prod.
+    // The explicit .gw1builds.com clear is required for cross-subdomain
+    // sign-out (tactics.gw1builds.com) and for users on www.gw1builds.com
+    // where the host-scoped variant alone leaves the apex cookie intact.
+    const clearDomains: (string | undefined)[] = [
+      undefined,
+      window.location.hostname,
+      ...(process.env.NODE_ENV === 'production' ? ['.gw1builds.com'] : []),
+    ]
     const cookies = document.cookie.split(';')
     for (const cookie of cookies) {
       const cookieName = cookie.split('=')[0].trim()
-      if (cookieName.startsWith('sb-') && cookieName.includes('-auth-token')) {
-        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
-        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${window.location.hostname}`
-        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.${window.location.hostname}`
+      if (!cookieName.startsWith('sb-') || !cookieName.includes('-auth-token'))
+        continue
+      for (const domain of clearDomains) {
+        const expires = 'expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
+        document.cookie = domain
+          ? `${cookieName}=; ${expires}; domain=${domain}`
+          : `${cookieName}=; ${expires}`
       }
     }
 

@@ -1,5 +1,9 @@
 # What's New
 
+## April 23, 2026
+
+- Laid the groundwork for GW1 Tactics — a demo of a new gamemode for GW1 Builds
+
 ## February 8, 2026
 
 **February 5, 2026 Skill Balance Update**

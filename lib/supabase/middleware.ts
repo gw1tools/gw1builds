@@ -1,6 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { withSupabaseCookieDomain } from './cookies'
 
+/**
+ * Refreshes the Supabase session on every request.
+ * Cookie domain is set to .gw1builds.com in production for
+ * cross-subdomain SSO with tactics.gw1builds.com.
+ */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -22,7 +28,11 @@ export async function updateSession(request: NextRequest) {
             request,
           })
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(
+              name,
+              value,
+              withSupabaseCookieDomain(options)
+            )
           )
         },
       },
