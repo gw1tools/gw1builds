@@ -17,6 +17,7 @@ import {
 } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { SITE_URL } from '@/lib/constants'
+import { trackSessionIdentified } from '@/lib/analytics'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import type { User } from '@/types/database'
 
@@ -97,6 +98,17 @@ export function AuthProvider({
     return () => {
       subscription.unsubscribe()
     }
+  }, [])
+
+  // Fire once per browser session so Vercel Analytics can compute the
+  // logged-in share of DAU. Uses initialUser from the server render, so the
+  // auth state is authoritative on mount.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (sessionStorage.getItem('session_identified_fired')) return
+    trackSessionIdentified({ is_logged_in: user !== null })
+    sessionStorage.setItem('session_identified_fired', '1')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const signInWithOAuth = useCallback(
