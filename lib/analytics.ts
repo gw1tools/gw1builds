@@ -59,3 +59,15 @@ export function trackBuildShared(data: {
 }) {
   safeTrack('build_shared', data)
 }
+
+export function trackSessionIdentified(data: { is_logged_in: boolean }) {
+  safeTrack('session_identified', data)
+}
+
+export function trackTacticsModalSeen() {
+  safeTrack('tactics_modal_seen')
+}
+
+export function trackTacticsModalClicked() {
+  safeTrack('tactics_modal_clicked')
+}

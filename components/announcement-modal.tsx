@@ -19,7 +19,7 @@
  * Current campaign: introducing GW1 Tactics.
  */
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { X } from 'lucide-react'
 import { useAuth } from '@/components/providers/auth-provider'
@@ -27,6 +27,10 @@ import { Modal, ModalBody } from '@/components/ui/modal'
 import { Button } from '@/components/ui/button'
 import { TACTICS_URL } from '@/lib/constants'
 import { isAccountOldEnough } from '@/lib/announcements'
+import {
+  trackTacticsModalClicked,
+  trackTacticsModalSeen,
+} from '@/lib/analytics'
 
 export function AnnouncementModal() {
   const { profile, refreshProfile } = useAuth()
@@ -41,6 +45,14 @@ export function AnnouncementModal() {
     isAccountOldEnough(profile?.created_at)
 
   const isOpen = shouldShow && !dismissed
+
+  const seenRef = useRef(false)
+  useEffect(() => {
+    if (isOpen && !seenRef.current) {
+      seenRef.current = true
+      trackTacticsModalSeen()
+    }
+  }, [isOpen])
 
   const dismiss = async () => {
     try {
@@ -62,6 +74,7 @@ export function AnnouncementModal() {
   }
 
   const handleOpenTactics = async () => {
+    trackTacticsModalClicked()
     // Route through /api/tactics so the preview-gate password is attached
     // server-side and never ships in the client bundle.
     window.open('/api/tactics', '_blank', 'noopener,noreferrer')
