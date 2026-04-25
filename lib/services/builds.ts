@@ -100,6 +100,13 @@ function normalizeAuthor<T extends { author: AuthorData[] | null }>(
   } as WithNormalizedAuthor<T>
 }
 
+/** Add tags that can be inferred from build structure. */
+function withDerivedTags(tags: string[], barCount: number): string[] {
+  if (barCount <= 1) return tags
+  if (tags.some(tag => tag.toLowerCase() === 'team')) return tags
+  return [...tags, 'team']
+}
+
 // ============================================================================
 // READ OPERATIONS
 // ============================================================================
@@ -528,6 +535,7 @@ export async function createBuild(build: BuildInsert): Promise<Build> {
   const dehydratedBars = sanitized.bars.map((bar) =>
     dehydrateBarEquipment(bar as unknown as import('@/types/database').SkillBar)
   )
+  const derivedTags = withDerivedTags(sanitized.tags, dehydratedBars.length)
 
   const { data, error } = await supabase
     .from('builds')
@@ -537,7 +545,7 @@ export async function createBuild(build: BuildInsert): Promise<Build> {
       name: sanitized.name,
       bars: dehydratedBars,
       notes: sanitized.notes,
-      tags: sanitized.tags,
+      tags: derivedTags,
       is_private: build.is_private ?? false,
     })
     .select()
@@ -651,6 +659,13 @@ export async function updateBuild(
   const current = await getBuildById(id)
   if (!current) {
     throw new NotFoundError(id)
+  }
+
+  const effectiveBars = sanitizedUpdates.bars ?? current.bars
+  const effectiveTags = sanitizedUpdates.tags ?? current.tags
+  const derivedTags = withDerivedTags(effectiveTags, effectiveBars.length)
+  if (derivedTags !== effectiveTags || sanitizedUpdates.tags !== undefined) {
+    sanitizedUpdates.tags = derivedTags
   }
 
   // Save current version to history (dehydrated for storage consistency)
