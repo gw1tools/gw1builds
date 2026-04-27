@@ -104,10 +104,15 @@ export function AuthProvider({
   // logged-in share of DAU. Uses initialUser from the server render, so the
   // auth state is authoritative on mount.
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (sessionStorage.getItem('session_identified_fired')) return
-    trackSessionIdentified({ is_logged_in: user !== null })
-    sessionStorage.setItem('session_identified_fired', '1')
+    // sessionStorage can throw in locked-down browser modes — never let an
+    // analytics side-effect break the auth provider render.
+    try {
+      if (sessionStorage.getItem('session_identified_fired')) return
+      trackSessionIdentified({ is_logged_in: user !== null })
+      sessionStorage.setItem('session_identified_fired', '1')
+    } catch {
+      // Ignore — analytics is best-effort.
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
