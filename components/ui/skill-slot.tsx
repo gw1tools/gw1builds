@@ -19,6 +19,7 @@ import {
 } from '@floating-ui/react'
 import { cn } from '@/lib/utils'
 import { getSkillIconUrlById } from '@/lib/gw/icons'
+import { getSkillById } from '@/lib/gw/skills'
 import { getSkillWikiUrl } from '@/lib/gw/wiki'
 import { SkillTooltipContent } from '@/components/ui/skill-tooltip'
 
@@ -29,25 +30,36 @@ const slotSizes = {
   lg: 'w-16 h-16',
 }
 
+const slotPixelSizes = {
+  xs: 24,
+  sm: 44,
+  md: 56,
+  lg: 64,
+} as const
+
+type SkillSlotData = {
+  id: string | number
+  name: string
+  description?: string
+  profession?: string
+  attribute?: string
+  energy?: number
+  activation?: number
+  recharge?: number
+  elite?: boolean
+  icon?: string
+  adrenaline?: number
+  sacrifice?: number
+  upkeep?: number
+  overcast?: number
+}
+
 export interface SkillSlotProps {
   /** Skill data - null/undefined for empty slot */
-  skill?: {
-    id: string | number
-    name: string
-    description?: string
-    profession?: string
-    attribute?: string
-    energy?: number
-    activation?: number
-    recharge?: number
-    elite?: boolean
-    icon?: string
-    adrenaline?: number
-    sacrifice?: number
-    upkeep?: number
-    overcast?: number
-  } | null
-  size?: keyof typeof slotSizes
+  skill?: SkillSlotData | null
+  /** Skill ID when the caller only has numeric list data */
+  skillId?: number
+  size?: keyof typeof slotSizes | number
   /** Slot position (1-8) for accessibility */
   position?: number
   /** Disable interactions */
@@ -66,6 +78,8 @@ export interface SkillSlotProps {
   className?: string
   /** Current attribute values for scaling skill descriptions */
   attributes?: Record<string, number>
+  /** Tooltip content density */
+  tooltipMode?: 'full' | 'compact'
 }
 
 /**
@@ -85,6 +99,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
     {
       className,
       skill,
+      skillId: skillIdProp,
       size = 'md',
       position,
       disabled = false,
@@ -94,26 +109,79 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
       invalid = false,
       emptyVariant = 'viewer',
       attributes,
+      tooltipMode = 'full',
     },
     forwardedRef
   ) => {
     const [isOpen, setIsOpen] = useState(false)
     const [imgError, setImgError] = useState(false)
     const [canHover, setCanHover] = useState(false) // Default false to avoid hydration mismatch
+    const [resolvedSkill, setResolvedSkill] = useState<SkillSlotData | null>(
+      skill ?? null
+    )
+    const [resolutionAttempted, setResolutionAttempted] = useState(
+      Boolean(skill)
+    )
     const arrowRef = useRef(null)
-    const isEmpty = empty || !skill
+    const normalizedSkillId =
+      typeof skillIdProp === 'number'
+        ? skillIdProp
+        : typeof skill?.id === 'number'
+          ? skill.id
+          : parseInt(String(skill?.id), 10)
+    const skillData = skill ?? resolvedSkill
+    const hasValidSkillId =
+      typeof normalizedSkillId === 'number' &&
+      Number.isFinite(normalizedSkillId) &&
+      normalizedSkillId > 0
+    const isResolvedEmpty = !skill && resolutionAttempted && !resolvedSkill
+    const isEmpty = empty || !hasValidSkillId || isResolvedEmpty
     // Elite is determined ONLY by skill data, not position
-    const elite = skill?.elite === true
+    const elite = skillData?.elite === true
 
     // Detect if device supports hover (desktop) vs touch-only (mobile)
     useEffect(() => {
       setCanHover(window.matchMedia('(hover: hover)').matches)
     }, [])
 
+    useEffect(() => {
+      if (skill) {
+        setResolvedSkill(skill)
+        setResolutionAttempted(true)
+        return
+      }
+
+      if (!hasValidSkillId) {
+        setResolvedSkill(null)
+        setResolutionAttempted(true)
+        return
+      }
+
+      let cancelled = false
+      setResolutionAttempted(false)
+
+      getSkillById(normalizedSkillId).then(loadedSkill => {
+        if (cancelled) return
+        setResolvedSkill(loadedSkill ?? null)
+        setResolutionAttempted(true)
+      })
+
+      return () => {
+        cancelled = true
+      }
+    }, [skill, hasValidSkillId, normalizedSkillId])
+
     // Get icon URL from skill ID (local files in /public/skills/)
-    const skillId =
-      typeof skill?.id === 'number' ? skill.id : parseInt(String(skill?.id), 10)
-    const iconUrl = skillId > 0 ? getSkillIconUrlById(skillId) : null
+    const iconUrl = hasValidSkillId
+      ? getSkillIconUrlById(normalizedSkillId)
+      : null
+    const pixelSize = typeof size === 'number' ? size : slotPixelSizes[size]
+    const slotSizeClassName =
+      typeof size === 'number' ? undefined : slotSizes[size]
+    const slotStyle =
+      typeof size === 'number'
+        ? { width: pixelSize, height: pixelSize }
+        : undefined
 
     // Floating UI setup for smart tooltip positioning
     const { refs, floatingStyles, context, isPositioned } = useFloating({
@@ -164,12 +232,19 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
 
     // Determine if this should be a link (no custom handler, has skill, and device supports hover)
     // On touch devices, we show the wiki link inside the tooltip instead
-    const isLink = canHover && !onSlotClick && !isEmpty && skill?.name
-    const wikiUrl = skill?.name ? getSkillWikiUrl(skill.name) : undefined
+    const isLink =
+      tooltipMode === 'full' &&
+      canHover &&
+      !onSlotClick &&
+      !isEmpty &&
+      skillData?.name
+    const wikiUrl = skillData?.name
+      ? getSkillWikiUrl(skillData.name)
+      : undefined
 
     // Shared styles for the slot
     const slotClassName = cn(
-      slotSizes[size],
+      slotSizeClassName,
       'relative flex items-center justify-center',
       'cursor-pointer overflow-hidden',
       'transition-transform duration-75 ease-out',
@@ -189,13 +264,17 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
 
     // Shared content
     const slotContent = isEmpty ? (
-      emptyVariant === 'editor' ? <EditorEmptySlotGhost /> : <EmptySlotGhost />
+      emptyVariant === 'editor' ? (
+        <EditorEmptySlotGhost />
+      ) : (
+        <EmptySlotGhost />
+      )
     ) : iconUrl && !imgError ? (
       <Image
         src={iconUrl}
-        alt={skill?.name || 'Skill'}
+        alt={skillData?.name || 'Skill'}
         fill
-        sizes={size === 'xs' ? '24px' : size === 'sm' ? '44px' : size === 'lg' ? '64px' : '56px'}
+        sizes={`${pixelSize}px`}
         className="object-cover"
         onError={() => setImgError(true)}
         unoptimized
@@ -207,7 +286,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
           elite ? 'text-accent-gold' : 'text-text-secondary'
         )}
       >
-        {getSkillAbbr(skill?.name || '')}
+        {getSkillAbbr(skillData?.name || '')}
       </span>
     )
 
@@ -226,8 +305,9 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
               href={wikiUrl}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`${skill?.name}${elite ? ' (Elite)' : ''} - View on GW1 Wiki`}
+              aria-label={`${skillData?.name}${elite ? ' (Elite)' : ''} - View on GW1 Wiki`}
               className={cn(slotClassName, 'block')}
+              style={slotStyle}
             >
               {slotContent}
               {invalid && <InvalidIndicator />}
@@ -240,11 +320,12 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
               aria-label={
                 isEmpty
                   ? `Empty skill slot${position ? ` ${position}` : ''}`
-                  : `${skill?.name}${elite ? ' (Elite)' : ''}`
+                  : `${skillData?.name || 'Skill'}${elite ? ' (Elite)' : ''}`
               }
               tabIndex={disabled ? -1 : 0}
               onClick={disabled ? undefined : onSlotClick}
               className={slotClassName}
+              style={slotStyle}
             >
               {slotContent}
               {invalid && <InvalidIndicator />}
@@ -268,28 +349,42 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
               {...getFloatingProps()}
             >
               {isEmpty ? (
-                <EmptySlotTooltip position={position} />
+                tooltipMode === 'compact' ? (
+                  <CompactEmptySlotTooltip />
+                ) : (
+                  <EmptySlotTooltip position={position} />
+                )
+              ) : tooltipMode === 'compact' ? (
+                <CompactSkillTooltip
+                  name={skillData?.name}
+                  elite={elite}
+                  loading={!skillData}
+                />
               ) : (
                 <SkillTooltipContent
                   skill={{
-                    id: typeof skill!.id === 'number' ? skill!.id : parseInt(String(skill!.id), 10),
-                    name: skill!.name,
-                    description: skill!.description,
-                    profession: skill!.profession,
-                    attribute: skill!.attribute,
-                    elite: skill!.elite,
-                    energy: skill!.energy,
-                    activation: skill!.activation,
-                    recharge: skill!.recharge,
-                    adrenaline: skill!.adrenaline,
-                    sacrifice: skill!.sacrifice,
-                    upkeep: skill!.upkeep,
-                    overcast: skill!.overcast,
+                    id:
+                      typeof skillData!.id === 'number'
+                        ? skillData!.id
+                        : parseInt(String(skillData!.id), 10),
+                    name: skillData!.name,
+                    description: skillData!.description,
+                    profession: skillData!.profession,
+                    attribute: skillData!.attribute,
+                    elite: skillData!.elite,
+                    energy: skillData!.energy,
+                    activation: skillData!.activation,
+                    recharge: skillData!.recharge,
+                    adrenaline: skillData!.adrenaline,
+                    sacrifice: skillData!.sacrifice,
+                    upkeep: skillData!.upkeep,
+                    overcast: skillData!.overcast,
                   }}
                   elite={elite}
                   wikiUrl={wikiUrl}
                   showWikiLink={!canHover}
                   attributes={attributes}
+                  loading={!skillData}
                 />
               )}
               <FloatingArrow
@@ -322,6 +417,48 @@ function EmptySlotGhost() {
       >
         <path d="M12 2L2 12l10 10 10-10L12 2zm0 3.5L18.5 12 12 18.5 5.5 12 12 5.5z" />
       </svg>
+    </div>
+  )
+}
+
+function CompactSkillTooltip({
+  name,
+  elite,
+  loading,
+}: {
+  name?: string
+  elite: boolean
+  loading: boolean
+}) {
+  if (loading) {
+    return (
+      <div className="bg-bg-primary border border-border rounded-lg px-2.5 py-1.5 shadow-xl">
+        <div className="h-4 w-20 animate-pulse rounded bg-bg-hover" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-bg-primary border border-border rounded-lg px-2.5 py-1.5 shadow-xl">
+      <div
+        className={cn(
+          'text-sm font-medium whitespace-nowrap',
+          elite ? 'text-accent-gold' : 'text-text-primary'
+        )}
+      >
+        {name}
+        {elite && <span className="ml-1">[Elite]</span>}
+      </div>
+    </div>
+  )
+}
+
+function CompactEmptySlotTooltip() {
+  return (
+    <div className="bg-bg-primary border border-border rounded-lg px-2.5 py-1.5 shadow-xl">
+      <div className="text-sm font-medium text-text-primary whitespace-nowrap">
+        Empty Slot
+      </div>
     </div>
   )
 }
@@ -373,7 +510,12 @@ function InvalidIndicator() {
       role="img"
       aria-label="Invalid skill - wrong profession"
     >
-      <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <svg
+        className="w-2.5 h-2.5 text-white"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        aria-hidden="true"
+      >
         <path
           fillRule="evenodd"
           d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
@@ -383,4 +525,3 @@ function InvalidIndicator() {
     </div>
   )
 }
-

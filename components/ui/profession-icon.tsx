@@ -45,7 +45,10 @@ export interface ProfessionIconProps extends React.HTMLAttributes<HTMLSpanElemen
  * <ProfessionIcon profession="warrior" size="lg" />
  */
 export const ProfessionIcon = forwardRef<HTMLSpanElement, ProfessionIconProps>(
-  ({ className, profession, size = 'md', style, ...props }, ref) => {
+  (
+    { className, profession, size = 'md', style, ...props },
+    ref
+  ) => {
     const prof = getProfession(profession)
     const fontChar = PROFESSION_FONT_CHARS[profession] ?? '?'
 
@@ -62,7 +65,6 @@ export const ProfessionIcon = forwardRef<HTMLSpanElement, ProfessionIconProps>(
           color: prof?.color ?? '#a8a8a8',
           ...style,
         }}
-        title={prof?.name}
         {...props}
       >
         {fontChar}
