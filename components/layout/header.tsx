@@ -117,12 +117,13 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            {/* Tactics link - desktop only, always visible (cross-product link). */}
             {TACTICS_URL && (
               <a
                 href="/api/tactics"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hidden md:flex items-center gap-2 h-8 px-3 rounded-full bg-bg-card border border-accent-gold-dim/40 text-text-primary hover:text-accent-gold hover:bg-bg-hover hover:border-accent-gold-dim shadow-sticky transition-all cursor-pointer"
-                aria-label="Open GW1 Tactics"
+                aria-label="Open GW1 Tactics in a new tab"
               >
                 <Swords className="h-4 w-4 text-accent-gold" />
                 <span className="text-xs font-medium">Play Tactics</span>
