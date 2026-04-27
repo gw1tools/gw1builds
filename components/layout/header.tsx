@@ -24,7 +24,6 @@ import { FeedbackModal } from '@/components/feedback/feedback-modal'
 import { dropdownVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { TACTICS_URL } from '@/lib/constants'
-import { isAccountOldEnough } from '@/lib/announcements'
 import { toast } from 'sonner'
 
 export function Header() {
@@ -118,23 +117,18 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            {/* Tactics link - desktop only. Only shown AFTER a user dismissed
-                the announcement modal (show_announcement flipped to false) AND
-                they were eligible to see it (account age > 7 days). Keeps the
-                cross-product link accessible to people who've been introduced to
-                Tactics, without cluttering the header for everyone else. */}
-            {TACTICS_URL &&
-              profile?.show_announcement === false &&
-              isAccountOldEnough(profile?.created_at) && (
-                <a
-                  href="/api/tactics"
-                  className="hidden md:flex items-center gap-1.5 h-8 px-3 rounded-full bg-bg-card border border-border text-text-secondary hover:text-accent-gold hover:bg-bg-hover hover:border-accent-gold-dim shadow-sticky transition-all cursor-pointer"
-                  aria-label="Open GW1 Tactics"
-                >
-                  <Swords className="h-3.5 w-3.5" />
-                  <span className="text-xs font-medium">Play</span>
-                </a>
-              )}
+            {TACTICS_URL && (
+              <a
+                href="/api/tactics"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden md:flex items-center gap-2 h-8 px-3 rounded-full bg-bg-card border border-accent-gold-dim/40 text-text-primary hover:text-accent-gold hover:bg-bg-hover hover:border-accent-gold-dim shadow-sticky transition-all cursor-pointer"
+                aria-label="Open GW1 Tactics in a new tab"
+              >
+                <Swords className="h-4 w-4 text-accent-gold" />
+                <span className="text-xs font-medium">Play Tactics</span>
+              </a>
+            )}
 
             {/* Feedback Button - icon only on mobile, with text on desktop */}
             <button
@@ -248,7 +242,7 @@ export function Header() {
             ) : (
               <Button
                 variant="secondary"
-                size="md"
+                size="sm"
                 onClick={() => openModal('/my-builds')}
               >
                 Sign In
