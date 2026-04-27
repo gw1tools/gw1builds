@@ -79,7 +79,7 @@ export {
   ErrorState,
   type EmptyStateProps,
 } from './empty-state'
-export { Tooltip, SimpleTooltip, type TooltipProps } from './tooltip'
+export { Tooltip, type TooltipProps } from './tooltip'
 
 // Loading
 export { ProfessionSpinner } from './profession-spinner'

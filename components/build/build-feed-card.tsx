@@ -14,12 +14,15 @@ import { cn } from '@/lib/utils'
 import { ProfessionBadge } from '@/components/ui/profession-badge'
 import { Badge } from '@/components/ui/badge'
 import { Tag, TagGroup } from '@/components/ui/tag'
-import { SkillIcon } from '@/components/ui/skill-icon'
+import { SkillSlot } from '@/components/ui/skill-slot'
 import { StarButton } from '@/components/ui/star-button'
+import { Tooltip } from '@/components/ui/tooltip'
+import { ProfessionIcon } from '@/components/ui/profession-icon'
 import { MAX_DISPLAYED_TAGS, TAG_LABELS } from '@/lib/constants'
 import type { BuildListItem } from '@/types/database'
 import type { ProfessionKey } from '@/types/gw1'
 import { isPvxBuildId } from '@/lib/pvx'
+import { useCanHover } from '@/hooks'
 
 export interface BuildFeedCardProps {
   build: BuildListItem
@@ -52,6 +55,12 @@ export interface BuildFeedCardProps {
   className?: string
 }
 
+type TeamCompositionEntry = {
+  primary: ProfessionKey
+  secondary?: ProfessionKey
+  count: number
+}
+
 /**
  * Format large numbers with K suffix
  */
@@ -60,6 +69,101 @@ function formatCount(count: number): string {
     return `${(count / 1000).toFixed(1).replace(/\.0$/, '')}k`
   }
   return count.toString()
+}
+
+function getTeamCompositionEntries(
+  bars: BuildListItem['bars']
+): TeamCompositionEntry[] {
+  return bars.map(bar => ({
+    primary: (bar.primary || 'warrior').toLowerCase() as ProfessionKey,
+    secondary:
+      bar.secondary && bar.secondary !== 'None'
+        ? (bar.secondary.toLowerCase() as ProfessionKey)
+        : undefined,
+    count: bar.playerCount || 1,
+  }))
+}
+
+function getTeamCompositionSlots(entries: TeamCompositionEntry[]): ProfessionKey[] {
+  return entries.flatMap(entry =>
+    Array.from({ length: entry.count }, () => entry.primary)
+  )
+}
+
+function TeamCompositionPreview({
+  entries,
+  showTooltips,
+}: {
+  entries: TeamCompositionEntry[]
+  showTooltips: boolean
+}) {
+  const slots = getTeamCompositionSlots(entries)
+  const visibleSlots = slots.slice(0, 8)
+  const hiddenCount = slots.length - visibleSlots.length
+
+  return (
+    <div className="flex items-center gap-1.5">
+      {visibleSlots.map((profession, index) => {
+        const icon = (
+          <div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-bg-card/70 ring-1 ring-border/60">
+            <ProfessionIcon profession={profession} size="sm" />
+          </div>
+        )
+
+        if (!showTooltips) {
+          return <div key={`${profession}-${index}`}>{icon}</div>
+        }
+
+        return (
+          <Tooltip
+            key={`${profession}-${index}`}
+            content={profession.charAt(0).toUpperCase() + profession.slice(1)}
+            position="bottom"
+            delay={120}
+            offset={6}
+          >
+            {icon}
+          </Tooltip>
+        )
+      })}
+      {hiddenCount > 0 && (
+        <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-border bg-bg-card px-1 text-[10px] font-semibold leading-none text-text-muted">
+          +{hiddenCount}
+        </span>
+      )}
+    </div>
+  )
+}
+
+function TeamCompositionTooltip({
+  entries,
+}: {
+  entries: TeamCompositionEntry[]
+}) {
+  return (
+    <div className="flex min-w-[220px] flex-col gap-2">
+      <div className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+        Team Composition
+      </div>
+      {entries.map((entry, index) => (
+        <div
+          key={`${entry.primary}-${entry.secondary || 'none'}-${index}`}
+          className="flex items-center justify-between gap-3"
+        >
+          <ProfessionBadge
+            primary={entry.primary}
+            secondary={entry.secondary}
+            size="sm"
+          />
+          {entry.count > 1 && (
+            <span className="inline-flex items-center rounded-full border border-border bg-bg-card px-2 py-0.5 text-[11px] font-medium text-text-muted">
+              x{entry.count}
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+  )
 }
 
 /**
@@ -80,12 +184,13 @@ const SkillPreview = memo(function SkillPreview({ skills, size = 'default' }: { 
     <div className="overflow-x-auto scrollbar-none -mx-4 px-4" aria-label="Skill bar preview">
       <div className="flex gap-0.5 w-fit">
         {normalizedSkills.slice(0, 8).map((skillId, index) => (
-          <SkillIcon
+          <SkillSlot
             key={`slot-${index}-${skillId}`}
             skillId={skillId}
             size={iconSize}
-            showEmptyGhost
+            position={index + 1}
             emptyVariant="viewer"
+            tooltipMode="compact"
           />
         ))}
       </div>
@@ -129,6 +234,8 @@ export const BuildFeedCard = memo(function BuildFeedCard({
   onUnauthenticatedStarClick,
   className,
 }: BuildFeedCardProps) {
+  const canHover = useCanHover()
+
   // Calculate total players (sum of playerCount across all bars)
   const totalPlayers = build.bars.reduce(
     (sum, bar) => sum + (bar.playerCount || 1),
@@ -138,6 +245,7 @@ export const BuildFeedCard = memo(function BuildFeedCard({
   const isDelisted = build.moderation_status === 'delisted'
   const isPrivate = build.is_private === true
   const isPvxBuild = isPvxBuildId(build.id)
+  const teamComposition = getTeamCompositionEntries(build.bars)
 
   // Check if a tag matches any highlighted tag (by key or label)
   const isHighlightedTag = (tag: string): boolean => {
@@ -172,6 +280,7 @@ export const BuildFeedCard = memo(function BuildFeedCard({
     firstBar?.secondary && firstBar.secondary !== 'None'
       ? (firstBar.secondary.toLowerCase() as ProfessionKey)
       : undefined
+  const showCardHoverTooltips = canHover
 
   const cardContent = (
     <>
@@ -213,11 +322,36 @@ export const BuildFeedCard = memo(function BuildFeedCard({
       {/* Badge row - Profession/Team + Variants */}
       <div className={cn('flex items-center gap-2', size === 'lg' ? 'mb-4' : 'mb-3')}>
         {isTeamBuild ? (
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-accent-gold/30 bg-accent-gold/10">
-            <Users className="w-3 h-3 text-accent-gold" />
-            <span className="text-[11px] font-semibold text-accent-gold">
-              Team ({totalPlayers})
-            </span>
+          <div className="inline-flex items-center gap-2">
+            {showCardHoverTooltips ? (
+              <Tooltip
+                content={<TeamCompositionTooltip entries={teamComposition} />}
+                position="bottom-start"
+                delay={150}
+                offset={10}
+                fallbackPlacements={['top-start', 'bottom-end', 'top-end']}
+                contentClassName="min-w-[220px] px-3 py-2.5 whitespace-normal"
+                className="inline-flex"
+              >
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-accent-gold/30 bg-accent-gold/10">
+                  <Users className="w-3 h-3 text-accent-gold" />
+                  <span className="text-[11px] font-semibold text-accent-gold">
+                    Team ({totalPlayers})
+                  </span>
+                </div>
+              </Tooltip>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-accent-gold/30 bg-accent-gold/10">
+                <Users className="w-3 h-3 text-accent-gold" />
+                <span className="text-[11px] font-semibold text-accent-gold">
+                  Team ({totalPlayers})
+                </span>
+              </div>
+            )}
+            <TeamCompositionPreview
+              entries={teamComposition}
+              showTooltips={showCardHoverTooltips}
+            />
           </div>
         ) : (
           <ProfessionBadge

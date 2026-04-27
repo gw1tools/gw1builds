@@ -427,6 +427,26 @@ function findTagMatches(query: string): Array<{ key: string; label: string }> {
 }
 
 /**
+ * Check whether a build matches a tag, including derived tags that can be
+ * inferred from the build structure for older records.
+ */
+function buildMatchesTag(build: SearchableBuild, tag: string): boolean {
+  const tagValue = tag.toLowerCase()
+  const tagKey = Object.entries(TAG_LABELS).find(
+    ([, label]) => label.toLowerCase() === tagValue
+  )?.[0]
+
+  const matchesStoredTag = build.tags.some(
+    t => t.toLowerCase() === tagValue || t.toLowerCase() === tagKey?.toLowerCase()
+  )
+
+  if (matchesStoredTag) return true
+
+  // Older gw1builds records may be team builds without the explicit team tag.
+  return tagValue === 'team' && build.original.bars.length > 1
+}
+
+/**
  * Find profession match (exact, alias, or prefix)
  */
 function findProfessionMatch(query: string): typeof PROFESSIONS[number] | null {
@@ -642,13 +662,7 @@ function buildMatchesFilter(build: SearchableBuild, filter: BuildFilter): boolea
       return professionList.some(p => p.toLowerCase() === profValue)
     }
     case 'tag': {
-      const filterValue = filter.value.toLowerCase()
-      const tagKey = Object.entries(TAG_LABELS).find(
-        ([, label]) => label.toLowerCase() === filterValue
-      )?.[0]
-      return build.tags.some(
-        t => t.toLowerCase() === filterValue || t.toLowerCase() === tagKey?.toLowerCase()
-      )
+      return buildMatchesTag(build, filter.value)
     }
     case 'skill': {
       const skillQuery = filter.value.toLowerCase()
@@ -742,13 +756,9 @@ export function searchBuilds(
   if (tagMatch) {
     const tagLabel = TAG_LABELS[tagMatch] || tagMatch
     // Results: from filtered builds
-    const tagBuilds = searchableBuilds.filter(b =>
-      b.tags.some(t => t.toLowerCase() === tagMatch.toLowerCase())
-    )
+    const tagBuilds = searchableBuilds.filter(b => buildMatchesTag(b, tagMatch))
     // Categories: from ALL builds (for discoverability)
-    const tagBuildsAll = allBuilds.filter(b =>
-      b.tags.some(t => t.toLowerCase() === tagMatch.toLowerCase())
-    )
+    const tagBuildsAll = allBuilds.filter(b => buildMatchesTag(b, tagMatch))
 
     if (tagBuilds.length > 0) {
       addToResults(resultsMap, tagBuilds, MATCH_SCORES.tag, 'tag', 'tag')
@@ -774,9 +784,7 @@ export function searchBuilds(
       if (tagMatch && suggestion.key === tagMatch) continue
 
       // Categories from ALL builds
-      const sugBuildsAll = allBuilds.filter(b =>
-        b.tags.some(t => t.toLowerCase() === suggestion.key.toLowerCase())
-      )
+      const sugBuildsAll = allBuilds.filter(b => buildMatchesTag(b, suggestion.key))
 
       if (sugBuildsAll.length > 0) {
         categories.push({

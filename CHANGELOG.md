@@ -1,5 +1,10 @@
 # What's New
 
+## April 27, 2026
+
+- Team builds show their profession lineup right on the build card — hover the team badge for the full composition breakdown
+- Hover skill and profession icons anywhere to see their name, and tooltips now flip away from screen edges instead of getting clipped — big thanks to Mhynlo for the tooltip overhaul and team composition preview contributions!
+
 ## April 23, 2026
 
 - Laid the groundwork for GW1 Tactics — a demo of a new gamemode for GW1 Builds

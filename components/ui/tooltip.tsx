@@ -1,10 +1,27 @@
 'use client'
 
-import { forwardRef, useState, useRef, useEffect } from 'react'
-import { createPortal } from 'react-dom'
+import { useCallback, useRef, useState } from 'react'
+import {
+  useFloating,
+  offset as floatingOffset,
+  flip,
+  shift,
+  useHover,
+  useFocus,
+  useDismiss,
+  useInteractions,
+  arrow,
+  FloatingArrow,
+  autoUpdate,
+  FloatingPortal,
+  type Placement,
+} from '@floating-ui/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { tooltipVariants } from '@/lib/motion'
+
+const tooltipPanelClassName =
+  'rounded-md border border-border bg-bg-primary px-2.5 py-1.5 text-sm text-text-primary shadow-lg whitespace-nowrap'
 
 export interface TooltipProps {
   /** Tooltip content */
@@ -12,7 +29,7 @@ export interface TooltipProps {
   /** The element that triggers the tooltip */
   children: React.ReactNode
   /** Tooltip position */
-  position?: 'top' | 'bottom' | 'left' | 'right'
+  position?: Placement
   /** Delay before showing (ms) */
   delay?: number
   /** Disable the tooltip */
@@ -21,16 +38,17 @@ export interface TooltipProps {
   offset?: number
   /** Horizontal offset adjustment in pixels (positive = right, negative = left) */
   offsetX?: number
+  /** Optional fallback placements */
+  fallbackPlacements?: Placement[]
+  /** Optional className for the trigger wrapper */
+  className?: string
+  /** Optional className for the tooltip panel */
+  contentClassName?: string
 }
 
 /**
- * Tooltip component for hover information
- * Uses a portal to render outside of overflow containers
- *
- * @example
- * <Tooltip content="Copy to clipboard">
- *   <IconButton icon={<Copy />} />
- * </Tooltip>
+ * Tooltip component for hover information.
+ * Uses Floating UI so tooltips can flip/shift when near viewport edges.
  */
 export function Tooltip({
   content,
@@ -40,134 +58,126 @@ export function Tooltip({
   disabled = false,
   offset = 8,
   offsetX = 0,
+  fallbackPlacements,
+  className,
+  contentClassName,
 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false)
-  const [coords, setCoords] = useState({ x: 0, y: 0 })
-  const triggerRef = useRef<HTMLDivElement>(null)
-  const timeoutRef = useRef<NodeJS.Timeout>(null)
-
-  const updatePosition = () => {
-    if (!triggerRef.current) return
-    const rect = triggerRef.current.getBoundingClientRect()
-
-    let x = 0
-    let y = 0
-
-    switch (position) {
-      case 'top':
-        x = rect.left + rect.width / 2 + offsetX
-        y = rect.top - offset
-        break
-      case 'bottom':
-        x = rect.left + rect.width / 2 + offsetX
-        y = rect.bottom + offset
-        break
-      case 'left':
-        x = rect.left - offset
-        y = rect.top + rect.height / 2
-        break
-      case 'right':
-        x = rect.right + offset
-        y = rect.top + rect.height / 2
-        break
-    }
-
-    setCoords({ x, y })
-  }
-
-  const handleMouseEnter = () => {
-    if (disabled) return
-    updatePosition()
-    timeoutRef.current = setTimeout(() => {
-      setIsVisible(true)
-    }, delay)
-  }
-
-  const handleMouseLeave = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
-    setIsVisible(false)
-  }
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
+  const [referenceEl, setReferenceEl] = useState<HTMLDivElement | null>(null)
+  const [floatingEl, setFloatingEl] = useState<HTMLDivElement | null>(null)
+  const arrowRef = useRef(null)
+  const { floatingStyles, context, isPositioned } = useFloating({
+    open: isVisible,
+    onOpenChange: setIsVisible,
+    placement: position,
+    strategy: 'fixed',
+    elements: {
+      reference: referenceEl,
+      floating: floatingEl,
+    },
+    middleware: [
+      floatingOffset({
+        mainAxis: offset,
+        crossAxis:
+          position.startsWith('top') || position.startsWith('bottom')
+            ? offsetX
+            : 0,
+      }),
+      flip({ fallbackPlacements }),
+      shift({ padding: 12 }),
+      // eslint-disable-next-line react-hooks/refs -- Floating UI expects the ref object
+      arrow({ element: arrowRef }),
+    ],
+    whileElementsMounted: autoUpdate,
+  })
+  const handleReferenceRef = useCallback((node: HTMLDivElement | null) => {
+    setReferenceEl(node)
+  }, [])
+  const handleFloatingRef = useCallback((node: HTMLDivElement | null) => {
+    setFloatingEl(node)
   }, [])
 
-  const transformClasses = {
-    top: '-translate-x-1/2 -translate-y-full',
-    bottom: '-translate-x-1/2',
-    left: '-translate-x-full -translate-y-1/2',
-    right: '-translate-y-1/2',
-  }
-
-  const arrowClasses = {
-    top: 'top-full left-1/2 -translate-x-1/2 border-t-bg-primary',
-    bottom: 'bottom-full left-1/2 -translate-x-1/2 border-b-bg-primary',
-    left: 'left-full top-1/2 -translate-y-1/2 border-l-bg-primary',
-    right: 'right-full top-1/2 -translate-y-1/2 border-r-bg-primary',
-  }
+  const hover = useHover(context, {
+    delay: { open: delay, close: 60 },
+    enabled: !disabled,
+  })
+  const focus = useFocus(context, {
+    enabled: !disabled,
+  })
+  const dismiss = useDismiss(context, {
+    ancestorScroll: true,
+  })
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    hover,
+    focus,
+    dismiss,
+  ])
 
   return (
-    <div
-      ref={triggerRef}
-      className="relative inline-block"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onFocus={handleMouseEnter}
-      onBlur={handleMouseLeave}
-    >
-      {children}
-      {typeof document !== 'undefined' && createPortal(
+    <>
+      <div
+        ref={handleReferenceRef}
+        className={cn('relative inline-block', className)}
+        {...getReferenceProps()}
+      >
+        {children}
+      </div>
+
+      <FloatingPortal>
         <AnimatePresence>
           {isVisible && (
-            <motion.div
-              variants={tooltipVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              style={{ left: coords.x, top: coords.y }}
+            <div
+              ref={handleFloatingRef}
+              style={floatingStyles}
               className={cn(
-                'fixed z-[9999] pointer-events-none',
-                transformClasses[position]
+                'z-[9999] pointer-events-none transition-opacity duration-75',
+                isPositioned ? 'opacity-100' : 'opacity-0'
               )}
+              {...getFloatingProps()}
             >
-              <div className="relative">
-                <div className="px-2.5 py-1.5 bg-bg-primary border border-border rounded-md shadow-lg text-sm text-text-primary whitespace-nowrap">
-                  {content}
-                </div>
-                <div
-                  className={cn(
-                    'absolute border-[5px] border-transparent',
-                    arrowClasses[position]
-                  )}
+              <motion.div
+                variants={tooltipVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <TooltipSurface
+                  content={content}
+                  contentClassName={contentClassName}
+                  arrowNode={
+                    <FloatingArrow
+                      ref={arrowRef}
+                      context={context}
+                      fill="var(--color-bg-primary)"
+                      stroke="var(--color-border)"
+                      strokeWidth={1}
+                    />
+                  }
                 />
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           )}
-        </AnimatePresence>,
-        document.body
-      )}
-    </div>
+        </AnimatePresence>
+      </FloatingPortal>
+    </>
   )
 }
 
-/**
- * Simple tooltip wrapper that uses title attribute for non-critical hints
- */
-export const SimpleTooltip = forwardRef<
-  HTMLSpanElement,
-  React.HTMLAttributes<HTMLSpanElement> & { tip: string }
->(({ tip, children, ...props }, ref) => {
+function TooltipSurface({
+  content,
+  contentClassName,
+  arrowNode,
+}: {
+  content: React.ReactNode
+  contentClassName?: string
+  arrowNode: React.ReactNode
+}) {
   return (
-    <span ref={ref} title={tip} {...props}>
-      {children}
-    </span>
+    <div className="relative">
+      <div className={cn(tooltipPanelClassName, contentClassName)}>
+        {content}
+      </div>
+      {arrowNode}
+    </div>
   )
-})
-
-SimpleTooltip.displayName = 'SimpleTooltip'
+}
