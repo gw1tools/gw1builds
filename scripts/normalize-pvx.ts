@@ -565,6 +565,9 @@ function normalizeRawPage(raw: RawPvxPage): PvxBuild | null {
   // Determine type: single if 1 bar, team if multiple main builds
   // Note: builds with only variants (no main) are treated as single with first variant
   const type: PvxBuildType = bars.length === 1 ? 'single' : 'team'
+  if (type === 'team' && !tags.includes('team')) {
+    tags.push('team')
+  }
 
   // Parse variant bars (alternative skill setups)
   // Only include if we have main builds - variants used as fallback don't count
