@@ -121,11 +121,11 @@ export function Header() {
             {TACTICS_URL && (
               <a
                 href="/api/tactics"
-                className="hidden md:flex items-center gap-1.5 h-8 px-3 rounded-full bg-bg-card border border-border text-text-secondary hover:text-accent-gold hover:bg-bg-hover hover:border-accent-gold-dim shadow-sticky transition-all cursor-pointer"
+                className="hidden md:flex items-center gap-2 h-8 px-3 rounded-full bg-bg-card border border-accent-gold-dim/40 text-text-primary hover:text-accent-gold hover:bg-bg-hover hover:border-accent-gold-dim shadow-sticky transition-all cursor-pointer"
                 aria-label="Open GW1 Tactics"
               >
-                <Swords className="h-3.5 w-3.5" />
-                <span className="text-xs font-medium">Play</span>
+                <Swords className="h-4 w-4 text-accent-gold" />
+                <span className="text-xs font-medium">Play Tactics</span>
               </a>
             )}
 
