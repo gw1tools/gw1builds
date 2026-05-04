@@ -1,5 +1,12 @@
 # What's New
 
+## May 4, 2026
+
+**April 28, 2026 Skill Balance Update**
+
+- Updated skill data for the [April 28, 2026 game balance patch](https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260428), including new values across all 10 professions
+- Added the new `Farmer's Scythe (PvP)` split, the `"Help!"` rename, Trick skill type support, and updated Well spell sacrifice text
+
 ## April 27, 2026
 
 - Team builds show their profession lineup right on the build card — hover the team badge for the full composition breakdown

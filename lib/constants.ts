@@ -598,4 +598,5 @@ export const SKILL_TYPE_BY_ID: Record<number, string> = {
   29: 'Weapon Spell',
   30: 'Well Spell',
   31: 'Trap',
+  35: 'Trick',
 }
