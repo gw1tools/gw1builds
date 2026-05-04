@@ -153,6 +153,7 @@ export type SkillTypeName =
   | 'Glyph'
   | 'Preparation'
   | 'Trap'
+  | 'Trick'
   | 'Attack'
   | 'Pet Attack'
   | 'Weapon Spell'

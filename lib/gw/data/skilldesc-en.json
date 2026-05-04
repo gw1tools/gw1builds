@@ -509,26 +509,26 @@
 		"91": {
 			"id": 91,
 			"name": "Well of Power",
-			"description": "Exploit nearest corpse to create a Well of Power at that location. For 8...20 seconds, allies within the area of Well of Power gain +1...6 Health regeneration and +2 Energy regeneration.",
-			"concise": "(8...20 seconds.) Allies in this well have +1...6 Health regeneration and +2 Energy regeneration. <gray>Exploits a fresh corpse.</gray>"
+			"description": "Exploit nearest corpse or sacrifice 66% Health to create a Well of Power at that location. For 8...20 seconds, allies within the area of Well of Power gain +1...6 Health regeneration and +2 Energy regeneration.",
+			"concise": "(8...20 seconds.) Allies in this well have +1...6 Health regeneration and +2 Energy regeneration. <gray>Exploits a fresh corpse or sacrifices 66% Health.</gray>"
 		},
 		"92": {
 			"id": 92,
 			"name": "Well of Blood",
-			"description": "Exploit nearest corpse to create a Well of Blood at its location. For 8...20 seconds, allies in that area receive +1...6 Health regeneration.",
-			"concise": "(8...20 seconds.) Allies in this well have +1...6 Health regeneration. <gray>Exploits a fresh corpse.</gray>"
+			"description": "Exploit nearest corpse or sacrifice 66% Health to create a Well of Blood at its location. For 8...20 seconds, allies in that area receive +1...6 Health regeneration.",
+			"concise": "(8...20 seconds.) Allies in this well have +1...6 Health regeneration. <gray>Exploits a fresh corpse or sacrifices 66% Health.</gray>"
 		},
 		"93": {
 			"id": 93,
 			"name": "Well of Suffering",
-			"description": "Exploit nearest corpse to create a Well of Suffering at its location. For 10...30 seconds, foes in that area suffer -1...6 Health degeneration.",
-			"concise": "(10...30 seconds.) Foes in this well have -1...6 Health degeneration. <gray>Exploits a fresh corpse.</gray>"
+			"description": "Exploit nearest corpse or sacrifice 66% Health to create a Well of Suffering at its location. For 10...30 seconds, foes in that area suffer -1...6 Health degeneration.",
+			"concise": "(10...30 seconds.) Foes in this well have -1...6 Health degeneration. <gray>Exploits a fresh corpse or sacrifices 66% Health.</gray>"
 		},
 		"94": {
 			"id": 94,
 			"name": "Well of the Profane",
-			"description": "Exploit nearest corpse to create a Well of the Profane at its location. For 8...20 seconds, foes in that area are stripped of all enchantments and cannot be the target of further enchantments. (50% failure chance with Death Magic 4 or less.)",
-			"concise": "(8...20 seconds.) Foes in this well lose all enchantments and cannot be the target of further enchantments. <gray>Exploits a fresh corpse. 50% failure chance unless Death Magic 5 or more.</gray>"
+			"description": "Exploit nearest corpse or sacrifice 66% Health to create a Well of the Profane at its location. For 8...20 seconds, foes in that area are stripped of all enchantments and cannot be the target of further enchantments. (50% failure chance with Death Magic 4 or less.)",
+			"concise": "(8...20 seconds.) Foes in this well lose all enchantments and cannot be the target of further enchantments. <gray>Exploits a fresh corpse or sacrifices 66% Health. 50% failure chance unless Death Magic 5 or more.</gray>"
 		},
 		"95": {
 			"id": 95,
@@ -641,8 +641,8 @@
 		"113": {
 			"id": 113,
 			"name": "Tainted Flesh",
-			"description": "For 20...44 seconds, target ally is immune to disease, and anyone striking that ally in melee becomes Diseased for 3...15 seconds.",
-			"concise": "(20...44 seconds.) Foes who hit target ally in melee become Diseased (3...15 seconds); this ally is immune to Disease."
+			"description": "For 20...44 seconds, allies in the area are immune to disease, and anyone striking those allies in melee becomes Diseased for 3...15 seconds.",
+			"concise": "(20...44 seconds.) Foes who hit allies in the area in melee become Diseased (3...15 seconds); these allies are immune to Disease."
 		},
 		"114": {
 			"id": 114,
@@ -1253,8 +1253,8 @@
 		"216": {
 			"id": 216,
 			"name": "Iron Mist",
-			"description": "For 8...15 seconds, you have +15 armor. Your Air Magic spells that target a foe activate and recharge 25% faster, but you are Overcast by 3 points.",
-			"concise": "(8...15 seconds.) Gain +15 armor. Air Magic spells that target a foe activate and recharge 25% faster, but you are Overcast by 3 points."
+			"description": "For 8...15 seconds, you have +15 armor. Your Air Magic spells that target a foe activate and recharge 33% faster, but you are Overcast by 2 points.",
+			"concise": "(8...15 seconds.) Gain +15 armor. Air Magic spells that target a foe activate and recharge 33% faster, but you are Overcast by 2 points."
 		},
 		"217": {
 			"id": 217,
@@ -2225,8 +2225,8 @@
 		"379": {
 			"id": 379,
 			"name": "Bull's Charge",
-			"description": "For 5...11 seconds, you move 33% faster and if you strike a moving foe in melee, that foe is knocked down. Bull's Charge ends if you use a skill.",
-			"concise": "(5...11 seconds.) You move 33% faster. Causes knock-down if you hit a moving foe in melee. <gray>Ends if you use a skill.</gray>"
+			"description": "For 1...7 seconds, you move 50% faster and if you strike a moving foe in melee, that foe is knocked down. Bull's Charge ends if you use a skill.",
+			"concise": "(1...7 seconds.) You move 50% faster. Causes knock-down if you hit a moving foe in melee. <gray>Ends if you use a skill.</gray>"
 		},
 		"380": {
 			"id": 380,
@@ -2309,8 +2309,8 @@
 		"393": {
 			"id": 393,
 			"name": "Crippling Shot",
-			"description": "If Crippling Shot hits, your target becomes Crippled for 1...11 seconds. This attack cannot be blocked.",
-			"concise": "Unblockable. Inflicts Crippled condition (1...11 seconds)."
+			"description": "If Crippling Shot hits, your target becomes Crippled for 1...12 seconds. This attack cannot be blocked.",
+			"concise": "Unblockable. Inflicts Crippled condition (1...12 seconds)."
 		},
 		"394": {
 			"id": 394,
@@ -2753,8 +2753,8 @@
 		"570": {
 			"id": 570,
 			"name": "Mark of Insecurity",
-			"description": "For 5...25 seconds, target foe suffers from -1...3 Health degeneration, and enchantments and stances on target foe expire 30...80% faster. All of your non-Assassin skills are disabled for 10 seconds.",
-			"concise": "(5...25 seconds.) Causes -1...3 Health degeneration. Enchantments and stances expire 30...80% faster on target foe. <gray>Disables your non-Assassin skills (10 seconds).</gray>"
+			"description": "For 5...25 seconds, target foe suffers from -1...5 Health degeneration, and enchantments and stances on target foe expire 30...80% faster. All of your non-Assassin skills are disabled for 5 seconds.",
+			"concise": "(5...25 seconds.) Causes -1...5 Health degeneration. Enchantments and stances expire 30...80% faster on target foe. <gray>Disables your non-Assassin skills (5 seconds).</gray>"
 		},
 		"571": {
 			"id": 571,
@@ -2903,8 +2903,8 @@
 		"789": {
 			"id": 789,
 			"name": "Grasping Was Kuurong",
-			"description": "Hold Kuurong's ashes for up to 15...60 seconds. When you drop his ashes, all nearby foes are struck for 15...75 damage and knocked down.",
-			"concise": "(15...60 seconds.) Drop effect: deal 15...75 damage and knocks-down all nearby foes."
+			"description": "Hold Kuurong's ashes for up to 15...60 seconds. When you drop his ashes, all foes in the area are struck for 15...75 damage and knocked down.",
+			"concise": "(15...60 seconds.) Drop effect: deal 15...75 damage and knocks-down all foes in the area."
 		},
 		"790": {
 			"id": 790,
@@ -3035,8 +3035,8 @@
 		"815": {
 			"id": 815,
 			"name": "Scorpion Wire",
-			"description": "For 8...20 seconds, the next time you and target foe are more than 100' apart, you Shadow Step to that foe and that foe is knocked down. This spell has half the normal range.",
-			"concise": "Half Range Hex Spell. (8...20 seconds.) Shadow Step to target foe and cause knock-down the next time this foe is more than 100' away from you."
+			"description": "For 8...20 seconds, the next time you and target foe are more than 75' apart, you Shadow Step to that foe and that foe is knocked down. This spell has half the normal range.",
+			"concise": "Half Range Hex Spell. (8...20 seconds.) Shadow Step to target foe and cause knock-down the next time this foe is more than 75' away from you."
 		},
 		"816": {
 			"id": 816,
@@ -3053,8 +3053,8 @@
 		"818": {
 			"id": 818,
 			"name": "Well of Weariness",
-			"description": "Exploit target corpse to create a Well of Weariness for 10...55 seconds. Enemies within the Well of Weariness suffer -1 Energy degeneration.",
-			"concise": "(10...55 seconds.) Foes in this well have -1 Energy degeneration. <gray>Exploits a fresh corpse.</gray>"
+			"description": "Exploit target corpse or sacrifice 66% Health to create a Well of Weariness for 10...55 seconds. Enemies within the Well of Weariness suffer -1 Energy degeneration.",
+			"concise": "(10...55 seconds.) Foes in this well have -1 Energy degeneration. <gray>Exploits a fresh corpse or sacrifices 66% Health.</gray>"
 		},
 		"819": {
 			"id": 819,
@@ -3077,8 +3077,8 @@
 		"822": {
 			"id": 822,
 			"name": "Weaken Knees",
-			"description": "For 1...16 seconds, target foe suffers -1...4 Health degeneration and takes 5...10 damage while moving.",
-			"concise": "(1...16 seconds.) Target foe has -1...4 Health degeneration and takes 5...10 damage while moving."
+			"description": "For 1...16 seconds, target foe suffers -1...4 Health degeneration and takes 5...20 damage while moving.",
+			"concise": "(1...16 seconds.) Target foe has -1...4 Health degeneration and takes 5...20 damage while moving."
 		},
 		"823": {
 			"id": 823,
@@ -3125,8 +3125,8 @@
 		"831": {
 			"id": 831,
 			"name": "Primal Rage",
-			"description": "For 1...15 seconds, you attack 33% faster and move 25% faster, but you take double damage.",
-			"concise": "(1...15 seconds.) You attack 33% faster and move 25% faster. <gray>You take double damage.</gray>"
+			"description": "For 1...9 seconds, you attack 33% faster and move 33% faster, but you take double damage.",
+			"concise": "(1...9 seconds.) You attack 33% faster and move 33% faster. <gray>You take double damage.</gray>"
 		},
 		"832": {
 			"id": 832,
@@ -3425,8 +3425,8 @@
 		"892": {
 			"id": 892,
 			"name": "Quivering Blade",
-			"description": "If Quivering Blade hits, you strike for +10...40 damage. If this attack hits a moving foe, that foe is Dazed for 5 seconds.",
-			"concise": "Deals +10...40 damage. Inflicts Dazed condition (5 seconds) if target foe was moving."
+			"description": "If Quivering Blade hits, you strike for +10...40 damage. If this attack hits a moving foe, that foe is Dazed for 10 seconds.",
+			"concise": "Deals +10...40 damage. Inflicts Dazed condition (10 seconds) if target foe was moving."
 		},
 		"893": {
 			"id": 893,
@@ -3677,8 +3677,8 @@
 		"942": {
 			"id": 942,
 			"name": "Withdraw Hexes",
-			"description": "Remove all hexes from target ally and all adjacent allies. This spell takes an additional 20...5 seconds to recharge for each hex removed in this way.",
-			"concise": "Removes all hexes. Also affects adjacent allies. <gray>Removal cost: +20...5 seconds recharge for each hex removed.</gray>"
+			"description": "Remove all hexes from target ally and all adjacent allies. This spell takes an additional 2 seconds to recharge for each hex removed in this way. 50% failure chance with Divine Favor 4 or less.",
+			"concise": "Removes all hexes. Also affects adjacent allies. <gray>Removal cost: +2 seconds recharge for each hex removed. 50% failure chance unless Divine Favor 5 or more.</gray>"
 		},
 		"943": {
 			"id": 943,
@@ -3695,8 +3695,8 @@
 		"946": {
 			"id": 946,
 			"name": "Trapper's Focus",
-			"description": "For 12...24 seconds, your trap skills are not easily interruptible and your Wilderness Survival attribute is increased by +0...2.",
-			"concise": "(12...24 seconds.) Your trap skills are no longer easy to interrupt. You gain +0...2 to your Wilderness Survival attribute."
+			"description": "For 12...36 seconds, your trap skills are not easily interruptible and your Wilderness Survival attribute is increased by +0...4.",
+			"concise": "(12...36 seconds.) Your trap skills are no longer easy to interrupt. You gain +0...4 to your Wilderness Survival attribute."
 		},
 		"947": {
 			"id": 947,
@@ -3719,14 +3719,14 @@
 		"950": {
 			"id": 950,
 			"name": "Shadowy Burden",
-			"description": "For 3...15 seconds, target foe moves 25% slower and while target foe has no other hexes, that foe has 20 less armor against your attacks.",
-			"concise": "(3...15 seconds.) Target foe moves 25% slower and has 20 less armor against your attacks. <gray>Armor reduction only affects this foe while it has no other hexes.</gray>"
+			"description": "For 3...15 seconds, target foe moves 25% slower and while target foe has no other hexes, that foe has 20...30 less armor against your attacks.",
+			"concise": "(3...15 seconds.) Target foe moves 25% slower and has 20...30 less armor against your attacks. <gray>Armor reduction only affects this foe while it has no other hexes.</gray>"
 		},
 		"951": {
 			"id": 951,
 			"name": "Siphon Speed",
-			"description": "For 5...15 seconds, target foe moves 33% slower and you move 33% faster. This spell has half the normal range. This spell recharges 50% faster if cast on a moving foe.",
-			"concise": "Half Range Hex Spell. (5...15 seconds.) Target foe moves 33% slower and you move 33% faster. Recharges 50% faster if cast on a moving foe."
+			"description": "For 5...15 seconds, target foe moves 33% slower and you move 33% faster. This spell recharges 50% faster if cast on a moving foe.",
+			"concise": "(5...15 seconds.) Target foe moves 33% slower and you move 33% faster. Recharges 50% faster if cast on a moving foe."
 		},
 		"952": {
 			"id": 952,
@@ -3755,8 +3755,8 @@
 		"957": {
 			"id": 957,
 			"name": "Spell Shield",
-			"description": "For 5...20 seconds, while you are casting spells, foes cannot target you with spells. When Spell Shield ends, all your skills are disabled for 10...5 seconds.",
-			"concise": "(5...20 seconds.) While casting spells, you cannot be the target of spells. <gray>End effect: your skills are disabled (10...5 seconds).</gray>"
+			"description": "For 5...20 seconds, while you are casting spells, foes cannot target you with spells. When Spell Shield ends, all your skills are disabled for 8...4 seconds.",
+			"concise": "(5...20 seconds.) While casting spells, you cannot be the target of spells. <gray>End effect: your skills are disabled (8...4 seconds).</gray>"
 		},
 		"958": {
 			"id": 958,
@@ -3809,8 +3809,8 @@
 		"974": {
 			"id": 974,
 			"name": "Mantis Touch",
-			"description": "Must follow a lead attack. Target foe becomes Crippled for 5...20 seconds. This skill counts as an off-hand attack.",
-			"concise": "Inflicts Crippled condition (5...20 seconds). This skill counts as an off-hand attack. <gray>Must follow a lead attack.</gray>"
+			"description": "Target foe becomes Crippled for 5...20 seconds. This skill counts as an off-hand attack.",
+			"concise": "Inflicts Crippled condition (5...20 seconds). This skill counts as an off-hand attack."
 		},
 		"975": {
 			"id": 975,
@@ -4139,8 +4139,8 @@
 		"1055": {
 			"id": 1055,
 			"name": "Recurring Insecurity",
-			"description": "For 10 seconds, target foe suffers from -1...5 Health degeneration. If that foe has another hex when Recurring Insecurity would end, it is reapplied.",
-			"concise": "(10 seconds.) Causes -1...5 Health degeneration. Renewal: if target foe has another hex when Recurring Insecurity would end."
+			"description": "For 5 seconds, target foe suffers from -1...6 Health degeneration. If that foe has another hex when Recurring Insecurity would end, it is reapplied.",
+			"concise": "(5 seconds.) Causes -1...6 Health degeneration. Renewal: if target foe has another hex when Recurring Insecurity would end."
 		},
 		"1056": {
 			"id": 1056,
@@ -4217,8 +4217,8 @@
 		"1076": {
 			"id": 1076,
 			"name": "Blood Drinker",
-			"description": "If your Health is above 50%, you begin Bleeding for 10 seconds. Steal up to 20...65 Health from target foe.",
-			"concise": "Steals 20...65 Health. <gray>You begin Bleeding (10 seconds) if your Health is above 50%.</gray>"
+			"description": "If your Health is above 90%, you begin Bleeding for 6 seconds. Steal up to 20...65 Health from target foe.",
+			"concise": "Steals 20...65 Health. <gray>You begin Bleeding (6 seconds) if your Health is above 90%.</gray>"
 		},
 		"1077": {
 			"id": 1077,
@@ -4235,8 +4235,8 @@
 		"1079": {
 			"id": 1079,
 			"name": "Enfeebling Touch",
-			"description": "Target touched foe loses 5...50 Health and suffers from Weakness for 5...20 seconds.",
-			"concise": "Causes 5...50 Health loss. Inflicts Weakness condition (5...20 seconds)."
+			"description": "Target touched foe loses 5...65 Health and suffers from Weakness for 5...20 seconds.",
+			"concise": "Causes 5...65 Health loss. Inflicts Weakness condition (5...20 seconds)."
 		},
 		"1081": {
 			"id": 1081,
@@ -4349,8 +4349,8 @@
 		"1115": {
 			"id": 1115,
 			"name": "Air of Enchantment",
-			"description": "For 4...10 seconds, enchantments cast on target other ally cost 5 less Energy (minimum 1 Energy).",
-			"concise": "(4...10 seconds.) Enchantments cast on target ally cost 5 less Energy (minimum 1 Energy). <gray>Cannot self-target.</gray>"
+			"description": "For 4...10 seconds, enchantments cast on target other ally cost 10 less Energy (minimum 1 Energy).",
+			"concise": "(4...10 seconds.) Enchantments cast on target ally cost 10 less Energy (minimum 1 Energy). <gray>Cannot self-target.</gray>"
 		},
 		"1117": {
 			"id": 1117,
@@ -4523,8 +4523,8 @@
 		"1200": {
 			"id": 1200,
 			"name": "Archer's Signet",
-			"description": "For 1...24 seconds, conditions you apply while wielding a bow last 100% longer.",
-			"concise": "(1...24 seconds.) Conditions you apply while wielding a bow last 100% longer."
+			"description": "For 1...24 seconds, conditions you apply while wielding a bow last 150% longer.",
+			"concise": "(1...24 seconds.) Conditions you apply while wielding a bow last 150% longer."
 		},
 		"1201": {
 			"id": 1201,
@@ -4625,8 +4625,8 @@
 		"1223": {
 			"id": 1223,
 			"name": "Anguished Was Lingwah",
-			"description": "Hold Lingwah's ashes for up to 10...60 seconds. While you hold her ashes, your Ritualist hexes cost 1...5 less energy and last 33% longer. When you drop her ashes all your Ritualist hexes are recharged.",
-			"concise": "(10...60 seconds.) Your Ritualist hexes cost 1...5 less energy and last 33% longer. Drop effect: all your Ritualist hexes are recharged."
+			"description": "Hold Lingwah's ashes for up to 10...60 seconds. While you hold her ashes, your Ritualist hexes cost 1...5 less energy and last 50% longer. When you drop her ashes all your Ritualist hexes are recharged.",
+			"concise": "(10...60 seconds.) Your Ritualist hexes cost 1...5 less energy and last 50% longer. Drop effect: all your Ritualist hexes are recharged."
 		},
 		"1224": {
 			"id": 1224,
@@ -5057,8 +5057,8 @@
 		"1366": {
 			"id": 1366,
 			"name": "Well of Darkness",
-			"description": "Exploit nearest corpse to create a Well of Darkness for 5...50 seconds. Hexed foes within the Well of Darkness miss 50% of the time.",
-			"concise": "(5...50 seconds.) Hexed foes in this well have 50% chance to miss. <gray>Exploits a fresh corpse</gray>."
+			"description": "Exploit nearest corpse or sacrifice 66% Health to create a Well of Darkness for 5...50 seconds. Hexed foes within the Well of Darkness miss 50% of the time.",
+			"concise": "(5...50 seconds.) Hexed foes in this well have 50% chance to miss. <gray>Exploits a fresh corpse or sacrifices 66% Health.</gray>"
 		},
 		"1367": {
 			"id": 1367,
@@ -5165,8 +5165,8 @@
 		"1391": {
 			"id": 1391,
 			"name": "Supportive Spirit",
-			"description": "For 5...23 seconds, whenever target ally takes damage while knocked down, that ally is healed for 5...35 Health.",
-			"concise": "(5...23 seconds.) Heals for 5...35 whenever target ally takes damage while knocked-down."
+			"description": "For 5...23 seconds, whenever target ally takes damage while knocked down, that ally is healed for 5...50 Health.",
+			"concise": "(5...23 seconds.) Heals for 5...50 whenever target ally takes damage while knocked-down."
 		},
 		"1392": {
 			"id": 1392,
@@ -5183,14 +5183,14 @@
 		"1394": {
 			"id": 1394,
 			"name": "Healer's Covenant",
-			"description": "While you maintain this enchantment, your Healing Prayers spells heal for 25% less Health, but cost 1...3 Energy.",
-			"concise": "Your Healing Prayers spells cost 1...3 less Energy. <gray>These spells heal for 25% less.</gray>"
+			"description": "While you maintain this enchantment, your Healing Prayers spells heal for 20% less Health, but cost 1...4 less Energy.",
+			"concise": "Your Healing Prayers spells cost 1...4 less Energy. <gray>These spells heal for 20% less.</gray>"
 		},
 		"1395": {
 			"id": 1395,
 			"name": "Balthazar's Pendulum",
-			"description": "For 5...10 seconds, the next time target ally would be knocked down by a foe, that foe is knocked down instead.",
-			"concise": "(5...10 seconds.) Causes knock-down to the next foe attempting to knock-down target ally."
+			"description": "For 5...25 seconds, the next time target ally would be knocked down by a foe, that foe is knocked down instead.",
+			"concise": "(5...25 seconds.) Causes knock-down to the next foe attempting to knock-down target ally."
 		},
 		"1396": {
 			"id": 1396,
@@ -5705,8 +5705,8 @@
 		"1534": {
 			"id": 1534,
 			"name": "Rending Touch",
-			"description": "Deals 15...65 cold damage to target foe. You lose one Dervish enchantment. If an enchantment was removed, target foe loses 1 enchantment and you gain 1 strike of adrenaline.",
-			"concise": "Touch Spell. Deals 15...65 cold damage. Lose 1 Dervish enchantment. Removal effect: target foe loses 1 enchantment and you gain 1 strike of adrenaline."
+			"description": "Deals 15...65 cold damage to target foe. You lose one Dervish enchantment. If an enchantment was removed, target foe loses 1 enchantment and you gain 2 strikes of adrenaline.",
+			"concise": "Touch Spell. Deals 15...65 cold damage. Lose 1 Dervish enchantment. Removal effect: target foe loses 1 enchantment and you gain 2 strikes of adrenaline."
 		},
 		"1535": {
 			"id": 1535,
@@ -5795,8 +5795,8 @@
 		"1549": {
 			"id": 1549,
 			"name": "Harrier's Toss",
-			"description": "If this attack hits, you deal +5...20 damage. If this attack hits a moving foe, it deals an additional 5...30 damage.",
-			"concise": "Deals +5...20 damage. Deals 5...30 more damage if target is moving."
+			"description": "If this attack hits, you deal +5...20 damage. If this attack hits a moving foe, it deals an additional 5...40 damage.",
+			"concise": "Deals +5...20 damage. Deals 5...40 more damage if target is moving."
 		},
 		"1550": {
 			"id": 1550,
@@ -5939,8 +5939,8 @@
 		"1573": {
 			"id": 1573,
 			"name": "Awe",
-			"description": "If this skill hits a knocked-down foe, that foe becomes Dazed for 5...15 seconds. Awe has half the normal range.",
-			"concise": "Half Range Skill. Inflicts Dazed condition (5...15 seconds). <gray>No effect unless target is knocked-down.</gray>"
+			"description": "If this skill hits a knocked-down foe, that foe becomes Dazed for 5...15 seconds.",
+			"concise": "Inflicts Dazed condition (5...15 seconds). <gray>No effect unless target is knocked-down.</gray>"
 		},
 		"1574": {
 			"id": 1574,
@@ -6035,8 +6035,8 @@
 		"1590": {
 			"id": 1590,
 			"name": "\"Lead the Way!\"",
-			"description": "Target ally moves 25% faster for 1...5 seconds for each ally within earshot (maximum of 20 seconds).",
-			"concise": "Target ally moves 25% faster for 1...5 seconds (maximum of 20 seconds) for each ally in earshot."
+			"description": "Target ally moves 25% faster for 1...5 seconds for each ally within earshot (maximum of 30 seconds).",
+			"concise": "Target ally moves 25% faster for 1...5 seconds (maximum of 30 seconds) for each ally in earshot."
 		},
 		"1591": {
 			"id": 1591,
@@ -6058,9 +6058,9 @@
 		},
 		"1594": {
 			"id": 1594,
-			"name": "\"Help Me!\"",
-			"description": "You gain 15...90 Health. For 1...10 seconds, other allies' spells targeting you cast 50% faster.",
-			"concise": "(1...10 seconds.) Other allies' spells targeting you cast 50% faster. You gain 15...90 Health."
+			"name": "\"Help!\"",
+			"description": "Target non-spirit ally gains 15...90 Health. For 1...10 seconds, other allies' spells targeting that ally cast 50% faster.",
+			"concise": "(1...10 seconds.) Target non-spirit ally gains 15...90 Health. Other allies' spells targeting that ally cast 50% faster."
 		},
 		"1595": {
 			"id": 1595,
@@ -6143,8 +6143,8 @@
 		"1635": {
 			"id": 1635,
 			"name": "Golden Skull Strike",
-			"description": "If you are under the effects of an enchantment and this attack hits, target foe is Dazed 1...5 seconds.",
-			"concise": "Inflicts Dazed condition (1...5 seconds). <gray>No effect unless you are enchanted.</gray>"
+			"description": "If you are under the effects of an enchantment and this attack hits, target foe is Dazed 1...12 seconds.",
+			"concise": "Inflicts Dazed condition (1...12 seconds). <gray>No effect unless you are enchanted.</gray>"
 		},
 		"1636": {
 			"id": 1636,
@@ -6161,8 +6161,8 @@
 		"1638": {
 			"id": 1638,
 			"name": "Deadly Haste",
-			"description": "For 10...35 seconds, half-ranged spells cast 5...50% faster and recharge 5...50% faster.",
-			"concise": "(10...35 seconds.) Your half-ranged spells cast 5...50% faster and recharge 5...50% faster."
+			"description": "For 10...35 seconds, half-ranged spells cast 5...50% faster and recharge 5...60% faster.",
+			"concise": "(10...35 seconds.) Your half-ranged spells cast 5...50% faster and recharge 5...60% faster."
 		},
 		"1639": {
 			"id": 1639,
@@ -6263,8 +6263,8 @@
 		"1655": {
 			"id": 1655,
 			"name": "Price of Pride",
-			"description": "For 5...20 seconds, the next time target foe uses an elite skill, that foe loses 1...7 Energy.",
-			"concise": "(5...20 seconds.) Causes 1...7 Energy loss the next time target foe uses an elite skill."
+			"description": "For 5 seconds, the next time target foe uses an elite skill, that foe loses 3...15 Energy.",
+			"concise": "(5 seconds.) Causes 3...15 Energy loss the next time target foe uses an elite skill."
 		},
 		"1656": {
 			"id": 1656,
@@ -6293,8 +6293,8 @@
 		"1660": {
 			"id": 1660,
 			"name": "Well of Silence",
-			"description": "Exploit target corpse to create a Well of Silence for 10...30 seconds. Foes within the well cannot use shouts or chants and suffer -1...4 Health degeneration.",
-			"concise": "(10...30 seconds.) Foes in this well cannot use shouts and chants and have -1...4 Health degeneration. <gray>Exploits a fresh corpse.</gray>"
+			"description": "Exploit target corpse or sacrifice 66% Health to create a Well of Silence for 10...30 seconds. Foes within the well cannot use shouts or chants and suffer -1...4 Health degeneration.",
+			"concise": "(10...30 seconds.) Foes in this well cannot use shouts and chants and have -1...4 Health degeneration. <gray>Exploits a fresh corpse or sacrifices 66% Health.</gray>"
 		},
 		"1661": {
 			"id": 1661,
@@ -6401,8 +6401,8 @@
 		"1696": {
 			"id": 1696,
 			"name": "Decapitate",
-			"description": "You lose all adrenaline and all Energy. If this attack hits, you deal +5...50 damage and cause a Deep Wound for 5...20 seconds. This attack always results in a critical hit.",
-			"concise": "Deals +5...50 damage. Inflicts Deep Wound condition (5...20 seconds). Automatic critical hit. <gray>You lose all adrenaline and Energy.</gray>"
+			"description": "You lose all adrenaline and all Energy. If this attack hits, you deal +5...80 damage and cause a Deep Wound for 5...20 seconds. This attack always results in a critical hit.",
+			"concise": "Deals +5...80 damage. Inflicts Deep Wound condition (5...20 seconds). Automatic critical hit. <gray>You lose all adrenaline and Energy.</gray>"
 		},
 		"1697": {
 			"id": 1697,
@@ -6431,8 +6431,8 @@
 		"1701": {
 			"id": 1701,
 			"name": "Steady Stance",
-			"description": "For 10 seconds, the next time you would be knocked down, you gain 1...3 strikes of adrenaline and 1...7 Energy instead.",
-			"concise": "(10 seconds.) The next time you would be knocked-down, you gain 1...3 adrenaline and 1...7 Energy instead."
+			"description": "For 10 seconds, the next time you would be knocked down, you gain 1...4 strikes of adrenaline and 1...7 Energy instead.",
+			"concise": "(10 seconds.) The next time you would be knocked-down, you gain 1...4 adrenaline and 1...7 Energy instead."
 		},
 		"1702": {
 			"id": 1702,
@@ -6563,8 +6563,8 @@
 		"1740": {
 			"id": 1740,
 			"name": "Wielder's Remedy",
-			"description": "For 10...30 seconds, whenever you cast a weapon spell on an ally, that ally loses 1 condition.",
-			"concise": "(10...30 seconds.) Whenever you cast a weapon spell, the targeted ally loses one condition."
+			"description": "For 10...30 seconds, whenever you cast a weapon spell on an ally, that ally loses 2 conditions.",
+			"concise": "(10...30 seconds.) Whenever you cast a weapon spell, the targeted ally loses 2 conditions."
 		},
 		"1741": {
 			"id": 1741,
@@ -6611,8 +6611,8 @@
 		"1749": {
 			"id": 1749,
 			"name": "Weapon of Fury",
-			"description": "For 5...20 seconds, target ally gains 5...50% more adrenaline and 1 Energy whenever that ally successfully hits with an attack.",
-			"concise": "(5...20 seconds.) 5...50% more adrenaline gain and +1 Energy whenever target ally hits with an attack."
+			"description": "For 5...20 seconds, target ally gains 100% more adrenaline and 1 Energy whenever that ally successfully hits with an attack.",
+			"concise": "(5...20 seconds.) 100% more adrenaline gain and +1 Energy whenever target ally hits with an attack."
 		},
 		"1750": {
 			"id": 1750,
@@ -6629,8 +6629,8 @@
 		"1752": {
 			"id": 1752,
 			"name": "Weapon of Remedy",
-			"description": "For 8 seconds, the next time target ally takes damage or life steal from a foe, that ally steals up to 15...75 Health from that foe and loses 1 condition.",
-			"concise": "(8 seconds.) The next time target ally takes damage or life steal from a foe, this ally steals 15...75 Health from that foe and loses 1 condition."
+			"description": "For 8 seconds, the next time target ally takes damage or life steal from a foe, that ally steals up to 20...80 Health from that foe and loses 1 condition.",
+			"concise": "(8 seconds.) The next time target ally takes damage or life steal from a foe, this ally steals 20...80 Health from that foe and loses 1 condition."
 		},
 		"1753": {
 			"id": 1753,
@@ -6683,8 +6683,8 @@
 		"1761": {
 			"id": 1761,
 			"name": "Zealous Vow",
-			"description": "For 20 seconds, you have -3 Energy regeneration, and you gain 1...6 Energy every time you hit with an attack.",
-			"concise": "(20 seconds.) You gain 1...6 Energy each time you hit with an attack. <gray>You have -3 Energy regeneration.</gray>"
+			"description": "For 20 seconds, you have -2 Energy regeneration, and you gain 1...6 Energy every time you hit with an attack.",
+			"concise": "(20 seconds.) You gain 1...6 Energy each time you hit with an attack. <gray>You have -2 Energy regeneration.</gray>"
 		},
 		"1762": {
 			"id": 1762,
@@ -6791,8 +6791,8 @@
 		"1779": {
 			"id": 1779,
 			"name": "\"Make Your Time!\"",
-			"description": "You gain 1 strike of adrenaline for each party member within earshot (maximum 1...5 adrenaline).",
-			"concise": "You gain one adrenaline (maximum 1...5) for each party member in earshot."
+			"description": "You gain 2 strikes of adrenaline for each party member within earshot (maximum 1...8 adrenaline).",
+			"concise": "You gain 2 adrenaline (maximum 1...8) for each party member in earshot."
 		},
 		"1780": {
 			"id": 1780,
@@ -6935,8 +6935,8 @@
 		"1993": {
 			"id": 1993,
 			"name": "Signet of Recall",
-			"description": "For 10 seconds, you have -4 Energy regeneration. When this effect ends, you gain 13...20 Energy.",
-			"concise": "(10 seconds.) You have -4 Energy regeneration. End effect: you gain 13...20 Energy."
+			"description": "For 6 seconds, you have -4 Energy regeneration. When this effect ends, you gain 13...20 Energy.",
+			"concise": "(6 seconds.) You have -4 Energy regeneration. End effect: you gain 13...20 Energy."
 		},
 		"1994": {
 			"id": 1994,
@@ -6965,8 +6965,8 @@
 		"1998": {
 			"id": 1998,
 			"name": "Cacophony",
-			"description": "For 10 seconds, whenever target foe uses a shout or chant, that foe takes 35...105 damage.",
-			"concise": "(10 seconds.) Deals 35...105 damage whenever target foe uses a shout or chant."
+			"description": "For 15 seconds, whenever target foe uses a shout or chant, that foe takes 35...105 damage.",
+			"concise": "(15 seconds.) Deals 35...105 damage whenever target foe uses a shout or chant."
 		},
 		"1999": {
 			"id": 1999,
@@ -7511,8 +7511,8 @@
 		"2194": {
 			"id": 2194,
 			"name": "Distracting Strike",
-			"description": "If Distracting Strike hits, it deals no damage and interrupts target foe's action. If target foe has Cracked Armor, that skill is disabled for 20 seconds.",
-			"concise": "Interrupts an action. Interruption effect: Disables interrupted skill (20 seconds) if target foe has Cracked Armor. <gray>Deals no damage.</gray>"
+			"description": "If Distracting Strike hits, it deals no damage and interrupts target foe's action. If target foe has Cracked Armor, that skill is disabled for 30 seconds.",
+			"concise": "Interrupts an action. Interruption effect: Disables interrupted skill (30 seconds) if target foe has Cracked Armor. <gray>Deals no damage.</gray>"
 		},
 		"2195": {
 			"id": 2195,
@@ -7559,8 +7559,8 @@
 		"2202": {
 			"id": 2202,
 			"name": "Mending Grip",
-			"description": "Target ally is healed for 15...75 Health. If that ally is under the effects of a weapon spell, that ally loses one condition.",
-			"concise": "Heals for 15...75. Removes one condition if target ally is under a Weapon <sic/> spell."
+			"description": "Target ally is healed for 20...80 Health. If that ally is under the effects of a weapon spell, that ally loses one condition.",
+			"concise": "Heals for 20...80. Removes one condition if target ally is under a Weapon <sic/> spell."
 		},
 		"2203": {
 			"id": 2203,
@@ -7763,8 +7763,8 @@
 		"2236": {
 			"id": 2236,
 			"name": "Well of Ruin",
-			"description": "Exploit nearest corpse to create a Well of Ruin at its location. For 5...30 seconds, whenever a foe in the well takes physical damage, that foe has Cracked Armor for 5...20 seconds.",
-			"concise": "(5...30 seconds.) Inflicts Cracked Armor condition (5...20 seconds) to any foe in the well that takes physical damage. <gray>Exploits a fresh corpse.</gray>"
+			"description": "Exploit nearest corpse or sacrifice 66% Health to create a Well of Ruin at its location. For 5...30 seconds, whenever a foe in the well takes physical damage, that foe has Cracked Armor for 5...20 seconds.",
+			"concise": "(5...30 seconds.) Inflicts Cracked Armor condition (5...20 seconds) to any foe in the well that takes physical damage. <gray>Exploits a fresh corpse or sacrifices 66% Health.</gray>"
 		},
 		"2237": {
 			"id": 2237,
@@ -8063,8 +8063,8 @@
 		"2875": {
 			"id": 2875,
 			"name": "Harrier's Toss (PvP)",
-			"description": "If this attack hits, you deal +5...20 damage. If this attack hits a moving foe, it deals an additional 5...30 damage.",
-			"concise": "Deals +5...20 damage. Deals 5...30 more damage if target is moving."
+			"description": "If this attack hits, you deal +5...20 damage. If this attack hits a moving foe, it deals an additional 5...40 damage.",
+			"concise": "Deals +5...20 damage. Deals 5...40 more damage if target is moving."
 		},
 		"2876": {
 			"id": 2876,
@@ -8333,8 +8333,8 @@
 		"3027": {
 			"id": 3027,
 			"name": "\"Brace Yourself!\" (PvP)",
-			"description": "For 5...15 seconds, the next time target other ally would be knocked down, 1 nearby foe takes 15...75 damage instead.",
-			"concise": "(5...15 seconds.) Prevents the next knock-down and deals 15...75 damage to one foe near target ally. <gray>Cannot self-target.</gray>"
+			"description": "For 5...15 seconds, the next time target other ally would be knocked down, 1 nearby foe takes 15...90 damage instead.",
+			"concise": "(5...15 seconds.) Prevents the next knock-down and deals 15...90 damage to one foe near target ally. <gray>Cannot self-target.</gray>"
 		},
 		"3028": {
 			"id": 3028,
@@ -8386,9 +8386,9 @@
 		},
 		"3036": {
 			"id": 3036,
-			"name": "\"Help Me!\" (PvP)",
-			"description": "You gain 5...50 Health. For 1...10 seconds, other allies' spells targeting you cast 50% faster.",
-			"concise": "(1...10 seconds.) Other allies' spells targeting you cast 50% faster. You gain 5...50 Health."
+			"name": "\"Help!\" (PvP)",
+			"description": "Target non-spirit ally gains 5...50 Health. For 1...10 seconds, other allies' spells targeting that ally cast 50% faster.",
+			"concise": "(1...10 seconds.) Target non-spirit ally gains 5...50 Health. Other allies' spells targeting that ally cast 50% faster."
 		},
 		"3037": {
 			"id": 3037,
@@ -8897,14 +8897,20 @@
 		"3430": {
 			"id": 3430,
 			"name": "Vow of Revolution",
-			"description": "For 3...10 seconds, you have +1...5 energy regeneration. This skill reapplies itself every time you use a non-Dervish skill.",
-			"concise": "(3...10 seconds.) Gain +1...5 energy regeneration. Renewal: whenever you use a non-Dervish skill."
+			"description": "For 3...10 seconds, you have +1...6 energy regeneration. This skill reapplies itself every time you use a non-Dervish skill.",
+			"concise": "(3...10 seconds.) Gain +1...6 energy regeneration. Renewal: whenever you use a non-Dervish skill."
 		},
 		"3431": {
 			"id": 3431,
 			"name": "Heroic Refrain",
 			"description": "For 3...15 seconds, target non-spirit ally gains +1...3 to all attributes. This echo is reapplied every time a chant or shout ends on that ally.",
 			"concise": "(3...15 seconds.) Target ally gains +1...3 to all attributes. Renewal: every time a chant or shout ends on this ally. <gray>Cannot target spirits. PvE Skill</gray>"
+		},
+		"3437": {
+			"id": 3437,
+			"name": "Farmer's Scythe (PvP)",
+			"description": "If this attack hits, you deal +5...35 damage. If you hit more than one foe, this attack recharges instantly.",
+			"concise": "Deals +5...35 damage. Instant recharge if you hit more than one foe."
 		}
 	}
 }
