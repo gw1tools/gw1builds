@@ -370,7 +370,7 @@ export function createBuildSearchIndex(
  * Find tag match with optional fuzzy/prefix matching
  * Supports hashtag prefix: #meta, #beg → beginner
  */
-function findTagMatch(query: string, fuzzy: boolean = false): string | null {
+export function findTagMatch(query: string, fuzzy: boolean = false): string | null {
   let q = query.toLowerCase()
 
   // Strip hashtag prefix if present
@@ -449,7 +449,7 @@ function buildMatchesTag(build: SearchableBuild, tag: string): boolean {
 /**
  * Find profession match (exact, alias, or prefix)
  */
-function findProfessionMatch(query: string): typeof PROFESSIONS[number] | null {
+export function findProfessionMatch(query: string): typeof PROFESSIONS[number] | null {
   const q = query.toLowerCase()
 
   // Check aliases first (exact match)
