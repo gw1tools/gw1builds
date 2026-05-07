@@ -42,6 +42,8 @@ import {
   searchBuilds,
   getProfessionAbbreviation,
   parseSlashPattern,
+  findTagMatch,
+  findProfessionMatch,
   normalizeBuilds,
   clearFilteredFuseCache,
 } from '@/lib/search/build-search'
@@ -80,6 +82,62 @@ export interface SpotlightBuildPickerProps {
   initialFilters?: BuildFilter[]
   /** Called before navigating to an internal build (to save state to URL) */
   onBeforeNavigate?: (query: string, filters: BuildFilter[]) => void
+}
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+function classifyToken(token: string): BuildFilter[] | null {
+  if (token.includes('/')) {
+    const combo = parseSlashPattern(token)
+    if (!combo) return null
+    const out: BuildFilter[] = []
+    if (combo.primary) out.push({ type: 'profession', value: combo.primary, role: 'primary' })
+    if (combo.secondary) out.push({ type: 'profession', value: combo.secondary, role: 'secondary' })
+    return out.length > 0 ? out : null
+  }
+
+  if (token.startsWith('#')) {
+    const tag = findTagMatch(token.slice(1), true)
+    return tag ? [{ type: 'tag', value: tag }] : null
+  }
+
+  const prof = findProfessionMatch(token)
+  if (prof) return [{ type: 'profession', value: prof.name, role: 'any' }]
+
+  return null
+}
+
+/**
+ * Peel recognized tokens from the left of an input string into pill filters.
+ * Only commits tokens followed by whitespace — the trailing unfinished token
+ * stays in `remaining` so the user can keep typing.
+ */
+function promoteTokens(value: string): { remaining: string; filtersToAdd: BuildFilter[] } {
+  let remaining = value
+  const filtersToAdd: BuildFilter[] = []
+
+  while (true) {
+    const wsMatch = remaining.match(/\s/)
+    if (!wsMatch || wsMatch.index === undefined) break
+
+    const head = remaining.slice(0, wsMatch.index)
+    const tail = remaining.slice(wsMatch.index + wsMatch[0].length)
+
+    if (!head) {
+      remaining = tail
+      continue
+    }
+
+    const tokenFilters = classifyToken(head)
+    if (!tokenFilters) break
+
+    filtersToAdd.push(...tokenFilters)
+    remaining = tail
+  }
+
+  return { remaining, filtersToAdd }
 }
 
 // ============================================================================
@@ -615,10 +673,18 @@ export function SpotlightBuildPicker({
                     rows={1}
                     value={query}
                     onChange={e => {
-                      setQuery(e.target.value)
-                      // Auto-resize height
+                      const value = e.target.value
+                      const { remaining, filtersToAdd } = promoteTokens(value)
+                      if (filtersToAdd.length > 0) {
+                        setActiveFilters(f => [...f, ...filtersToAdd])
+                      }
+                      setQuery(remaining)
+                      // Auto-resize height; if we promoted tokens, reset to
+                      // intrinsic so the textarea can shrink to the remainder.
                       e.target.style.height = 'auto'
-                      e.target.style.height = `${e.target.scrollHeight}px`
+                      if (filtersToAdd.length === 0) {
+                        e.target.style.height = `${e.target.scrollHeight}px`
+                      }
                     }}
                     onKeyDown={handleKeyDown}
                     placeholder={activeFilters.length > 0 ? 'Add...' : 'Mo/Me, #meta, skill...'}
