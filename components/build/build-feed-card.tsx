@@ -191,6 +191,7 @@ const SkillPreview = memo(function SkillPreview({ skills, size = 'default' }: { 
             position={index + 1}
             emptyVariant="viewer"
             tooltipMode="compact"
+            pressable={false}
           />
         ))}
       </div>

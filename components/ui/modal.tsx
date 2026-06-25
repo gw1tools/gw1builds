@@ -45,6 +45,8 @@ export interface ModalProps {
   className?: string
   /** Whether to show the header (default: true if title provided) */
   showHeader?: boolean
+  /** Center on mobile instead of anchoring as a bottom sheet (default: false) */
+  centerOnMobile?: boolean
   /** Custom header content (replaces default header) */
   headerContent?: ReactNode
   /** Footer content */
@@ -64,6 +66,7 @@ export function Modal({
   maxWidth = 'max-w-md',
   className,
   showHeader,
+  centerOnMobile = false,
   headerContent,
   footerContent,
 }: ModalProps) {
@@ -172,7 +175,12 @@ export function Modal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+          className={cn(
+            'fixed inset-0 z-50 flex justify-center',
+            centerOnMobile
+              ? 'items-center p-4'
+              : 'items-end sm:items-center p-0 sm:p-4'
+          )}
           variants={reducedMotion ? undefined : modalOverlayVariants}
           initial={reducedMotion ? undefined : 'hidden'}
           animate={reducedMotion ? undefined : 'visible'}
@@ -196,10 +204,10 @@ export function Modal({
               'relative z-10 w-full',
               maxWidth,
               'bg-bg-card border border-border',
-              'rounded-t-xl sm:rounded-xl',
+              centerOnMobile ? 'rounded-xl' : 'rounded-t-xl sm:rounded-xl',
               'shadow-xl',
               'max-h-[90vh] flex flex-col',
-              'pb-[env(safe-area-inset-bottom)] sm:pb-0',
+              centerOnMobile ? '' : 'pb-[env(safe-area-inset-bottom)] sm:pb-0',
               className
             )}
             variants={reducedMotion ? undefined : modalContentVariants}
