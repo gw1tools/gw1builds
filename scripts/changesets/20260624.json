@@ -1,0 +1,3147 @@
+{
+  "date": "20260624",
+  "source": "https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260624",
+  "generatedAt": "2026-07-01T07:59:06.939Z",
+  "entries": [
+    {
+      "id": 27,
+      "name": "Shatter Delusions",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Remove one Mesmer hex from target foe. If a hex was removed, that foe and all adjacent foes takes 15...75 damage.",
+          "to": "Remove one Mesmer hex from target foe. If a hex was removed, that foe takes 15...75 damage and all adjacent foes take 75% of that damage."
+        },
+        "concise": {
+          "from": "Removes a Mesmer hex from target foe. Removal effect: 15...75 damage to target and all adjacent foes.",
+          "to": "Removes a Mesmer hex from target foe. Removal effect: 15...75 damage to target and 75% of that damage to all adjacent foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[BOTH] Reduce AoE damage from 100% to 75%",
+        "override: AoE 100% -> 75%"
+      ]
+    },
+    {
+      "id": 31,
+      "name": "Conjure Phantasm",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 2...16 seconds, target foe experiences -5 Health degeneration.",
+          "to": "For 4...18 seconds, target foe experiences -5 Health degeneration."
+        },
+        "concise": {
+          "from": "(2...16 seconds.) Causes -5 Health degeneration.",
+          "to": "(4...18 seconds.) Causes -5 Health degeneration."
+        }
+      },
+      "flags": [],
+      "notes": ["[base] Increase effect duration from 2..16 to 4..18."]
+    },
+    {
+      "id": 33,
+      "name": "Illusionary Weaponry",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 25,
+          "to": 15,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 30 seconds, your melee attacks neither hit nor fail to hit. Instead, Illusionary Weaponry deals 8...40 damage to your targets for each melee attack. You have +5 armor for each equipped Illusion Magic skill.",
+          "to": "For 30 seconds, your melee attacks neither hit nor fail to hit. Instead, Illusionary Weaponry deals 16...50 damage to your targets for each melee attack. You have +5 armor for each equipped Illusion Magic skill."
+        },
+        "concise": {
+          "from": "(30 seconds.) Deals 8...40 damage to foes in place of other damage or effects from melee attacks. You have +5 armor for each equipped Illusion Magic skill. <gray>Your melee attacks neither hit nor fail to hit.</gray>",
+          "to": "(30 seconds.) Deals 16...50 damage to foes in place of other damage or effects from melee attacks. You have +5 armor for each equipped Illusion Magic skill. <gray>Your melee attacks neither hit nor fail to hit.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[BOTH] Reduce recharge from 25 to 15, increase damage from 8..40 to 16..50."
+      ]
+    },
+    {
+      "id": 36,
+      "name": "Arcane Conundrum",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 30,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Increase recharge from 20 to 30."]
+    },
+    {
+      "id": 39,
+      "name": "Energy Surge",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Target foe loses 1...10 Energy. For each point of Energy lost, that foe and all nearby foes take 9 damage.",
+          "to": "Target foe loses 1...10 Energy. For each point of Energy lost, that foe takes 7 damage and all nearby foes take 75% of that damage."
+        },
+        "concise": {
+          "from": "Causes 1...10 Energy loss. Deals 9 damage to target and nearby foes for each point of Energy lost.",
+          "to": "Causes 1...10 Energy loss. Deals 7 damage to target for each point of Energy lost and 75% of that damage to nearby foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce damage per energy from 9 to 7, reduce AoE damage from 100% to 75%.",
+        "override: damage per energy 9 -> 7, AoE 100% -> 75%"
+      ]
+    },
+    {
+      "id": 43,
+      "name": "Clumsiness",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 8,
+          "to": 12,
+          "noteFrom": 8,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 4 seconds, target and adjacent foes are hexed with Clumsiness. The next time each foe attacks, the attack is interrupted and that foe suffers 10...92 damage.",
+          "to": "For 4 seconds, target and adjacent foes are hexed with Clumsiness. The next time each foe attacks, the attack is interrupted and that foe suffers 10...80 damage."
+        },
+        "concise": {
+          "from": "(4 seconds.) Also hexes adjacent foes. Interrupts next attack. Interruption effect: deals 10...92 damage.",
+          "to": "(4 seconds.) Also hexes adjacent foes. Interrupts next attack. Interruption effect: deals 10...80 damage."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase recharge from 8 to 12, reduce damage from 10..92 to 10..80."
+      ]
+    },
+    {
+      "id": 50,
+      "name": "Wastrel's Worry",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 1,
+          "to": 4,
+          "noteFrom": 1,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "After 3 seconds, target foe and all adjacent foes take 20...100 damage. If that foe successfully uses a skill, Wastrel's Worry ends prematurely and does no damage.",
+          "to": "After 3 seconds, target foe takes 20...100 damage and all adjacent foes take 75% of that damage. If that foe successfully uses a skill, Wastrel's Worry ends prematurely and does no damage."
+        },
+        "concise": {
+          "from": "(3 seconds). End effect: causes 20...100 damage to target and adjacent foes. <gray>No effect and ends early if target foe uses a skill.</gray>",
+          "to": "(3 seconds). End effect: causes 20...100 damage to target and 75% of that damage to adjacent foes. <gray>No effect and ends early if target foe uses a skill.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase recharge from 1 to 4, reduce AoE damage from 100% to 75%.",
+        "override: AoE 100% -> 75% (recharge handled numerically)"
+      ]
+    },
+    {
+      "id": 57,
+      "name": "Cry of Frustration",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 20,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "If target foe is using a skill, that foe and all foes in the area are interrupted and suffer 15...75 damage.",
+          "to": "If target foe is using a skill, that foe and all foes in the area are interrupted and suffer 15...75 damage and foes in the area take 75% of that damage."
+        },
+        "concise": {
+          "from": "If target foe is using a skill, that foe and all foes in the area are interrupted and take 15...75 damage.",
+          "to": "If target foe is using a skill, that foe and all foes in the area are interrupted. Foe suffers 15...75 damage and foes in the area take 75% of that damage."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase recharge from 15 to 20, reduce AoE damage from 100% to 75%.",
+        "override: AoE 100% -> 75% (recharge handled numerically)"
+      ]
+    },
+    {
+      "id": 62,
+      "name": "Signet of Humility",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Target foe's elite skill is disabled for 1...16 seconds. Your non-Mesmer skills are disabled for 10 seconds.",
+          "to": "Target foe's elite skill is disabled for 1...16 seconds. Your non-Mesmer skills are disabled for 4 seconds."
+        },
+        "concise": {
+          "from": "Disables elite skill (1...16 seconds). <gray>Disables your non-Mesmer skills (10 seconds).</gray>",
+          "to": "Disables elite skill (1...16 seconds). <gray>Disables your non-Mesmer skills (4 seconds).</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce “Your non-Mesmer skills are disabled for X seconds.” from 10 to 4.",
+        "override: non-Mesmer disable 10 -> 4 seconds"
+      ]
+    },
+    {
+      "id": 79,
+      "name": "Energy Drain",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 30,
+          "to": 20,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[BOTH] Reduce recharge from 30/25 to 20.",
+        "override: recharge 30 -> 20 (single skill; no local PvP split)"
+      ]
+    },
+    {
+      "id": 83,
+      "name": "Animate Bone Horror",
+      "profession": "Necromancer",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 3,
+          "to": 1,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10 to 5, reduce activation time from 3 to 1."
+      ]
+    },
+    {
+      "id": 84,
+      "name": "Animate Bone Fiend",
+      "profession": "Necromancer",
+      "data": {
+        "energy": {
+          "from": 25,
+          "to": 15,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 3,
+          "to": 1,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 25 to 15, reduce activation time from 3 to 1."
+      ]
+    },
+    {
+      "id": 85,
+      "name": "Animate Bone Minions",
+      "profession": "Necromancer",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 3,
+          "to": 1,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 15 to 10, reduce activation time from 3 to 1."
+      ]
+    },
+    {
+      "id": 87,
+      "name": "Verata's Gaze",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If target hostile animated undead has a master, its bond to its master is broken, making it hostile to all other creatures. If it had no master, you become its master. (50% failure chance with Death Magic 4 or less.)",
+          "to": "If target hostile animated undead has a master, its bond to its master is broken, making it hostile to all other creatures. If it had no master, you become its master and heal it for 60...80. (50% failure chance with Death Magic 4 or less.)"
+        },
+        "concise": {
+          "from": "Make target undead servant masterless. If it is already masterless, you become its master. <gray>50% failure chance unless Death Magic 5 or more.</gray>",
+          "to": "Make target undead servant masterless. If it is already masterless, you become its master and heal it for 60...80. <gray>50% failure chance unless Death Magic 5 or more.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Add “…and heal it for 60..80.” when claiming masterless minions.",
+        "override: add 60...80 heal on claiming masterless minion"
+      ]
+    },
+    {
+      "id": 98,
+      "name": "Consume Corpse",
+      "profession": "Necromancer",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce energy cost from 10 to 5."]
+    },
+    {
+      "id": 121,
+      "name": "Spiteful Spirit",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 8...20 seconds, whenever target foe attacks or uses a skill, Spiteful Spirit deals 5...35 shadow damage to that foe and all adjacent allies of that foe.",
+          "to": "For 10...25 seconds, whenever target foe attacks or uses a skill, Spiteful Spirit deals 15...45 shadow damage to that foe and all adjacent allies of that foe."
+        },
+        "concise": {
+          "from": "(8...20 seconds.) Deals 5...35 damage to target and adjacent foes whenever this foe attacks or uses a skill.",
+          "to": "(10...25 seconds.) Deals 15...45 damage to target and adjacent foes whenever this foe attacks or uses a skill."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase effect duration from 8..20 to 10..25, increase damage from 5..35 to 15..45."
+      ]
+    },
+    {
+      "id": 142,
+      "name": "Lingering Curse",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 6...30 seconds, target foe and all nearby foes suffer -0...3 Health degeneration, and gain 20% less benefit from healing.",
+          "to": "For 6...30 seconds, target foe and all nearby foes suffer -1...4 Health degeneration, and gain 25% less benefit from healing."
+        },
+        "concise": {
+          "from": "(6...30 seconds.) Target and nearby foes have -0...3 Health degeneration and receive 20% less benefit from healing.",
+          "to": "(6...30 seconds.) Target and nearby foes have -1...4 Health degeneration and receive 25% less benefit from healing."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase health degeneration from 0..3 to 1..4, increase healing benefit reduction from 20% to 25%.",
+        "override: degeneration 0...3 -> 1...4, healing reduction 20% -> 25%"
+      ]
+    },
+    {
+      "id": 151,
+      "name": "Feast of Corruption",
+      "profession": "Necromancer",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 15,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 20 to 15."]
+    },
+    {
+      "id": 157,
+      "name": "Blood Ritual",
+      "profession": "Necromancer",
+      "data": {
+        "activation": {
+          "from": 2,
+          "to": 1,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce activation time from 2 to 1."]
+    },
+    {
+      "id": 159,
+      "name": "Weaken Armor",
+      "profession": "Necromancer",
+      "data": {
+        "activation": {
+          "from": 1,
+          "to": 0.5,
+          "noteFrom": 1,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce activation time from 1 to 0.5."]
+    },
+    {
+      "id": 166,
+      "name": "Kinetic Armor",
+      "profession": "Elementalist",
+      "data": {
+        "recharge": {
+          "from": 60,
+          "to": 30,
+          "noteFrom": 60,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 8 seconds, you gain +20...80 armor. Whenever you cast a spell, Kinetic Armor is renewed for 8 seconds.",
+          "to": "For 12 seconds, you gain +20...80 armor. Whenever you cast a spell, Kinetic Armor is renewed for 8 seconds."
+        },
+        "concise": {
+          "from": "(8 seconds.) You have +20...80 armor. Renewal bonus: cast a spell.",
+          "to": "(12 seconds.) You have +20...80 armor. Renewal bonus: cast a spell."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase effect duration from 8 to 12, decrease recharge from 60 to 30.",
+        "override: initial duration 8 -> 12 seconds (recharge handled numerically)"
+      ]
+    },
+    {
+      "id": 186,
+      "name": "Fireball",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Send out a ball of fire that strikes target foe and all adjacent foes for 7...112 fire damage.",
+          "to": "Send out a ball of fire that strikes target foe and all nearby foes for 7...112 fire damage."
+        },
+        "concise": {
+          "from": "Projectile: deals 7...112 fire damage to target and adjacent foes.",
+          "to": "Projectile: deals 7...112 fire damage to target and nearby foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase range of effect from adjacent to nearby.",
+        "override: area of effect adjacent -> nearby"
+      ]
+    },
+    {
+      "id": 205,
+      "name": "Lightning Surge",
+      "profession": "Elementalist",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 15,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Increase energy cost from 10 to 15."]
+    },
+    {
+      "id": 222,
+      "name": "Lightning Strike",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Strike target foe for 5...50 lightning damage. This spell has 25% armor penetration. If you are Overcast, that foe is hexed with Lightning Strike for 3 seconds. When this hex ends, that foe is struck again for 5...50 lightning damage.",
+          "to": "Strike target foe for 5...40 lightning damage. This spell has 25% armor penetration. If you are Overcast, that foe is hexed with Lightning Strike for 3 seconds. When this hex ends, that foe is struck again for 5...40 lightning damage."
+        },
+        "concise": {
+          "from": "Deals 5...50 lightning damage. 25% armor penetration. Hex for 3 seconds if Overcast. End effect: deals 5...50 lightning damage.",
+          "to": "Deals 5...40 lightning damage. 25% armor penetration. Hex for 3 seconds if Overcast. End effect: deals 5...40 lightning damage."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Decrease damage and conditional damage from 5..50 to 5..40.",
+        "override: damage + conditional damage 5...50 -> 5...40 (both)"
+      ]
+    },
+    {
+      "id": 228,
+      "name": "Thunderclap",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Create a massive shockwave at target foe's location. Deals 10...50 lightning damage to target and all adjacent foes. Struck foes are interrupted and suffer from Cracked Armor and Weakness for 5...20 seconds. This spell has 25% armor penetration.",
+          "to": "Create a massive shockwave at target foe's location. Deals 10...50 lightning damage to target and all nearby foes. Struck foes are interrupted and suffer from Cracked Armor and Weakness for 5...20 seconds. This spell has 25% armor penetration."
+        },
+        "concise": {
+          "from": "Deals 10...50 lightning damage. Also strikes adjacent foes. Inflicts Cracked Armor and Weakness (5...20 seconds). Causes interrupt. 25% armor penetration.",
+          "to": "Deals 10...50 lightning damage. Also strikes nearby foes. Inflicts Cracked Armor and Weakness (5...20 seconds). Causes interrupt. 25% armor penetration."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase range from adjacent to nearby.",
+        "override: range adjacent -> nearby"
+      ]
+    },
+    {
+      "id": 247,
+      "name": "Symbol of Wrath",
+      "profession": "Monk",
+      "data": {
+        "recharge": {
+          "from": 30,
+          "to": 20,
+          "noteFrom": 30,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 2,
+          "to": 1,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 5 seconds, foes adjacent to the location in which the spell was cast take 8...32 holy damage each second.",
+          "to": "Create a Symbol of Wrath at target foe's location. For 5 seconds, adjacent foes are struck for 10...40 holy damage each second."
+        },
+        "concise": {
+          "from": "Deals 8...32 holy damage each second (5 seconds). Hits foes adjacent to your initial location.",
+          "to": "Deals 10...40 holy damage each second (5 seconds). Hits foes adjacent to target foe's initial location."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation time from 2 to 1, reduce recharge from 30 to 20, increase damage from 8..32 to 10..40. Change functionality so that the AoE pulse happens at the target’s location instead of the caster’s.",
+        "override: damage 8...32 -> 10...40; AoE pulse now at target location (act/recharge numeric)"
+      ]
+    },
+    {
+      "id": 258,
+      "name": "Guardian",
+      "profession": "Monk",
+      "data": {
+        "recharge": {
+          "from": 4,
+          "to": 6,
+          "noteFrom": 4,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Increase recharge time from 4 to 6."]
+    },
+    {
+      "id": 259,
+      "name": "Shield of Deflection",
+      "profession": "Monk",
+      "data": {
+        "recharge": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge time from 10 to 5."]
+    },
+    {
+      "id": 261,
+      "name": "Shield of Regeneration",
+      "profession": "Monk",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 5...13 seconds, target ally gains +3...10 Health regeneration and 40 armor.",
+          "to": "For 5...13 seconds, target ally gains +3...10 Health regeneration and 20...45 armor."
+        },
+        "concise": {
+          "from": "(5...13 seconds.) +3...10 Health regeneration and +40 armor.",
+          "to": "(5...13 seconds.) +3...10 Health regeneration and +20...45 armor."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 15 to 10, adjust armor increase to scaling (20..45).",
+        "override: armor 40 -> scaling 20...45 (energy handled numerically)"
+      ]
+    },
+    {
+      "id": 272,
+      "name": "Balthazar's Aura",
+      "profession": "Monk",
+      "data": {
+        "energy": {
+          "from": 25,
+          "to": 15,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 25,
+          "to": 20,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 2,
+          "to": 1,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 8 seconds, foes adjacent to target ally take 10...25 holy damage each second.",
+          "to": "For 8 seconds, foes adjacent to target ally take 10...30 holy damage each second."
+        },
+        "concise": {
+          "from": "(8 seconds.) Deals 10...25 holy damage each second to foes adjacent to target ally.",
+          "to": "(8 seconds.) Deals 10...30 holy damage each second to foes adjacent to target ally."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 25 to 15, reduce activation time from 2 to 1, reduce recharge from 25 to 20, increase damage from 10..25 to 10..30."
+      ]
+    },
+    {
+      "id": 285,
+      "name": "Healing Hands",
+      "profession": "Monk",
+      "data": {
+        "recharge": {
+          "from": 25,
+          "to": 15,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 25 to 15."]
+    },
+    {
+      "id": 316,
+      "name": "\"To the Limit!\"",
+      "profession": "Warrior",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 15 to 10."]
+    },
+    {
+      "id": 320,
+      "name": "Hamstring",
+      "profession": "Warrior",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10 to 5, reduce recharge from 15 to 10."
+      ]
+    },
+    {
+      "id": 335,
+      "name": "Cleave",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If this attack hits, you strike for +10...30 damage.",
+          "to": "If this attack hits, you strike for +10...40 damage. This attack also hits 1...2 random adjacent foes."
+        },
+        "concise": {
+          "from": "Deals +10...30 damage.",
+          "to": "Deals +10...40 damage. Also hits 1...2 random adjacent foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from 10..30 to 10..40, and also hits 1..2 random adjacent foes.",
+        "override: WIKI LAGGED 2026-06-25: adjacent-hit clause from notes; verify later"
+      ]
+    },
+    {
+      "id": 338,
+      "name": "Eviscerate",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If Eviscerate hits, you strike for +1...31 damage and inflict a Deep Wound, lowering your target's maximum Health by 20% for 5...20 seconds.",
+          "to": "If Eviscerate hits, you strike for +10...45 damage and inflict a Deep Wound, lowering your target's maximum Health by 20% for 5...20 seconds."
+        },
+        "concise": {
+          "from": "Deals +1...31 damage. Inflicts Deep Wound condition (5...20 seconds).",
+          "to": "Deals +10...45 damage. Inflicts Deep Wound condition (5...20 seconds)."
+        }
+      },
+      "flags": [],
+      "notes": ["[base] Increase damage from 1..31 to 10..45."]
+    },
+    {
+      "id": 340,
+      "name": "Disrupting Chop",
+      "profession": "Warrior",
+      "data": {
+        "recharge": {
+          "from": 0,
+          "to": 1,
+          "noteFrom": 0,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Increase recharge from 0 to 1."]
+    },
+    {
+      "id": 366,
+      "name": "\"Fear Me!\"",
+      "profession": "Warrior",
+      "data": {
+        "recharge": {
+          "from": 6,
+          "to": 4,
+          "noteFrom": 6,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "All nearby foes lose 1...4 Energy. For 1...15 seconds, your melee attacks gain +5...30% chance of a critical hit against stationary foes.",
+          "to": "All nearby foes lose 2...6 Energy. For 1...15 seconds, your melee attacks gain +5...30% chance of a critical hit against stationary foes."
+        },
+        "concise": {
+          "from": "(1...15 seconds.) You have +5...30% chance of a critical hit with melee attacks against stationary foes. Initial effect: nearby foes lose 1...4 Energy.",
+          "to": "(1...15 seconds.) You have +5...30% chance of a critical hit with melee attacks against stationary foes. Initial effect: nearby foes lose 2...6 Energy."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 6 to 4, increase energy loss from 1..4 to 2..6."
+      ]
+    },
+    {
+      "id": 370,
+      "name": "Berserker Stance",
+      "profession": "Warrior",
+      "data": {
+        "energy": {
+          "from": 5,
+          "to": 10,
+          "noteFrom": 5,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 5...11 seconds, you attack 33% faster and gain 50% more adrenaline. Berserker Stance ends if you use a skill.",
+          "to": "For 8...14 seconds, you attack 33% faster and gain 100% more adrenaline. Berserker Stance ends if you use a skill."
+        },
+        "concise": {
+          "from": "(5...11 seconds.) You attack 33% faster and gain 50% more adrenaline. <gray>Ends if you use a skill.</gray>",
+          "to": "(8...14 seconds.) You attack 33% faster and gain 100% more adrenaline. <gray>Ends if you use a skill.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase energy cost from 5 to 10, reduce recharge from 20 to 10, increase effect duration from 5..11 to 8..14, increase adrenaline gain from 50% to 100%.",
+        "override: adrenaline gain 50% -> 100% (energy/recharge numeric, duration via swap)"
+      ]
+    },
+    {
+      "id": 372,
+      "name": "Gladiator's Defense",
+      "profession": "Warrior",
+      "data": {
+        "recharge": {
+          "from": 30,
+          "to": 20,
+          "noteFrom": 30,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 30 to 20."]
+    },
+    {
+      "id": 381,
+      "name": "Hundred Blades",
+      "profession": "Warrior",
+      "data": {
+        "recharge": {
+          "from": 25,
+          "to": 20,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 15 seconds, whenever you attack with a sword, all adjacent foes take 10...25 slashing damage.",
+          "to": "For 15 seconds, whenever you attack with a sword, all adjacent foes take 10...35 slashing damage."
+        },
+        "concise": {
+          "from": "(15 seconds.) Deals 10...25 slashing damage to all adjacent foes whenever you attack with a sword.",
+          "to": "(15 seconds.) Deals 10...35 slashing damage to all adjacent foes whenever you attack with a sword."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Decrease recharge from 25 to 20, increase damage from 10..25 to 10..35."
+      ]
+    },
+    {
+      "id": 390,
+      "name": "Savage Slash",
+      "profession": "Warrior",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 15 to 10."]
+    },
+    {
+      "id": 438,
+      "name": "Maiming Strike",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Your animal companion attempts a Maiming Strike that deals +5...20 damage. If that attack hits a moving foe that foe becomes Crippled for 3...15 seconds.",
+          "to": "Your animal companion attempts a Maiming Strike that deals +5...20 damage. If that attack hits that foe becomes Crippled for 3...15 seconds."
+        },
+        "concise": {
+          "from": "Deals +5...20 damage. Inflicts Crippled condition (3...15 seconds) if target foe is moving.",
+          "to": "Deals +5...20 damage. Inflicts Crippled condition (3...15 seconds)."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Remove condition to hit a moving foe and apply Crippled if the attack hits.",
+        "override: removed moving-foe condition; Crippled on any hit"
+      ]
+    },
+    {
+      "id": 445,
+      "name": "Disrupting Lunge",
+      "profession": "Ranger",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 20 to 10."]
+    },
+    {
+      "id": 458,
+      "name": "Barbed Trap",
+      "profession": "Ranger",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce energy cost from 15 to 10."]
+    },
+    {
+      "id": 462,
+      "name": "Winter",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 463,
+      "name": "Winnowing",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 5,
+          "to": 2,
+          "noteFrom": 5,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 464,
+      "name": "Edge of Extinction",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 465,
+      "name": "Greater Conflagration",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 466,
+      "name": "Conflagration",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 467,
+      "name": "Fertile Season",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 468,
+      "name": "Symbiosis",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 469,
+      "name": "Primal Echoes",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 5,
+          "to": 2,
+          "noteFrom": 5,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 470,
+      "name": "Predatory Season",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 471,
+      "name": "Frozen Soil",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 472,
+      "name": "Favorable Winds",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 5,
+          "to": 2,
+          "noteFrom": 5,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 474,
+      "name": "Energizing Wind",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 5,
+          "to": 2,
+          "noteFrom": 5,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 475,
+      "name": "Quickening Zephyr",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 5,
+          "to": 2,
+          "noteFrom": 5,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 476,
+      "name": "Nature's Renewal",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 5,
+          "to": 2,
+          "noteFrom": 5,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 477,
+      "name": "Muddy Terrain",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 570,
+      "name": "Mark of Insecurity",
+      "profession": "Assassin",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 5...25 seconds, target foe suffers from -1...5 Health degeneration, and enchantments and stances on target foe expire 30...80% faster. All of your non-Assassin skills are disabled for 5 seconds.",
+          "to": "For 5...25 seconds, target foe suffers from -1...5 Health degeneration, and enchantments and stances on target foe expire 20...60% faster. All of your non-Assassin skills are disabled for 5 seconds."
+        },
+        "concise": {
+          "from": "(5...25 seconds.) Causes -1...5 Health degeneration. Enchantments and stances expire 30...80% faster on target foe. <gray>Disables your non-Assassin skills (5 seconds).</gray>",
+          "to": "(5...25 seconds.) Causes -1...5 Health degeneration. Enchantments and stances expire 20...60% faster on target foe. <gray>Disables your non-Assassin skills (5 seconds).</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce enchantment expiration increase from 30..80 to 20..60.",
+        "override: range applied automatically; partial-parse flag is a false positive"
+      ]
+    },
+    {
+      "id": 764,
+      "name": "Wail of Doom",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 1...4 seconds, all of target foe's attributes are set to 0.",
+          "to": "For 2...6 seconds, all of target foe's attributes are set to 0."
+        },
+        "concise": {
+          "from": "(1...4 seconds.) Target foe's attributes are 0.",
+          "to": "(2...6 seconds.) Target foe's attributes are 0."
+        }
+      },
+      "flags": [],
+      "notes": ["[base] Increase effect duration from 1..4 to 2..6."]
+    },
+    {
+      "id": 782,
+      "name": "Jagged Strike",
+      "profession": "Assassin",
+      "data": {
+        "recharge": {
+          "from": 1,
+          "to": 2,
+          "noteFrom": 1,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Increase recharge time from 1 to 2."]
+    },
+    {
+      "id": 790,
+      "name": "Vengeful Was Khanhei",
+      "profession": "Ritualist",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 15,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Hold Khanhei's ashes for 5...11 seconds. Whenever a foe strikes you in combat while you are holding Khanhei's ashes, you steal 5...35 Health from that foe.",
+          "to": "Hold Khanhei's ashes for 5...11 seconds. Whenever a foe strikes you in combat while you are holding Khanhei's ashes, you steal 10...45 Health from that foe."
+        },
+        "concise": {
+          "from": "(5...11 seconds.) You steal 5...35 Health from every foe that hits you with an attack.",
+          "to": "(5...11 seconds.) You steal 10...45 Health from every foe that hits you with an attack."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 20 to 15, increase health steal from 5..35 to 10..45."
+      ]
+    },
+    {
+      "id": 799,
+      "name": "Beguiling Haze",
+      "profession": "Assassin",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce energy cost from 15 to 10."]
+    },
+    {
+      "id": 805,
+      "name": "Animate Vampiric Horror",
+      "profession": "Necromancer",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 3,
+          "to": 1,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 15 to 10, reduce activation time from 3 to 1."
+      ]
+    },
+    {
+      "id": 819,
+      "name": "Vampiric Spirit",
+      "profession": "Necromancer",
+      "data": {
+        "activation": {
+          "from": 2,
+          "to": 1,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Steal up to 5...50 Health from target foe. For 10 seconds, you have +5...10 Health regeneration.",
+          "to": "Steal up to 15...60 Health from target foe. For 10 seconds, you have +5...10 Health regeneration."
+        },
+        "concise": {
+          "from": "Steal 5...50 Health from target foe. You have +5...10 Health regeneration (10 seconds).",
+          "to": "Steal 15...60 Health from target foe. You have +5...10 Health regeneration (10 seconds)."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation time from 2 to 1, increase health steal from 5..50 to 15..60."
+      ]
+    },
+    {
+      "id": 830,
+      "name": "Ray of Judgment",
+      "profession": "Monk",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 15,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 2,
+          "to": 1,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Invoke a Ray of Judgment at target foe's location. For 5 seconds, target foe and all foes adjacent to this location take 5...45 holy damage each second and begin Burning for 1...3 seconds.",
+          "to": "Invoke a Ray of Judgment at target foe's location. For 5 seconds, target foe and all foes adjacent to this location take 10...50 holy damage each second and begin Burning for 1...3 seconds."
+        },
+        "concise": {
+          "from": "Deals 5...45 holy damage and inflicts Burning (1...3 seconds) every second (5 seconds). Hits foes adjacent to target's initial location.",
+          "to": "Deals 10...50 holy damage and inflicts Burning (1...3 seconds) every second (5 seconds). Hits foes adjacent to target's initial location."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation time from 2 to 1, reduce recharge from 20 to 15, increase damage from 5..45 to 10..50."
+      ]
+    },
+    {
+      "id": 832,
+      "name": "Animate Flesh Golem",
+      "profession": "Necromancer",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 1,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce activation time from 3 to 1."]
+    },
+    {
+      "id": 843,
+      "name": "Gust",
+      "profession": "Elementalist",
+      "data": {
+        "recharge": {
+          "from": 10,
+          "to": 15,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 5...11 seconds, both you and target ally move 33% faster. When you cast this spell, all foes near you and your target take 15...70 cold damage. Foes struck by Gust while attacking or moving are knocked down.",
+          "to": "For 5...11 seconds, both you and target ally move 33% faster. When you cast this spell, all foes adjacent to you and your target take 15...70 cold damage. Foes struck by Gust while attacking or moving are knocked down."
+        },
+        "concise": {
+          "from": "(5...11 seconds.) You and target ally move 33% faster. Initial effect: Foes near you and target ally are struck for 15...70 cold damage. Attacking or moving foes are knocked down.",
+          "to": "(5...11 seconds.) You and target ally move 33% faster. Initial effect: Foes adjacent to you and target ally are struck for 15...70 cold damage. Attacking or moving foes are knocked down."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase recharge from 10 to 15, reduce range of cold damage on cast from nearby to adjacent.",
+        "override: cold damage range nearby -> adjacent (recharge handled numerically)"
+      ]
+    },
+    {
+      "id": 853,
+      "name": "Melandru's Shot",
+      "profession": "Ranger",
+      "data": {
+        "recharge": {
+          "from": 8,
+          "to": 12,
+          "noteFrom": 8,
+          "wiki": "lagged"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Increase recharge from 8 to 12."]
+    },
+    {
+      "id": 862,
+      "name": "Ravenous Gaze",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Deal 15...30 damage and steal 15...30 Health from target foe and all nearby foes.",
+          "to": "Deal 20...40 damage and steal 20...40 Health from target foe and all nearby foes."
+        },
+        "concise": {
+          "from": "Deals 15...30 damage and steals 15...30 Health from target and nearby foes.",
+          "to": "Deals 20...40 damage and steals 20...40 Health from target and nearby foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage and health steal from 15..30 to 20..40.",
+        "override: damage + steal 15...30 -> 20...40 (both)"
+      ]
+    },
+    {
+      "id": 870,
+      "name": "Pestilence",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 892,
+      "name": "Quivering Blade",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from 10 to 10..40. (This skill was accidentally nerfed in the last balance update when updating its daze duration from 5 to 10.)",
+        "override: already +10...40 locally (accidental nerf never applied here)"
+      ]
+    },
+    {
+      "id": 898,
+      "name": "Overload",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 5 seconds, target foe suffers -1...3 Health degeneration. If target foe is using a skill, then Overload deals 15...75 damage to that foe and all adjacent foes.",
+          "to": "For 5 seconds, target foe suffers -1...3 Health degeneration. If target foe is using a skill, then Overload deals 15...75 damage to that foe and 75% of that damage to all adjacent foes."
+        },
+        "concise": {
+          "from": "(5 seconds.) Causes -1...3 Health degeneration. If target foe is using a skill, that foe and all adjacent foes take 15...75 damage.",
+          "to": "(5 seconds.) Causes -1...3 Health degeneration. If target foe is using a skill, that foe takes 15...75 damage and all adjacent foes take 75% of that damage."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce AoE damage from 100% to 75%",
+        "override: AoE 100% -> 75%"
+      ]
+    },
+    {
+      "id": 899,
+      "name": "Images of Remorse",
+      "profession": "Mesmer",
+      "data": {
+        "activation": {
+          "from": 2,
+          "to": 1,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce activation time from 2 to 1."]
+    },
+    {
+      "id": 907,
+      "name": "Dragon Slash",
+      "profession": "Warrior",
+      "data": {
+        "adrenaline": {
+          "from": 10,
+          "to": 8,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce adrenaline cost from 10 to 8."]
+    },
+    {
+      "id": 913,
+      "name": "Tranquil Was Tanasen",
+      "profession": "Ritualist",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 20,
+          "to": 15,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10 to 5, reduce recharge from 20 to 15."
+      ]
+    },
+    {
+      "id": 930,
+      "name": "Auspicious Incantation",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 25,
+          "to": 20,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 25 to 20."]
+    },
+    {
+      "id": 947,
+      "name": "Brambles",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 949,
+      "name": "Way of the Fox",
+      "profession": "Assassin",
+      "data": {
+        "recharge": {
+          "from": 45,
+          "to": 30,
+          "noteFrom": 45,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge time from 45 to 30."]
+    },
+    {
+      "id": 953,
+      "name": "Power Flux",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 10,
+          "to": 15,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Increase recharge from 10 to 15."]
+    },
+    {
+      "id": 961,
+      "name": "Lacerate",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 979,
+      "name": "Mistrust",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 6 seconds, the next spell that target foe casts on one of your allies fails and deals 10...100 damage to that foe and all nearby foes.",
+          "to": "For 6 seconds, the next spell that target foe casts on one of your allies fails and deals 10...80 damage to that foe and 75% of that damage to all nearby foes."
+        },
+        "concise": {
+          "from": "(6 seconds.) The next spell that target foe casts on one of your allies fails and deals 10...100 damage to target and nearby foes.",
+          "to": "(6 seconds.) The next spell that target foe casts on one of your allies fails and deals 10...80 damage to target and 75% of that damage to nearby foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[PVE] Reduce damage from 10..100 to 10..80, reduce AoE damage from 100% to 75%.",
+        "override: damage 10...100 -> 10...80, AoE 100% -> 75% (PvE)"
+      ]
+    },
+    {
+      "id": 987,
+      "name": "Way of the Empty Palm",
+      "profession": "Assassin",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 5...20 seconds, off-hand and dual attacks cost no Energy.",
+          "to": "For 5...15 seconds, off-hand and dual attacks cost no Energy and recharge 20...50% faster."
+        },
+        "concise": {
+          "from": "(5...20 seconds.) Your off-hand and dual attacks cost no Energy.",
+          "to": "(5...15 seconds.) Your off-hand and dual attacks cost no Energy and recharge 20...50% faster."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce effect duration from 5..20 to 5..15, add “…your off-hand and dual attacks cost no energy and recharge 25..50% faster.”",
+        "override: duration 5...20 -> 5...15; added recharge 20...50% faster"
+      ]
+    },
+    {
+      "id": 997,
+      "name": "Famine",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 1021,
+      "name": "Jungle Strike",
+      "profession": "Assassin",
+      "data": {
+        "recharge": {
+          "from": 10,
+          "to": 6,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Must follow a lead attack. If it hits, this attack strikes for +10...25 damage. If it hits a foe that was Crippled, that foe and all adjacent foes take +1...31 damage.",
+          "to": "Must follow a lead attack. If it hits, this attack strikes for +10...25 damage. If it hits a foe that was Crippled, that foe and all adjacent foes take 1...31 damage."
+        },
+        "concise": {
+          "from": "Deals +10...25 damage. Deals +1...31 damage to target and adjacent foes if target foe is Crippled. <gray>Must follow a lead attack.</gray>",
+          "to": "Deals +10...25 damage. Deals 1...31 damage to target and adjacent foes if target foe is Crippled. <gray>Must follow a lead attack.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Decrease recharge time from 10 to 6. Adjust text to remove '+' before conditional damage.",
+        "override: removed '+' before conditional damage (recharge handled numerically)"
+      ]
+    },
+    {
+      "id": 1030,
+      "name": "Locust's Fury",
+      "profession": "Assassin",
+      "data": {
+        "activation": {
+          "from": 1,
+          "to": 0.5,
+          "noteFrom": 1,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce activation time from 1 to 0.5."]
+    },
+    {
+      "id": 1034,
+      "name": "Seeping Wound",
+      "profession": "Assassin",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 12,
+          "to": 10,
+          "noteFrom": 12,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 15 to 10, reduce recharge from 12 to 10."
+      ]
+    },
+    {
+      "id": 1057,
+      "name": "Psychic Instability",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 12,
+          "to": 20,
+          "noteFrom": 12,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[BOTH] Increase recharge from 12 to 20."]
+    },
+    {
+      "id": 1081,
+      "name": "Teinai's Wind",
+      "profession": "Elementalist",
+      "data": {
+        "energy": {
+          "from": 5,
+          "to": 10,
+          "noteFrom": 5,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Increase energy cost from 5 to 10."]
+    },
+    {
+      "id": 1085,
+      "name": "Ash Blast",
+      "profession": "Elementalist",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge time from 15 to 10."]
+    },
+    {
+      "id": 1091,
+      "name": "Double Dragon",
+      "profession": "Elementalist",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 15,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Invoke the power of the Dragon. For 8 seconds, you and target ally are enchanted with Double Dragon. Adjacent foes are dealt 5...30 fire damage each second. Additionally, when you or your ally use skills that target a foe, that foe is set on fire for 0...3 seconds.",
+          "to": "Invoke the power of the Dragon. For 8 seconds, you and target ally are enchanted with Double Dragon. Adjacent foes are dealt 10...40 fire damage each second. Additionally, when you or your ally use skills that target a foe, that foe is set on fire for 1...4 seconds."
+        },
+        "concise": {
+          "from": "(8 seconds.) Enchants you and target ally. Adjacent foes take 5...30 fire damage each second. Skills that target a foe also inflict Burning (0...3 seconds).",
+          "to": "(8 seconds.) Enchants you and target ally. Adjacent foes take 10...40 fire damage each second. Skills that target a foe also inflict Burning (1...4 seconds)."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Decrease recharge from 20 to 15, increase damage per second to 10..40, increase “set on fire” duration from 0..3 to 1..4.",
+        "override: dps 5...30 -> 10...40, burning 0...3 -> 1...4 (recharge handled numerically)"
+      ]
+    },
+    {
+      "id": 1118,
+      "name": "Healing Burst",
+      "profession": "Monk",
+      "data": {
+        "recharge": {
+          "from": 4,
+          "to": 6,
+          "noteFrom": 4,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Target ally is healed for 10...160. All party members in earshot of your target gain Health equal to the Divine Favor bonus from this spell. Your Smiting Prayers are disabled for 20 seconds.",
+          "to": "Target ally is healed for 20...120. All party members in earshot of your target gain Health equal to the Divine Favor bonus from this spell. Your Smiting Prayers are disabled for 20 seconds."
+        },
+        "concise": {
+          "from": "Heals for 10...160. Party members in earshot of your target gain Health equal to the Divine Favor bonus. <gray>Disables your Smiting Prayers (20 seconds).</gray>",
+          "to": "Heals for 20...120. Party members in earshot of your target gain Health equal to the Divine Favor bonus. <gray>Disables your Smiting Prayers (20 seconds).</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase recharge time from 4 to 6, adjust healing amount from 10..160 to 20..120."
+      ]
+    },
+    {
+      "id": 1198,
+      "name": "Broad Head Arrow",
+      "profession": "Ranger",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 15 to 10, reduce recharge from 15 to 10."
+      ]
+    },
+    {
+      "id": 1203,
+      "name": "Bestial Mauling",
+      "profession": "Ranger",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 20 to 10."]
+    },
+    {
+      "id": 1206,
+      "name": "Pounce",
+      "profession": "Ranger",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 15 to 10."]
+    },
+    {
+      "id": 1212,
+      "name": "Equinox",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 1213,
+      "name": "Tranquility",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 1219,
+      "name": "Protective Was Kaolai",
+      "profession": "Ritualist",
+      "data": {
+        "recharge": {
+          "from": 25,
+          "to": 20,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[BOTH] Reduce recharge from 25 to 20."]
+    },
+    {
+      "id": 1228,
+      "name": "Spirit Siphon",
+      "profession": "Ritualist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "The spirit nearest you loses all Energy. You gain 15...50% of that Energy.",
+          "to": "The spirit nearest you loses all Energy. You gain 30...60% of that Energy."
+        },
+        "concise": {
+          "from": "The spirit nearest you loses all Energy. You gain 15...50% of that Energy.",
+          "to": "The spirit nearest you loses all Energy. You gain 30...60% of that Energy."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase energy gain percentage from 15..50% to 30..60%."
+      ]
+    },
+    {
+      "id": 1257,
+      "name": "Spirit Light Weapon",
+      "profession": "Ritualist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 10 seconds, target ally gains 1...15 Health per second and an additional 1...15 Health per second if that ally is within earshot of a spirit.",
+          "to": "For 10 seconds, target ally gains 5...25 Health per second and an additional 5...25 Health per second if that ally is within earshot of a spirit."
+        },
+        "concise": {
+          "from": "(10 seconds.) Target ally gains 1...15 Health each second. 1...15 more healing per second while within earshot of a spirit.",
+          "to": "(10 seconds.) Target ally gains 5...25 Health each second. 5...25 more healing per second while within earshot of a spirit."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase heal per second and additional heal per second within earshot of a spirit from 1..15 to 5..25.",
+        "override: heal 1...15 -> 5...25 (both)"
+      ]
+    },
+    {
+      "id": 1268,
+      "name": "Weapon of Quickening",
+      "profession": "Ritualist",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce energy cost from 10 to 5."]
+    },
+    {
+      "id": 1335,
+      "name": "Wastrel's Demise",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 3,
+          "to": 5,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[PVE] Increase recharge from 3 to 5."]
+    },
+    {
+      "id": 1342,
+      "name": "Tease",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 20,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Increase recharge from 15 to 20."]
+    },
+    {
+      "id": 1345,
+      "name": "Enchanter's Conundrum",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 10 seconds, target foe casts enchantments 100...200% slower. If target foe is not under the effects of an enchantment when this hex is applied, that foe and all adjacent foes take 10...100 damage.",
+          "to": "For 10 seconds, target foe casts enchantments 100...200% slower. If target foe is not under the effects of an enchantment when this hex is applied, that foe takes 10...100 damage and all adjacent foes take 75% of that damage."
+        },
+        "concise": {
+          "from": "Causes 100...200% slower enchantment casting (10 seconds). Initial effect: deals 10...100 damage to target and adjacent foes if target foe is not enchanted.",
+          "to": "Causes 100...200% slower enchantment casting (10 seconds). Initial effect: if target foe is not enchanted deals 10...100 damage to target and 75% of that damage to adjacent foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[BOTH] Reduce AoE damage from 100% to 75%",
+        "override: AoE 100% -> 75%"
+      ]
+    },
+    {
+      "id": 1346,
+      "name": "Signet of Illusions",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Your next 1...3 spells use your Illusion attribute instead of its normal attribute.",
+          "to": "Your next 1...3 non-Illusion spells use your Illusion attribute instead of its normal attribute."
+        },
+        "concise": {
+          "from": "Your next 1...3 spells use your Illusion attribute instead of its normal attribute.",
+          "to": "Your next 1...3 non-Illusion spells use your Illusion attribute instead of its normal attribute."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Changed functionality to “Your next 1..3 non-Illusion spells use your Illusion attribute instead of their normal attribute.”",
+        "override: reworked: only non-Illusion spells"
+      ]
+    },
+    {
+      "id": 1351,
+      "name": "Animate Shambling Horror",
+      "profession": "Necromancer",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 3,
+          "to": 1,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 15 to 10, reduce activation time from 3 to 1."
+      ]
+    },
+    {
+      "id": 1372,
+      "name": "Sandstorm",
+      "profession": "Elementalist",
+      "data": {
+        "recharge": {
+          "from": 25,
+          "to": 20,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Create a Sandstorm at target foe's location. For 10 seconds, nearby foes are struck for 10...30 earth damage each second and attacking foes are struck for an additional 10...30 earth damage each second.",
+          "to": "Create a Sandstorm at target foe's location. For 10 seconds, nearby foes are struck for 20...40 earth damage each second and attacking foes are struck for an additional 10...30 earth damage each second."
+        },
+        "concise": {
+          "from": "Deals 10...30 earth damage each second (10 seconds). Hits foes near target foe's initial location. Hits attacking foes for 10...30 more earth damage each second.",
+          "to": "Deals 20...40 earth damage each second (10 seconds). Hits foes near target foe's initial location. Hits attacking foes for 10...30 more earth damage each second."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Decrease recharge from 25 to 20, increase damage per second from 10..30 to 20..40 (additional DPS stays the same).",
+        "override: primary dps 10...30 -> 20...40 (recharge handled numerically)"
+      ]
+    },
+    {
+      "id": 1406,
+      "name": "Headbutt",
+      "profession": "Warrior",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Target touched foe takes 40...100 damage. You are Dazed for 5 seconds.",
+          "to": "Target touched foe takes 40...100 damage. You are Dazed for 10 seconds."
+        },
+        "concise": {
+          "from": "Deals 40...100 damage. <gray>You are Dazed (5 seconds).</gray>",
+          "to": "Deals 40...100 damage. <gray>You are Dazed (10 seconds).</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Decrease recharge from 15 to 10, decrease energy cost from 15 to 10, increase daze duration from 5 to 10.",
+        "override: Daze duration 5 -> 10 seconds (energy/recharge numeric)"
+      ]
+    },
+    {
+      "id": 1472,
+      "name": "Toxicity",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 1473,
+      "name": "Quicksand",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 1490,
+      "name": "Pious Assault",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If it hits, this attack deals +10...20 damage and removes 1 Dervish enchantment. If a Dervish enchantment was removed, this skill recharges 75% faster and adjacent foes take 10...30 damage.",
+          "to": "If it hits, this attack deals +10...20 damage and removes 1 Dervish enchantment. If a Dervish enchantment was removed, this skill recharges 75% faster and adjacent foes take 15...40 damage."
+        },
+        "concise": {
+          "from": "Deals +10...20 damage. Removes 1 of your Dervish enchantments. Removal Effect: this skill recharges 75% faster and adjacent foes take 10...30 damage.",
+          "to": "Deals +10...20 damage. Removes 1 of your Dervish enchantments. Removal Effect: this skill recharges 75% faster and adjacent foes take 15...40 damage."
+        }
+      },
+      "flags": [],
+      "notes": ["[BOTH] Increase conditional damage from 10..30 to 15..40."]
+    },
+    {
+      "id": 1491,
+      "name": "Mystic Twister",
+      "profession": "Dervish",
+      "data": {
+        "activation": {
+          "from": 1,
+          "to": 0.5,
+          "noteFrom": 1,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Decrease activation time from 1 to 0.5."]
+    },
+    {
+      "id": 1500,
+      "name": "Mirage Cloak",
+      "profession": "Dervish",
+      "data": {
+        "recharge": {
+          "from": 10,
+          "to": 15,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 1...7 seconds, you have a 40...80% chance to block incoming attacks. When you cast this enchantment, all nearby foes are struck for 10...40 earth damage.",
+          "to": "For 1...7 seconds, you have a 30...60% chance to block incoming attacks. When you cast this enchantment, all nearby foes are struck for 10...40 earth damage."
+        },
+        "concise": {
+          "from": "(1...7 seconds.) You have 40...80% chance to block. Initial Effect: deals 10...40 earth damage to nearby foes.",
+          "to": "(1...7 seconds.) You have 30...60% chance to block. Initial Effect: deals 10...40 earth damage to nearby foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase recharge from 10 to 15, reduce block chance from 40..80% to 30..60%."
+      ]
+    },
+    {
+      "id": 1514,
+      "name": "Fleeting Stability",
+      "profession": "Dervish",
+      "data": {
+        "recharge": {
+          "from": 10,
+          "to": 15,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 2...6 seconds, you cannot be knocked down and move 25% faster. This enchantment ends prematurely if it prevents a knockdown.",
+          "to": "For 4...10 seconds, you cannot be knocked down and move 25% faster. This enchantment ends prematurely if it prevents a knockdown."
+        },
+        "concise": {
+          "from": "(2...6 seconds.) You cannot be knocked down and move 25% faster. Ends if knockdown prevented.",
+          "to": "(4...10 seconds.) You cannot be knocked down and move 25% faster. Ends if knockdown prevented."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase recharge from 10 to 15, increase effect duration from 2..6 to 4..10."
+      ]
+    },
+    {
+      "id": 1516,
+      "name": "Mystic Regeneration",
+      "profession": "Dervish",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 15,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[BOTH] Increase energy cost from 10 to 15."]
+    },
+    {
+      "id": 1544,
+      "name": "Whirling Charge",
+      "profession": "Dervish",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 6,
+          "to": 10,
+          "noteFrom": 6,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 1...6 seconds, you move 33% faster than normal. The next time you strike a foe, all other nearby foes take 10...60 cold damage and this enchantment ends.",
+          "to": "For 1...6 seconds, you move 33% faster than normal. The next time you strike a foe, all other nearby foes take 10...50 cold damage and this enchantment ends."
+        },
+        "concise": {
+          "from": "(1...6 seconds.) You move 33% faster. Deal 10...60 cold damage to all other nearby foes the next time you hit a foe and this enchantment ends.",
+          "to": "(1...6 seconds.) You move 33% faster. Deal 10...50 cold damage to all other nearby foes the next time you hit a foe and this enchantment ends."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Decrease energy cost from 10 to 5, increase recharge from 6 to 10, decrease damage from 10..60 to 10..50."
+      ]
+    },
+    {
+      "id": 1547,
+      "name": "Mighty Throw",
+      "profession": "Paragon",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 1,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce activation time from 3 to 1."]
+    },
+    {
+      "id": 1548,
+      "name": "Cruel Spear",
+      "profession": "Paragon",
+      "data": {
+        "adrenaline": {
+          "from": 7,
+          "to": 6,
+          "noteFrom": 7,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "If this attack hits, you deal +1...31 damage. If it hits a non-moving target, you inflict a Deep Wound for 5...20 seconds.",
+          "to": "If this attack hits, you deal +10...50 damage. If it hits a non-moving target, you inflict a Deep Wound for 5...20 seconds."
+        },
+        "concise": {
+          "from": "Deals +1...31 damage. Inflicts Deep Wound condition (5...20 seconds) if target is not moving.",
+          "to": "Deals +10...50 damage. Inflicts Deep Wound condition (5...20 seconds) if target is not moving."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Decrease adrenaline cost from 7 to 6, increase damage from 1..31 to 10..50."
+      ]
+    },
+    {
+      "id": 1550,
+      "name": "Unblockable Throw",
+      "profession": "Paragon",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 1,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        },
+        "adrenaline": {
+          "from": 7,
+          "to": 4,
+          "noteFrom": 7,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation time from 3 to 1, reduce adrenaline cost from 7 to 4."
+      ]
+    },
+    {
+      "id": 1561,
+      "name": "Zealous Anthem",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 20 to 10."]
+    },
+    {
+      "id": 1562,
+      "name": "Aria of Zeal",
+      "profession": "Paragon",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 2,
+          "to": 1,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10 to 5, reduce activation time from 2 to 1, reduce recharge from 20 to 10."
+      ]
+    },
+    {
+      "id": 1564,
+      "name": "Ballad of Restoration",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[PVE] Reduce recharge from 20 to 10."]
+    },
+    {
+      "id": 1566,
+      "name": "Aria of Restoration",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 20 to 10."]
+    },
+    {
+      "id": 1602,
+      "name": "Stunning Strike",
+      "profession": "Paragon",
+      "data": {
+        "adrenaline": {
+          "from": 10,
+          "to": 8,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "If this attack hits, you deal +5...30 damage. If it hits a foe suffering from a condition, that foe is also Dazed for 4...10 seconds.",
+          "to": "If this attack hits, you deal +10...50 damage. If it hits a foe suffering from a condition, that foe is also Dazed for 4...10 seconds."
+        },
+        "concise": {
+          "from": "Deals +5...30 damage. Inflicts Dazed condition (4...10 seconds) if target has a condition.",
+          "to": "Deals +10...50 damage. Inflicts Dazed condition (4...10 seconds) if target has a condition."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce adrenaline cost from 10 to 8, increase damage from 5..30 to 10..50."
+      ]
+    },
+    {
+      "id": 1636,
+      "name": "Black Spider Strike",
+      "profession": "Assassin",
+      "data": {
+        "recharge": {
+          "from": 12,
+          "to": 8,
+          "noteFrom": 12,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge time from 12 to 8."]
+    },
+    {
+      "id": 1692,
+      "name": "Divert Hexes",
+      "profession": "Monk",
+      "data": {
+        "recharge": {
+          "from": 5,
+          "to": 8,
+          "noteFrom": 5,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 1,
+          "to": 0.75,
+          "noteFrom": 1,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Increase recharge time from 5 to 8, reduce activation time from 1 to 0.75."
+      ]
+    },
+    {
+      "id": 1725,
+      "name": "Roaring Winds",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 1730,
+      "name": "Infuriating Heat",
+      "profession": "Ranger (Nature Ritual)",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 2,
+          "noteFrom": 3,
+          "wiki": "bulk",
+          "bulk": "nature-ritual"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["Nature Ritual activation -> 2"]
+    },
+    {
+      "id": 1736,
+      "name": "Spirit's Strength",
+      "profession": "Ritualist",
+      "data": {
+        "recharge": {
+          "from": 30,
+          "to": 20,
+          "noteFrom": 30,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 30 to 20."]
+    },
+    {
+      "id": 1765,
+      "name": "Rending Aura",
+      "profession": "Dervish",
+      "data": {
+        "recharge": {
+          "from": 6,
+          "to": 10,
+          "noteFrom": 6,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Increase recharge from 6 to 10."]
+    },
+    {
+      "id": 1771,
+      "name": "Song of Restoration",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[PVE] Reduce recharge from 20 to 10."]
+    },
+    {
+      "id": 1772,
+      "name": "Lyric of Purification",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 20 to 10."]
+    },
+    {
+      "id": 1774,
+      "name": "Aggressive Refrain",
+      "profession": "Paragon",
+      "data": {
+        "energy": {
+          "from": 25,
+          "to": 15,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 2,
+          "to": 1,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 25 to 15, reduce activation time from 2 to 1."
+      ]
+    },
+    {
+      "id": 1782,
+      "name": "\"The Power Is Yours!\"",
+      "profession": "Paragon",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 3 seconds, all allies within earshot gain 0...1 Energy regeneration.",
+          "to": "For 2...4 seconds, all allies within earshot gain 1...2 Energy regeneration."
+        },
+        "concise": {
+          "from": "(3 seconds.) Allies within earshot gain 0...1 Energy regeneration.",
+          "to": "(2...4 seconds.) Allies within earshot gain 1...2 Energy regeneration."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase effect time from 3 to 2..4, increase energy regen from 0..1 to 1..2.",
+        "override: effect time 3 -> 2...4, energy regen 0...1 -> 1...2"
+      ]
+    },
+    {
+      "id": 1990,
+      "name": "Falling Lotus Strike",
+      "profession": "Assassin",
+      "data": {
+        "recharge": {
+          "from": 12,
+          "to": 8,
+          "noteFrom": 12,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge time from 12 to 8."]
+    },
+    {
+      "id": 1994,
+      "name": "Power Lock",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 12,
+          "to": 20,
+          "noteFrom": 12,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Increase recharge from 12 to 20."]
+    },
+    {
+      "id": 2003,
+      "name": "Cure Hex",
+      "profession": "Monk",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Remove one Hex from target ally. If a Hex was removed, that ally is healed for 30...120 Health.",
+          "to": "Remove one Hex from target ally. If a Hex was removed, that ally is healed for 30...100 Health."
+        },
+        "concise": {
+          "from": "Removes a Hex. Removal effect: Heals for 30...120.",
+          "to": "Removes a Hex. Removal effect: Heals for 30...100."
+        }
+      },
+      "flags": [],
+      "notes": ["[base] Reduce heal amount from 30..120 to 30..100."]
+    },
+    {
+      "id": 2207,
+      "name": "Inspirational Speech",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 20 to 10."]
+    },
+    {
+      "id": 2877,
+      "name": "Ballad of Restoration (PvP)",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 30,
+          "to": 20,
+          "noteFrom": 30,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 30 to 20."]
+    },
+    {
+      "id": 2878,
+      "name": "Song of Restoration (PvP)",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 30,
+          "to": 20,
+          "noteFrom": 30,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce recharge from 30 to 20."]
+    },
+    {
+      "id": 2884,
+      "name": "Mystic Regeneration (PvP)",
+      "profession": "Dervish",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 15,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[BOTH] Increase energy cost from 10 to 15."]
+    },
+    {
+      "id": 3006,
+      "name": "Shadowsong (PvP)",
+      "profession": "Ritualist",
+      "data": {
+        "recharge": {
+          "from": 45,
+          "to": 30,
+          "noteFrom": 45,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 5,
+          "to": 2,
+          "noteFrom": 5,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation time from 5 to 2, reduce recharge from 45 to 30."
+      ]
+    },
+    {
+      "id": 3007,
+      "name": "Pain (PvP)",
+      "profession": "Ritualist",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 1.5,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce activation time from 3 to 1.5."]
+    },
+    {
+      "id": 3014,
+      "name": "Dissonance (PvP)",
+      "profession": "Ritualist",
+      "data": {
+        "recharge": {
+          "from": 45,
+          "to": 30,
+          "noteFrom": 45,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 5,
+          "to": 2,
+          "noteFrom": 5,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation time from 5 to 2, reduce recharge from 45 to 30."
+      ]
+    },
+    {
+      "id": 3019,
+      "name": "Bloodsong (PvP)",
+      "profession": "Ritualist",
+      "data": {
+        "activation": {
+          "from": 3,
+          "to": 1.5,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[base] Reduce activation time from 3 to 1.5."]
+    },
+    {
+      "id": 3023,
+      "name": "Anguish (PvP)",
+      "profession": "Ritualist",
+      "data": {
+        "recharge": {
+          "from": 45,
+          "to": 30,
+          "noteFrom": 45,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 3,
+          "to": 1.5,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation time from 3 to 1.5, reduce recharge from 45 to 30."
+      ]
+    },
+    {
+      "id": 3152,
+      "name": "Crippling Anguish (PvP)",
+      "profession": "Mesmer",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 5...20 seconds, target moves 50% slower and suffers -1...5 Health degeneration.",
+          "to": "For 5...20 seconds, target moves 50% slower and suffers -2...6 Health degeneration."
+        },
+        "concise": {
+          "from": "(5...20 seconds.) Target foe moves 50% slower and has -1...5 Health degeneration.",
+          "to": "(5...20 seconds.) Target foe moves 50% slower and has -2...6 Health degeneration."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 15 to 10, increase health degeneration from 1..5 to 2..6."
+      ]
+    },
+    {
+      "id": 3180,
+      "name": "Shatter Delusions (PvP)",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Remove one Mesmer hex from target foe. If a hex was removed, that foe and all adjacent foes takes 15...75 damage.",
+          "to": "Remove one Mesmer hex from target foe. If a hex was removed, that foe takes 15...75 damage and all adjacent foes take 75% of that damage."
+        },
+        "concise": {
+          "from": "Removes a Mesmer hex from target foe. Removal effect: 15...75 damage to target and all adjacent foes.",
+          "to": "Removes a Mesmer hex from target foe. Removal effect: 15...75 damage to target and 75% of that damage to all adjacent foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[BOTH] Reduce AoE damage from 100% to 75%",
+        "override: AoE 100% -> 75% (PvP)"
+      ]
+    },
+    {
+      "id": 3181,
+      "name": "Illusionary Weaponry (PvP)",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 25,
+          "to": 15,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 30 seconds, your melee attacks neither hit nor fail to hit. Instead, Illusionary Weaponry deals 8...40 damage to your targets for each melee attack.",
+          "to": "For 30 seconds, your melee attacks neither hit nor fail to hit. Instead, Illusionary Weaponry deals 16...50 damage to your targets for each melee attack."
+        },
+        "concise": {
+          "from": "(30 seconds.) Deals 8...40 damage to foes in place of other damage or effects from melee attacks. <gray>Your melee attacks neither hit nor fail to hit.</gray>",
+          "to": "(30 seconds.) Deals 16...50 damage to foes in place of other damage or effects from melee attacks. <gray>Your melee attacks neither hit nor fail to hit.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[BOTH] Reduce recharge from 25 to 15, increase damage from 8..40 to 16..50."
+      ]
+    },
+    {
+      "id": 3183,
+      "name": "Migraine (PvP)",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 3...12 seconds, target foe suffers -1...8 Health degeneration and takes 100% longer to activate skills.",
+          "to": "For 4...16 seconds, target foe suffers -1...8 Health degeneration and takes 100% longer to activate skills."
+        },
+        "concise": {
+          "from": "(3...12 seconds.) Causes -1...8 Health degeneration and doubles skill activation time.",
+          "to": "(4...16 seconds.) Causes -1...8 Health degeneration and doubles skill activation time."
+        }
+      },
+      "flags": [],
+      "notes": ["[base] Increase duration from 3..12 to 4..16."]
+    },
+    {
+      "id": 3185,
+      "name": "Psychic Instability (PvP)",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 12,
+          "to": 20,
+          "noteFrom": 12,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": ["[BOTH] Increase recharge from 12 to 20."]
+    },
+    {
+      "id": 3191,
+      "name": "Mistrust (PvP)",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 6 seconds, the next spell that target foe casts on one of your allies fails and deals 10...75 damage to that foe and all nearby foes.",
+          "to": "For 6 seconds, the next spell that target foe casts on one of your allies fails and deals 10...60 damage to that foe and 75% of that damage to all nearby foes."
+        },
+        "concise": {
+          "from": "(6 seconds.) The next spell that target foe casts on one of your allies fails and deals 10...75 damage to target and nearby foes.",
+          "to": "(6 seconds.) The next spell that target foe casts on one of your allies fails and deals 10...60 damage to target and 75% of that damage to nearby foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce damage from 10..75 to 10..60, reduce AoE damage from 100% to 75%.",
+        "override: damage 10...75 -> 10...60, AoE 100% -> 75% (PvP)"
+      ]
+    },
+    {
+      "id": 3192,
+      "name": "Enchanter's Conundrum (PvP)",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 10 seconds, target foe casts enchantments 100...200% slower. If target foe is not under the effects of an enchantment when this hex is applied, that foe and all adjacent foes take 10...100 damage.",
+          "to": "For 10 seconds, target foe casts enchantments 100...200% slower. If target foe is not under the effects of an enchantment when this hex is applied, that foe takes 10...100 damage and all adjacent foes take 75% of that damage."
+        },
+        "concise": {
+          "from": "Causes 100...200% slower enchantment casting (10 seconds). Initial effect: deals 10...100 damage to target and adjacent foes if target foe is not enchanted.",
+          "to": "Causes 100...200% slower enchantment casting (10 seconds). Initial effect: if target foe is not enchanted deals 10...100 damage to target and 75% of that damage to adjacent foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[BOTH] Reduce AoE damage from 100% to 75%",
+        "override: AoE 100% -> 75% (PvP)"
+      ]
+    },
+    {
+      "id": 3266,
+      "name": "Pious Assault (PvP)",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "You remove 1 Dervish enchantment. If a Dervish enchantment was removed, this skill recharges 75% faster and adjacent foes take 10...30 damage.",
+          "to": "You remove 1 Dervish enchantment. If a Dervish enchantment was removed, this skill recharges 75% faster and adjacent foes take 15...40 damage."
+        },
+        "concise": {
+          "from": "Removes 1 of your Dervish enchantments. Removal effect: this skill recharges 75% faster and adjacent foes take 10...30 damage.",
+          "to": "Removes 1 of your Dervish enchantments. Removal effect: this skill recharges 75% faster and adjacent foes take 15...40 damage."
+        }
+      },
+      "flags": [],
+      "notes": ["[BOTH] Increase conditional damage from 10..30 to 15..40."]
+    },
+    {
+      "id": 3273,
+      "name": "Signet of Pious Restraint (PvP)",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Lose 1 Dervish enchantment and Cripple target foe 5...15 seconds. If an enchantment was removed, this skill recharges 75% faster.",
+          "to": "Lose 1 Dervish enchantment and Cripple target foe 5...15 seconds. If an enchantment was removed, this skill recharges 50% faster."
+        },
+        "concise": {
+          "from": "(5...15 seconds.) Cripples target foe and removes 1 of your Dervish enchantments. Removal effect: recharges 75% faster.",
+          "to": "(5...15 seconds.) Cripples target foe and removes 1 of your Dervish enchantments. Removal effect: recharges 50% faster."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge bonus on enchantment removal from 75% to 50%.",
+        "override: recharge bonus 75% -> 50% (PvP)"
+      ]
+    }
+  ]
+}

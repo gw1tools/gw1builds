@@ -1,5 +1,17 @@
 # What's New
 
+## June 25, 2026
+
+**June 24, 2026 Skill Balance Update**
+
+- Updated skill data for 156 skills across all 10 professions from the [June 24, 2026 game balance patch](https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260624)
+- Minion masters rejoice: every Animate spell now casts in 1 second (from 3) and most cost far less Energy
+- Paragon party support got much more spammable — Aria, Ballad, Song of Restoration, Zealous Anthem and more had recharge cut roughly in half
+- Nature Rituals all cast faster now (2 seconds)
+- **Signet of Illusions** reworked to convert only your next 1...3 non-Illusion spells
+- Mesmer AoE nukes (Energy Surge, Cry of Frustration, Mistrust, Overload and friends) now deal 75% damage to secondary targets
+- Big-hitter buffs: **Eviscerate**, **Cruel Spear**, **Stunning Strike**, and **Cleave** (now also strikes 1...2 adjacent foes)
+
 ## May 4, 2026
 
 **April 28, 2026 Skill Balance Update**
