@@ -1,0 +1,27 @@
+{
+	"date": "20260703-june24-followup",
+	"source": "https://wiki.guildwars.com/wiki/Cleave (post-20260624 verify follow-up)",
+	"generatedAt": "2026-07-03T08:30:00.000Z",
+	"entries": [
+		{
+			"id": 335,
+			"name": "Cleave",
+			"profession": "Warrior",
+			"data": {},
+			"desc": {
+				"description": {
+					"from": "If this attack hits, you strike for +10...40 damage. This attack also hits 1...2 random adjacent foes.",
+					"to": "If this attack hits, you strike for +10...40 damage and hit 1...2 adjacent foe for 10...40 slashing damage."
+				},
+				"concise": {
+					"from": "Deals +10...40 damage. Also hits 1...2 random adjacent foes.",
+					"to": "Deals +10...40 damage and hits 1...2 adjacent foe for 10...40 slashing damage."
+				}
+			},
+			"flags": [],
+			"notes": [
+				"Follow-up to the 20260624 changeset's WIKI LAGGED override: the adjacent-hit clause was authored from patch notes before the wiki page updated. Wiki has since caught up and specifies the adjacent hits deal 10...40 slashing damage; text replaced with the wiki page's wording rendered to our style (fetchSkill, 2026-07-03)."
+			]
+		}
+	]
+}

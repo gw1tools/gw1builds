@@ -90,7 +90,7 @@ export const renderWikiText = raw => {
   t = t.replace(/\{\{gr\|([^}]*)\}\}/gi, (_m, args) => {
     const parts = args.split('|').map(s => s.trim())
     const neg = parts.includes('-')
-    const nums = parts.filter(p => /^-?\d/.test(p))
+    const nums = parts.filter(p => /^[+-]?\d/.test(p))
     if (nums.length === 0) return ''
     const range =
       nums.length === 1 ? nums[0] : `${nums[0]}...${nums[nums.length - 1]}`

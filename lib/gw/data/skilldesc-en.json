@@ -1967,8 +1967,8 @@
 		"335": {
 			"id": 335,
 			"name": "Cleave",
-			"description": "If this attack hits, you strike for +10...40 damage. This attack also hits 1...2 random adjacent foes.",
-			"concise": "Deals +10...40 damage. Also hits 1...2 random adjacent foes."
+			"description": "If this attack hits, you strike for +10...40 damage and hit 1...2 adjacent foe for 10...40 slashing damage.",
+			"concise": "Deals +10...40 damage and hits 1...2 adjacent foe for 10...40 slashing damage."
 		},
 		"336": {
 			"id": 336,
