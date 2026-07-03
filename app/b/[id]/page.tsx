@@ -2,9 +2,9 @@
  * @fileoverview Build detail page - displays single or team builds
  * @module app/b/[id]/page
  *
- * Server Component that fetches and displays a complete build.
- * Handles both single-character and team (8-hero) builds.
- * Increments view count on each page load.
+ * Statically rendered / ISR-cached Server Component that fetches and displays
+ * a complete build. Handles both single-character and team (8-hero) builds.
+ * View tracking and per-user state are handled client-side (see ./client).
  *
  * Route: /b/[id] where id is a 7-character nanoid
  *
@@ -12,18 +12,25 @@
  * @see components/build/ for UI components
  */
 import { notFound } from 'next/navigation'
-import { headers } from 'next/headers'
 import type { Metadata } from 'next'
-import {
-  getBuildById,
-  recordBuildView,
-  hasUserStarredBuild,
-} from '@/lib/services/builds'
+import { getBuildById } from '@/lib/services/builds'
 import { getSkillsByIds, type Skill } from '@/lib/gw/skills'
-import { createClient } from '@/lib/supabase/server'
 import { PROFESSION_COLORS, SITE_URL } from '@/lib/constants'
 import { BuildPageClient } from './client'
 import type { SkillBar } from '@/types/database'
+
+// ISR: build pages are public content and rendered from cache so crawler +
+// user traffic doesn't invoke a function per request. Per-user state (owner,
+// stars, views) is resolved client-side. Edits trigger on-demand revalidation.
+export const revalidate = 300
+export const dynamicParams = true
+
+// Opt into ISR for the dynamic [id] segment. Returning [] prerenders nothing
+// at build time; each build id renders and is cached on first request, then
+// served from cache (no function invocation) until revalidated.
+export function generateStaticParams() {
+  return []
+}
 
 interface BuildPageProps {
   params: Promise<{ id: string }>
@@ -43,8 +50,8 @@ export async function generateMetadata({
   const { id } = await params
   const build = await getBuildById(id)
 
-  // Don't expose metadata for non-existent or delisted builds
-  if (!build || build.moderation_status === 'delisted') {
+  // Only published builds are publicly viewable; everything else is "not found".
+  if (!build || build.moderation_status !== 'published') {
     return {
       title: 'Build not found',
     }
@@ -75,6 +82,10 @@ export async function generateMetadata({
   return {
     title: build.name,
     description,
+    // Private (link-only) builds are accessible by URL but must not be indexed.
+    robots: build.is_private
+      ? { index: false, follow: false }
+      : undefined,
     openGraph: {
       title: build.name,
       description,
@@ -135,68 +146,35 @@ async function getSkillsForBuild(
 /**
  * Build detail page component
  *
- * Async Server Component that:
- * 1. Fetches build data by ID
- * 2. Shows 404 if not found
+ * Statically rendered / ISR-cached Server Component that:
+ * 1. Fetches public build data by ID (cookieless)
+ * 2. Shows 404 for missing or non-published builds
  * 3. Fetches skill data (icons served locally from /public/skills/)
- * 4. Increments view count (fire-and-forget)
- * 5. Checks ownership for edit button
- * 6. Renders appropriate view (single vs team)
+ * 4. Renders the appropriate view (single vs team)
+ *
+ * Per-user concerns (ownership, edit button, star state, view tracking) are
+ * resolved client-side in BuildPageClient so this page stays cacheable.
  */
 export default async function BuildPage({ params }: BuildPageProps) {
   const { id } = await params
 
   const build = await getBuildById(id)
 
-  if (!build) {
+  // Only published builds are publicly viewable. Delisted/appealed builds 404
+  // here; owners manage them via the authenticated editor (/b/[id]/edit).
+  // Private (is_private) builds stay published and remain link-accessible.
+  if (!build || build.moderation_status !== 'published') {
     notFound()
   }
 
-  // Get client IP for unique view tracking
-  const headersList = await headers()
-  const clientIP =
-    headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    headersList.get('x-real-ip') ||
-    'unknown'
-
-  // Run independent operations in parallel
-  const [skillMap, supabase] = await Promise.all([
-    getSkillsForBuild(build.bars as SkillBar[]),
-    createClient(),
-  ])
-
-  // Get user (required for isOwner and star check)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  const isOwner = user?.id === build.author_id
-  const isCollaborator = build.collaborators?.some(c => c.user_id === user?.id) ?? false
-  const canEdit = isOwner || isCollaborator
-
-  // Access control: delisted builds only visible to owner
-  if (build.moderation_status === 'delisted' && !isOwner) {
-    notFound()
-  }
-
-  // Record view - fire and forget (don't block render, only for published builds)
-  if (build.moderation_status === 'published') {
-    recordBuildView(id, clientIP).catch(() => {})
-  }
-
-  // Check if user has starred this build
-  const initialStarred = user ? await hasUserStarredBuild(user.id, id) : false
+  const skillMap = await getSkillsForBuild(build.bars as SkillBar[])
 
   return (
     <BuildPageClient
       build={build}
       skillMap={Object.fromEntries(skillMap)}
-      isOwner={isOwner}
-      canEdit={canEdit}
       professionColors={PROFESSION_COLORS}
-      initialStarred={initialStarred}
       starCount={build.star_count}
-      isAuthenticated={!!user}
     />
   )
 }

@@ -12,6 +12,7 @@
  */
 
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import {
   submitReport,
   ReportServiceError,
@@ -70,6 +71,13 @@ export async function POST(
       reason: reason as ReportReason,
       details: details?.trim() || undefined,
     })
+
+    // A report can trip the DB auto-delist trigger (3-report threshold). That
+    // happens in Postgres with no app-layer hook, so bust the cached build
+    // page and feed here — otherwise an auto-delisted build would keep serving
+    // its cached published copy until the ISR window expires (~5 min).
+    revalidatePath(`/b/${id}`)
+    revalidatePath('/')
 
     return NextResponse.json({ success: true })
   } catch (error) {

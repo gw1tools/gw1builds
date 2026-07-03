@@ -14,14 +14,22 @@ import type { Metadata } from 'next'
 import {
   getUserByUsername,
   getPublicBuildsByUser,
-  type UserBuildSortType,
 } from '@/lib/services/users'
 import { SITE_URL } from '@/lib/constants'
 import { ProfilePageClient } from './client'
 
+// ISR: public profiles served from cache. Tab state (?tab=recent) is resolved
+// client-side; both tab datasets are sent so switching is instant.
+export const revalidate = 300
+export const dynamicParams = true
+
+// Opt into ISR for the dynamic [username] segment (on-demand cached renders).
+export function generateStaticParams() {
+  return []
+}
+
 interface ProfilePageProps {
   params: Promise<{ username: string }>
-  searchParams: Promise<{ tab?: string }>
 }
 
 /**
@@ -66,18 +74,14 @@ export async function generateMetadata({
  * Fetches user profile and their public builds.
  * Shows 404 if user doesn't exist.
  */
-export default async function ProfilePage({ params, searchParams }: ProfilePageProps) {
+export default async function ProfilePage({ params }: ProfilePageProps) {
   const { username } = await params
-  const { tab } = await searchParams
 
   const user = await getUserByUsername(username)
 
   if (!user || !user.username) {
     notFound()
   }
-
-  // Validate tab parameter
-  const initialTab: UserBuildSortType = tab === 'recent' ? 'recent' : 'popular'
 
   // Fetch user's public builds for both tabs in parallel
   const [popularBuilds, recentBuilds] = await Promise.all([
@@ -91,7 +95,7 @@ export default async function ProfilePage({ params, searchParams }: ProfilePageP
       createdAt={user.created_at}
       popularBuilds={popularBuilds}
       recentBuilds={recentBuilds}
-      initialTab={initialTab}
+      initialTab="popular"
     />
   )
 }

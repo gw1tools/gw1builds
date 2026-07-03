@@ -8,20 +8,18 @@ import { Container } from '@/components/layout/container'
 import { Button } from '@/components/ui'
 import { BuildFeed } from '@/components/build/build-feed'
 import { BuildSearchTrigger } from '@/components/build/build-search-trigger'
-import { getBuilds, type BuildSortType } from '@/lib/supabase/queries'
+import { getBuilds } from '@/lib/supabase/queries'
 import { loadBuildsForSearch } from '@/lib/actions/search'
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ tab?: string }>
-}) {
-  // Read and validate tab parameter
-  const { tab } = await searchParams
-  const initialTab: BuildSortType = tab === 'recent' ? 'recent' : 'popular'
+// ISR: the homepage is public content served from cache. The "Popular" feed
+// is rendered server-side; the Recent tab and ?tab=recent deep-links are
+// resolved client-side in BuildFeed.
+export const revalidate = 120
 
-  // Fetch builds for the selected tab
-  const { builds, nextOffset } = await getBuilds({ type: initialTab, limit: 20 })
+export default async function HomePage() {
+  // Always render the Popular feed for the cached page; tab switching happens
+  // client-side without re-rendering the server component.
+  const { builds, nextOffset } = await getBuilds({ type: 'popular', limit: 20 })
 
   return (
     <>
@@ -63,7 +61,7 @@ export default async function HomePage({
         <Container size="md">
           <BuildFeed
             initialBuilds={builds}
-            initialTab={initialTab}
+            initialTab="popular"
             initialNextOffset={nextOffset}
           />
         </Container>

@@ -24,6 +24,8 @@ import type { User } from '@/types/database'
 interface AuthContextValue {
   user: SupabaseUser | null
   profile: User | null
+  /** True until the session has been resolved client-side on mount. */
+  loading: boolean
   signInWithGoogle: () => Promise<void>
   signInWithDiscord: () => Promise<void>
   signInWithEmail: (email: string) => Promise<{ error: Error | null }>
@@ -38,19 +40,70 @@ const supabase = createClient()
 
 interface AuthProviderProps {
   children: ReactNode
-  initialUser: SupabaseUser | null
-  initialProfile: User | null
 }
 
-export function AuthProvider({
-  children,
-  initialUser,
-  initialProfile,
-}: AuthProviderProps) {
-  // Initialize with server-provided data (no async fetch needed)
-  const [user, setUser] = useState<SupabaseUser | null>(initialUser)
-  const [profile, setProfile] = useState<User | null>(initialProfile)
-  // No loading state - we have initial data from server
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [profile, setProfile] = useState<User | null>(null)
+  // Loading until the session is resolved client-side on mount. The root
+  // layout is static, so it no longer provides the session.
+  const [loading, setLoading] = useState(true)
+
+  // Resolve the authoritative session client-side on mount. The root layout
+  // is static (it no longer reads cookies), so this is where logged-in state
+  // is established. Auth-dependent UI shows a skeleton while loading.
+  useEffect(() => {
+    let active = true
+    supabase.auth
+      .getUser()
+      .then(({ data: { user: fetchedUser } }) => {
+        if (!active) return
+        // Mirror the server-side anon-session filter (lib/supabase/server.ts).
+        const currentUser = fetchedUser?.is_anonymous ? null : fetchedUser
+
+        if (!currentUser) {
+          setUser(null)
+          setProfile(null)
+          setLoading(false)
+          return
+        }
+
+        // Fetch the profile BEFORE committing the user, then set both together.
+        // Otherwise there is a render with user set but profile still null,
+        // which the auth modal reads as "needs a username" and wrongly prompts
+        // returning users on refresh. .then() (not await) avoids the documented
+        // Supabase deadlock.
+        Promise.resolve(
+          supabase
+            .from('users')
+            .select('*')
+            .eq('id', currentUser.id)
+            .single()
+        )
+          .then(({ data: profileData }) => {
+            if (!active) return
+            setUser(currentUser)
+            setProfile(profileData)
+            setLoading(false)
+          })
+          .catch(() => {
+            if (!active) return
+            setUser(currentUser)
+            setProfile(null)
+            setLoading(false)
+          })
+      })
+      .catch(() => {
+        if (!active) return
+        setUser(null)
+        setProfile(null)
+        setLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   // Subscribe to auth state changes (sign in/out only)
   // IMPORTANT: Never use async/await inside onAuthStateChange - it causes deadlocks
@@ -70,11 +123,12 @@ export function AuthProvider({
         // Treat tactics-created anonymous sessions as not signed in.
         // Mirrors the server-side filter in lib/supabase/server.ts.
         const currentUser = sessionUser?.is_anonymous ? null : sessionUser
-        setUser(currentUser)
 
         if (currentUser) {
-          // Use .then() instead of await to avoid deadlock
-          // Wrap in Promise.resolve to ensure .catch() is available
+          // Fetch the profile before committing the user so consumers never
+          // see a logged-in user without a profile (which would briefly flash
+          // the "choose a username" modal for existing users). Use .then()
+          // instead of await to avoid the documented Supabase deadlock.
           Promise.resolve(
             supabase
               .from('users')
@@ -83,13 +137,16 @@ export function AuthProvider({
               .single()
           )
             .then(({ data: profileData }) => {
+              setUser(currentUser)
               setProfile(profileData)
             })
             .catch((error) => {
               console.error('Failed to fetch profile:', error)
+              setUser(currentUser)
               setProfile(null)
             })
         } else {
+          setUser(null)
           setProfile(null)
         }
       }
@@ -101,9 +158,10 @@ export function AuthProvider({
   }, [])
 
   // Fire once per browser session so Vercel Analytics can compute the
-  // logged-in share of DAU. Uses initialUser from the server render, so the
-  // auth state is authoritative on mount.
+  // logged-in share of DAU. Waits for the session to resolve so the
+  // is_logged_in flag is authoritative.
   useEffect(() => {
+    if (loading) return
     // sessionStorage can throw in locked-down browser modes — never let an
     // analytics side-effect break the auth provider render.
     try {
@@ -114,7 +172,7 @@ export function AuthProvider({
       // Ignore — analytics is best-effort.
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [loading])
 
   const signInWithOAuth = useCallback(
     async (provider: 'google' | 'discord') => {
@@ -221,6 +279,7 @@ export function AuthProvider({
       value={{
         user,
         profile,
+        loading,
         signInWithGoogle,
         signInWithDiscord,
         signInWithEmail,

@@ -12,7 +12,7 @@
  */
 
 import { cache } from 'react'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createPublicClient } from '@/lib/supabase/server'
 import { nanoid } from 'nanoid'
 import type {
   Build,
@@ -137,7 +137,10 @@ export const getBuildById = cache(async function getBuildById(
     return null
   }
 
-  const supabase = await createClient()
+  // Cookieless client so build pages can be statically rendered / ISR-cached.
+  // RLS already exposes non-deleted builds to everyone, so anon results are
+  // identical to an authenticated read here.
+  const supabase = createPublicClient()
 
   const { data, error } = await supabase
     .from('builds')
@@ -850,7 +853,9 @@ export async function getCollaborators(
     return []
   }
 
-  const supabase = await createClient()
+  // Cookieless: collaborators are public on active builds (RLS), and this
+  // runs inside getBuildById on the cacheable build page.
+  const supabase = createPublicClient()
 
   const { data, error } = await supabase
     .from('build_collaborators')

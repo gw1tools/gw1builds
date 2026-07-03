@@ -92,11 +92,13 @@ function AuthModal({
   onClose: () => void
   redirectTo: string | null
 }) {
-  const { user, profile, refreshProfile, signOut } = useAuth()
+  const { user, profile, loading, refreshProfile, signOut } = useAuth()
   const router = useRouter()
 
-  // Determine modal state
-  const needsUsername = user && !profile?.username
+  // Determine modal state. Wait for auth to resolve (loading) before treating
+  // a session as "needs a username" — otherwise the modal briefly prompts
+  // returning users while the profile is still being fetched.
+  const needsUsername = !loading && user && !profile?.username
   const showSignIn = open && !user
   const isOpen = needsUsername || showSignIn
   const canClose = !needsUsername

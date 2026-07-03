@@ -3,7 +3,6 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import { Toaster } from 'sonner'
 import { Analytics } from '@vercel/analytics/next'
-import { createClient } from '@/lib/supabase/server'
 import { AuthProvider } from '@/components/providers/auth-provider'
 import { AuthModalProvider } from '@/components/auth/auth-modal'
 import { ThankYouModal } from '@/components/thank-you-modal'
@@ -58,35 +57,21 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  // Fetch session on server - this is fast and uses HTTP-only cookies
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Fetch profile if user exists
-  let profile = null
-  if (user) {
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', user.id)
-      .single()
-    profile = data
-  }
-
+  // Auth is resolved client-side in AuthProvider so this layout (and every
+  // page under it) can be statically rendered / CDN-cached instead of being
+  // forced dynamic by reading cookies() here.
   return (
     <html
       lang="en"
       className={`${GeistSans.variable} ${GeistMono.variable} ${buildWarsFont.variable}`}
     >
       <body className="antialiased min-h-dvh bg-background font-sans dot-grid-subtle flex flex-col">
-        <AuthProvider initialUser={user} initialProfile={profile}>
+        <AuthProvider>
           <AuthModalProvider>
             <Header />
             <main className="pt-16 flex-1">

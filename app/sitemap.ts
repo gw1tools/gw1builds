@@ -53,6 +53,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .from('builds')
       .select('id, updated_at')
       .is('deleted_at', null)
+      // Only advertise publicly listed builds. Private (link-only) builds must
+      // not be exposed to crawlers, and delisted builds 404, so both are excluded.
+      .eq('moderation_status', 'published')
+      .eq('is_private', false)
       .order('updated_at', { ascending: false })
 
     if (error) {
