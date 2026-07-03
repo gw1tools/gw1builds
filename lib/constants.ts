@@ -313,6 +313,7 @@ export const CHARACTERISTICS = [
   'budget',
   'niche',
   'meme',
+  'mobile-friendly',
 ] as const
 
 /**
@@ -367,6 +368,7 @@ export const TAG_LABELS: Record<string, string> = {
   budget: 'Budget',
   niche: 'Niche',
   meme: 'Meme',
+  'mobile-friendly': 'Mobile Friendly',
   // Build types
   player: 'Player',
   hero: 'Hero',
@@ -402,6 +404,8 @@ export const TAG_TOOLTIPS: Record<string, string> = {
   'hard-mode': 'Harder enemies, better drops',
   'speed-clear': 'Optimized team runs',
   running: 'Movement/escort builds',
+  // Characteristics
+  'mobile-friendly': 'Easy to play on the GW1 mobile app',
 }
 
 /**

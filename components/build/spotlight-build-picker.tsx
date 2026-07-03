@@ -59,7 +59,7 @@ const TAG_GROUPS: Record<string, string[]> = {
   'Elite Areas': ['uw', 'fow', 'doa', 'deep', 'urgoz', 'se', 'sf'],
   'PvP Formats': ['gvg', 'ha', 'ra', 'ab', 'fa', 'jq', 'ca'],
   'Build Type': ['player', 'hero', 'team'],
-  'Characteristics': ['meta', 'beginner', 'budget', 'alternative', 'niche', 'meme'],
+  'Characteristics': ['meta', 'beginner', 'budget', 'alternative', 'niche', 'meme', 'mobile-friendly'],
   'PvX Status': ['great', 'good', 'testing'],
 }
 
