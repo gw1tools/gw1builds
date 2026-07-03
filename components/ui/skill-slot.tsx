@@ -80,6 +80,8 @@ export interface SkillSlotProps {
   attributes?: Record<string, number>
   /** Tooltip content density */
   tooltipMode?: 'full' | 'compact'
+  /** Apply the press-down hover affordance (default true). Set false for read-only previews. */
+  pressable?: boolean
 }
 
 /**
@@ -110,6 +112,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
       emptyVariant = 'viewer',
       attributes,
       tooltipMode = 'full',
+      pressable = true,
     },
     forwardedRef
   ) => {
@@ -248,7 +251,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
       'relative flex items-center justify-center',
       'cursor-pointer overflow-hidden',
       'transition-transform duration-75 ease-out',
-      'hover:translate-y-0.5',
+      pressable && !disabled && 'hover:translate-y-0.5',
       elite ? 'shadow-sticky-gold' : 'shadow-sticky',
       isEmpty && 'border-2 border-black',
       isEmpty
@@ -256,7 +259,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
           ? 'bg-bg-card/80'
           : 'bg-black/60'
         : 'bg-bg-card',
-      disabled && 'opacity-50 cursor-not-allowed hover:translate-y-0',
+      disabled && 'opacity-50 cursor-not-allowed',
       active && 'ring-2 ring-accent-gold ring-offset-1 ring-offset-bg-primary',
       invalid && 'border-2 border-accent-red',
       className
