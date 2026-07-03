@@ -2669,8 +2669,8 @@
 		"463": {
 			"id": 463,
 			"name": "Winnowing",
-			"description": "Create a level 1...10 spirit. Non-spirit creatures within range take 4 additional damage whenever they take physical damage. This spirit dies after 30...150 seconds.",
-			"concise": "Creates a level 1...10 spirit (30...150 second lifespan). Increases physical damage by +4 for creatures in range. Does not affect spirits."
+			"description": "Create a level 1...10 spirit. Non-spirit creatures within range take 4 additional damage whenever they take physical damage. This spirit dies after 30...240 seconds.",
+			"concise": "Creates a level 1...10 spirit (30...240 second lifespan). Increases physical damage by +4 for creatures in range. Does not affect spirits."
 		},
 		"464": {
 			"id": 464,
@@ -2705,14 +2705,14 @@
 		"469": {
 			"id": 469,
 			"name": "Primal Echoes",
-			"description": "Create a level 1...10 Spirit. For non-Spirit creatures within its range, Signets cost 10 Energy to use. This Spirit dies after 30...150 seconds.",
-			"concise": "Creates a level 1...10 spirit (30...150 second lifespan). Signets cost 10 energy for creatures in range. Does not affect spirits."
+			"description": "Create a level 1...10 Spirit. For non-Spirit creatures within its range, Signets cost 10 Energy to use. This Spirit dies after 30...240 seconds.",
+			"concise": "Creates a level 1...10 spirit (30...240 second lifespan). Signets cost 10 energy for creatures in range. Does not affect spirits."
 		},
 		"470": {
 			"id": 470,
 			"name": "Predatory Season",
-			"description": "Create a level 1...10 spirit. For non-spirit creatures within its range, all healing is reduced by 20%. If any of your attacks hit, you gain 5 Health. This spirit dies after 30...240 seconds.",
-			"concise": "Creates a level 1...10 spirit (30...240 second lifespan). Creatures in range receive 20% less from healing. Creatures gain 5 health each time they hit with an attack. Does not affect spirits."
+			"description": "Create a level 1...10 spirit. For non-spirit creatures within its range, all healing is reduced by 20%. If any of your attacks hit, you gain 5 Health. This spirit dies after 30...150 seconds.",
+			"concise": "Creates a level 1...10 spirit (30...150 second lifespan). Creatures in range receive 20% less from healing. Creatures gain 5 health each time they hit with an attack. Does not affect spirits."
 		},
 		"471": {
 			"id": 471,
@@ -2723,26 +2723,26 @@
 		"472": {
 			"id": 472,
 			"name": "Favorable Winds",
-			"description": "Create a level 1...10 spirit. For non-spirit creatures within its range, arrows move twice as fast and strike for +6 damage. This spirit dies after 30...150 seconds.",
-			"concise": "Creates a level 1...10 spirit (30...150 second lifespan). Arrows move twice as fast and hit for +6 damage for creatures in range. Does not affect spirits."
+			"description": "Create a level 1...10 spirit. For non-spirit creatures within its range, arrows move twice as fast and strike for +6 damage. This spirit dies after 30...240 seconds.",
+			"concise": "Creates a level 1...10 spirit (30...240 second lifespan). Arrows move twice as fast and hit for +6 damage for creatures in range. Does not affect spirits."
 		},
 		"474": {
 			"id": 474,
 			"name": "Energizing Wind",
-			"description": "Create a level 1...6 spirit. For non-spirit creatures within its range, all skills cost 15 less Energy (minimum cost 10 Energy), and skills recharge 25% slower. This spirit dies after 1...31 seconds.",
-			"concise": "Creates a level 1...6 spirit (1...31 seconds lifespan). Skills cost 15 less energy (minimum cost 10 energy) and recharge 25% slower for creatures in range. Does not affect spirits."
+			"description": "Create a level 1...6 spirit. For non-spirit creatures within its range, all skills cost 15 less Energy (minimum cost 10 Energy), and skills recharge 25% slower. This spirit dies after 1...60 seconds.",
+			"concise": "Creates a level 1...6 spirit (1...60 seconds lifespan). Skills cost 15 less energy (minimum cost 10 energy) and recharge 25% slower for creatures in range. Does not affect spirits."
 		},
 		"475": {
 			"id": 475,
 			"name": "Quickening Zephyr",
-			"description": "Create a level 1...10 spirit. For non-spirit creatures within its range, all skills recharge twice as fast and cost 30% more of the base Energy to cast. This spirit dies after 15...45 seconds.",
-			"concise": "Creates a level 1...10 spirit (15...45 second lifespan). Skills cost 30% more Energy and recharge twice as fast for creatures in range. Does not affect spirits."
+			"description": "Create a level 1...10 spirit. For non-spirit creatures within its range, all skills recharge twice as fast and cost 30% more of the base Energy to cast. This spirit dies after 15...90 seconds.",
+			"concise": "Creates a level 1...10 spirit (15...90 second lifespan). Skills cost 30% more Energy and recharge twice as fast for creatures in range. Does not affect spirits."
 		},
 		"476": {
 			"id": 476,
 			"name": "Nature's Renewal",
-			"description": "Create a level 1...10 spirit. For 30...150 seconds, enchantments and hexes cast by non-spirit creatures in range take twice as long to cast, and it costs twice as much Energy to maintain enchantments. This spirit dies after 30...150 seconds.",
-			"concise": "Creates a level 1...10 spirit (30...150 second lifespan). For creatures in range, enchantments and Hexes <sic/> take twice as long to cast and it costs twice as much Energy to maintain enchantments. Does not affect spirits."
+			"description": "Create a level 1...10 spirit. For 30...240 seconds, enchantments and hexes cast by non-spirit creatures in range take twice as long to cast, and it costs twice as much Energy to maintain enchantments. This spirit dies after 30...240 seconds.",
+			"concise": "Creates a level 1...10 spirit (30...240 second lifespan). For creatures in range, enchantments and Hexes <sic/> take twice as long to cast and it costs twice as much Energy to maintain enchantments. Does not affect spirits."
 		},
 		"477": {
 			"id": 477,
@@ -4577,8 +4577,8 @@
 		"1213": {
 			"id": 1213,
 			"name": "Tranquility",
-			"description": "Create a level 1...10 spirit. Enchantments cast by non-spirit creatures within its range expire 20...50% faster. This spirit dies after 30...120 seconds.",
-			"concise": "Creates a level 1...10 spirit (30...120 second lifespan). Enchantments expire 20...50% faster on creatures in range. Does not affect spirits."
+			"description": "Create a level 1...10 spirit. Enchantments cast by non-spirit creatures within its range expire 20...50% faster. This spirit dies after 15...120 seconds.",
+			"concise": "Creates a level 1...10 spirit (15...120 second lifespan). Enchantments expire 20...50% faster on creatures in range. Does not affect spirits."
 		},
 		"1215": {
 			"id": 1215,
