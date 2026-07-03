@@ -20,13 +20,14 @@ import { useAuth } from '@/components/providers/auth-provider'
 import { useAuthModal } from '@/components/auth/auth-modal'
 import { UserAvatar } from '@/components/ui/user-avatar'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { FeedbackModal } from '@/components/feedback/feedback-modal'
 import { dropdownVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
 export function Header() {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile, loading, signOut } = useAuth()
   const { openModal } = useAuthModal()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
@@ -127,7 +128,9 @@ export function Header() {
             </button>
 
             {/* Auth Section */}
-            {user && profile ? (
+            {loading ? (
+              <Skeleton className="h-8 w-8 rounded-full" />
+            ) : user && profile ? (
               <div className="relative">
                 <button
                   id="user-menu-button"

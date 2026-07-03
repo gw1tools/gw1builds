@@ -10,7 +10,7 @@
  */
 
 import { cache } from 'react'
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/server'
 import type { BuildListItem, PublicUserProfile } from '@/types/database'
 
 // ============================================================================
@@ -58,7 +58,8 @@ export const getUserByUsername = cache(async function getUserByUsername(
     return null
   }
 
-  const supabase = await createClient()
+  // Cookieless: public profiles, so the page can be statically cached.
+  const supabase = createPublicClient()
 
   const { data, error } = await supabase
     .from('users')
@@ -104,7 +105,8 @@ export async function getPublicBuildsByUser(
     return []
   }
 
-  const supabase = await createClient()
+  // Cookieless: only public builds are returned (filtered below).
+  const supabase = createPublicClient()
 
   let query = supabase
     .from('builds')

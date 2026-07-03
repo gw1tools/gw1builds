@@ -5,7 +5,7 @@
  * Server-side query functions for fetching builds.
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/server'
 import type { BuildListItem } from '@/types/database'
 
 export type BuildSortType = 'popular' | 'recent'
@@ -39,7 +39,9 @@ export async function getBuilds(
   options: GetBuildsOptions
 ): Promise<GetBuildsResult> {
   const { type, offset = 0, limit = 20 } = options
-  const supabase = await createClient()
+  // Cookieless: the feed only shows published, non-private builds (filtered
+  // below), so this can be served from cache instead of forcing dynamic.
+  const supabase = createPublicClient()
 
   let query = supabase
     .from('builds')

@@ -14,7 +14,43 @@
 
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { toggleStar, NotFoundError, ValidationError } from '@/lib/services/builds'
+import {
+  toggleStar,
+  hasUserStarredBuild,
+  NotFoundError,
+  ValidationError,
+} from '@/lib/services/builds'
+
+/**
+ * GET /api/builds/[id]/star
+ * Returns whether the current user has starred this build.
+ *
+ * Used by the (now cacheable) build page to hydrate star state client-side.
+ * Always returns 200 with { starred: boolean } — anonymous users get false.
+ */
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ starred: false })
+    }
+
+    const starred = await hasUserStarredBuild(user.id, id)
+    return NextResponse.json({ starred })
+  } catch (error) {
+    console.error('[GET /api/builds/[id]/star] Error:', error)
+    return NextResponse.json({ starred: false })
+  }
+}
 
 /**
  * POST /api/builds/[id]/star

@@ -4,7 +4,7 @@
  */
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Calendar, Star, Clock } from 'lucide-react'
@@ -56,6 +56,17 @@ export function ProfilePageClient({
     const url = tab === 'popular' ? `/u/${username}` : `/u/${username}?tab=recent`
     router.replace(url, { scroll: false })
   }
+
+  // The page is statically cached and always renders Popular, so honor
+  // ?tab=recent deep-links on the client after mount. Both datasets are
+  // already present, so this is an instant switch (no fetch).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('tab') === 'recent') {
+      handleTabChange('recent')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 pb-12">

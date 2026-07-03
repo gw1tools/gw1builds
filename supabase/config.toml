@@ -338,6 +338,12 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# Skill-update detector: invoked by pg_cron, which can't mint a Supabase JWT and
+# the new sb_secret_* keys aren't JWTs — so JWT verification is off and the
+# function gates itself with a shared secret (CRON_SECRET). See the function file.
+[functions.check-skill-updates]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

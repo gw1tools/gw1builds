@@ -12,6 +12,21 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
+  // Skip the session refresh for requests with no Supabase auth cookie
+  // (anonymous visitors and crawlers). There is no session to refresh, so this
+  // avoids a Supabase round-trip on every cached public page hit — which is
+  // the bulk of the edge traffic. Signed-in users always carry the cookie and
+  // are unaffected.
+  const hasAuthCookie = request.cookies
+    .getAll()
+    .some(
+      cookie =>
+        cookie.name.startsWith('sb-') && cookie.name.includes('-auth-token')
+    )
+  if (!hasAuthCookie) {
+    return supabaseResponse
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
