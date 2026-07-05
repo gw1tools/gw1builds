@@ -12,6 +12,10 @@
 - Public pages load noticeably faster thanks to smarter caching
 - Search terms you type now turn into filter pills, and fixed a scroll bug plus assorted UI polish
 
+**Minor fixes**
+
+- Shields and focus items no longer offer weapon-only inscriptions (like "Guided by Fate" Damage +15%) in the equipment picker — they now show only their proper offhand inscriptions
+
 ## June 25, 2026
 
 **June 24, 2026 Skill Balance Update**
