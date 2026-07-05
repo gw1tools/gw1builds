@@ -93,6 +93,11 @@ interface AttributeGroup {
   skills: Skill[]
 }
 
+/** A keyboard-navigable entry in the results list, in render order */
+type NavigableItem =
+  | { type: 'category'; cat: SkillCategoryMatch }
+  | { type: 'skill'; skill: Skill }
+
 export interface SpotlightSkillPickerProps {
   isOpen: boolean
   onClose: () => void
@@ -377,6 +382,10 @@ export function SpotlightSkillPicker({
 
   const isSkillInBar = useCallback((skill: Skill) => currentSkills.some(s => s.id === skill.id), [currentSkills])
   const hasEliteInBar = useMemo(() => currentSkills.some(s => s.elite), [currentSkills])
+  const isSkillDisabled = useCallback(
+    (skill: Skill) => isSkillInBar(skill) || (skill.elite && hasEliteInBar && !isSkillInBar(skill)),
+    [isSkillInBar, hasEliteInBar]
+  )
 
   const totalVisibleSkills = useMemo(() => {
     if (smartSearchResults.groupedByAttribute.length > 0) {
@@ -386,6 +395,39 @@ export function SpotlightSkillPicker({
     }
     return smartSearchResults.skills.length
   }, [smartSearchResults, collapsedAttributes])
+
+  // Flat list of keyboard-navigable rows, in render order
+  const navigableItems = useMemo<NavigableItem[]>(() => {
+    if (smartSearchResults.groupedByAttribute.length > 0) {
+      return smartSearchResults.groupedByAttribute.flatMap(g =>
+        collapsedAttributes.has(g.attribute)
+          ? []
+          : g.skills.map(skill => ({ type: 'skill' as const, skill }))
+      )
+    }
+    return [
+      ...smartSearchResults.categories.map(cat => ({ type: 'category' as const, cat })),
+      ...smartSearchResults.skills.map(skill => ({ type: 'skill' as const, skill })),
+    ]
+  }, [smartSearchResults, collapsedAttributes])
+
+  // Keep selection valid when results shrink (e.g. collapsing an attribute group)
+  useEffect(() => {
+    setSelectedIndex(i => Math.min(i, Math.max(0, navigableItems.length - 1)))
+  }, [navigableItems.length])
+
+  const selectedItem = navigableItems[selectedIndex] as NavigableItem | undefined
+  const selectedSkillId = selectedItem?.type === 'skill' ? selectedItem.skill.id : null
+
+  // Keep the keyboard-selected row visible while arrowing through results
+  useEffect(() => {
+    const item = navigableItems[selectedIndex]
+    if (!item || !listRef.current) return
+    const selector = item.type === 'skill'
+      ? `[data-skill-id="${item.skill.id}"]`
+      : `[data-cat="${item.cat.type}:${item.cat.name}"]`
+    listRef.current.querySelector(selector)?.scrollIntoView({ block: 'nearest' })
+  }, [selectedIndex, navigableItems])
 
   const toggleAttributeCollapse = useCallback((attr: string) => {
     setCollapsedAttributes(prev => {
@@ -399,7 +441,25 @@ export function SpotlightSkillPicker({
     })
   }, [])
 
+  const handleCategoryClick = useCallback((cat: SkillCategoryMatch) => {
+    setActiveFilter({ type: cat.type, value: cat.name })
+    setQuery('')
+    setSelectedIndex(0)
+    inputRef.current?.focus()
+  }, [])
+
+  // Clear hover tooltip immediately (keyboard scrolling can pop it under a stationary cursor)
+  const clearHover = useCallback(() => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current)
+    }
+    setHoveredSkill(null)
+    refs.setReference(null)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs object is stable from useFloating
+  }, [])
+
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.nativeEvent.isComposing) return
     if (e.key === 'Escape') {
       e.preventDefault()
       if (activeFilter) {
@@ -409,27 +469,30 @@ export function SpotlightSkillPicker({
       } else {
         onClose()
       }
-    } else if (e.key === 'Enter' && query.trim() !== '' && !activeFilter) {
+    } else if (e.key === 'ArrowDown') {
       e.preventDefault()
-      const firstCat = smartSearchResults.categories[0]
-      if (firstCat) {
-        setActiveFilter({ type: firstCat.type, value: firstCat.name })
-        setQuery('')
-        setSelectedIndex(0)
+      clearHover()
+      setSelectedIndex(i => Math.min(i + 1, Math.max(0, navigableItems.length - 1)))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      clearHover()
+      setSelectedIndex(i => Math.max(i - 1, 0))
+    } else if (e.key === 'Enter') {
+      // Always prevent default: the search box is a textarea and must never get a newline
+      e.preventDefault()
+      const item = navigableItems[selectedIndex]
+      if (!item) return
+      if (item.type === 'category') {
+        handleCategoryClick(item.cat)
+      } else if (!isSkillDisabled(item.skill)) {
+        onSelect(item.skill)
       }
     } else if (e.key === 'Backspace' && query === '' && activeFilter) {
       e.preventDefault()
       setActiveFilter(null)
       setCollapsedAttributes(new Set())
     }
-  }, [smartSearchResults, activeFilter, onClose, query])
-
-  const handleCategoryClick = useCallback((cat: SkillCategoryMatch) => {
-    setActiveFilter({ type: cat.type, value: cat.name })
-    setQuery('')
-    setSelectedIndex(0)
-    inputRef.current?.focus()
-  }, [])
+  }, [navigableItems, selectedIndex, activeFilter, onClose, query, handleCategoryClick, isSkillDisabled, onSelect, clearHover])
 
   const clearFilter = useCallback(() => {
     setActiveFilter(null)
@@ -586,6 +649,7 @@ export function SpotlightSkillPicker({
                         onSelectSkill={onSelect}
                         isSkillInBar={isSkillInBar}
                         hasEliteInBar={hasEliteInBar}
+                        selectedSkillId={selectedSkillId}
                         attributes={attributes}
                         compactMode={canHover}
                         onHover={handleSkillHover}
@@ -601,15 +665,17 @@ export function SpotlightSkillPicker({
                   <div className="p-2">
                     {smartSearchResults.categories.length > 0 && (
                       <div className="mb-2">
-                        {smartSearchResults.categories.map((cat, idx) => (
+                        {smartSearchResults.categories.map(cat => (
                           <button
                             type="button"
                             key={`${cat.type}-${cat.name}`}
-                            data-index={idx}
+                            data-cat={`${cat.type}:${cat.name}`}
                             onClick={() => handleCategoryClick(cat)}
                             className={cn(
                               'w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all cursor-pointer',
-                              selectedIndex === idx ? 'bg-bg-hover ring-1 ring-accent-gold/50' : 'hover:bg-bg-hover'
+                              selectedItem?.type === 'category' && selectedItem.cat.type === cat.type && selectedItem.cat.name === cat.name
+                                ? 'bg-bg-hover ring-1 ring-accent-gold/50'
+                                : 'hover:bg-bg-hover'
                             )}
                           >
                             <div className={cn(
@@ -642,11 +708,11 @@ export function SpotlightSkillPicker({
                       </div>
                     )}
 
-                    {smartSearchResults.skills.map((skill, idx) => (
+                    {smartSearchResults.skills.map(skill => (
                       <SkillResultRow
                         key={skill.id}
                         skill={skill}
-                        isSelected={selectedIndex === smartSearchResults.categories.length + idx}
+                        isSelected={skill.id === selectedSkillId}
                         isInBar={isSkillInBar(skill)}
                         eliteBlocked={skill.elite && hasEliteInBar && !isSkillInBar(skill)}
                         onSelect={() => onSelect(skill)}
@@ -664,7 +730,8 @@ export function SpotlightSkillPicker({
               <div className="h-px bg-border" />
               <div className="px-4 py-2 text-xs text-text-muted flex items-center justify-between">
                 <span className="hidden sm:inline">
-                  <kbd className="px-1.5 py-0.5 bg-bg-card rounded">↵</kbd> select
+                  <kbd className="px-1.5 py-0.5 bg-bg-card rounded">↑↓</kbd> navigate
+                  {' '}<kbd className="px-1.5 py-0.5 bg-bg-card rounded">↵</kbd> select
                   {activeFilter && (
                     <>{' '}<kbd className="px-1.5 py-0.5 bg-bg-card rounded">⌫</kbd> back</>
                   )}
@@ -792,6 +859,7 @@ function AttributeGroupSection({
   onSelectSkill,
   isSkillInBar,
   hasEliteInBar,
+  selectedSkillId,
   attributes,
   compactMode = false,
   onHover,
@@ -805,6 +873,7 @@ function AttributeGroupSection({
   onSelectSkill: (skill: Skill) => void
   isSkillInBar: (skill: Skill) => boolean
   hasEliteInBar: boolean
+  selectedSkillId: number | null
   attributes?: Record<string, number>
   compactMode?: boolean
   onHover?: (skill: Skill, el: HTMLElement) => void
@@ -852,6 +921,7 @@ function AttributeGroupSection({
                 >
                   <GroupedSkillRow
                     skill={skill}
+                    isSelected={skill.id === selectedSkillId}
                     isInBar={isSkillInBar(skill)}
                     eliteBlocked={skill.elite && hasEliteInBar && !isSkillInBar(skill)}
                     onSelect={() => onSelectSkill(skill)}
@@ -873,6 +943,7 @@ function AttributeGroupSection({
 
 function GroupedSkillRow({
   skill,
+  isSelected,
   isInBar,
   eliteBlocked,
   onSelect,
@@ -883,6 +954,7 @@ function GroupedSkillRow({
   descriptionSnippet,
 }: {
   skill: Skill
+  isSelected: boolean
   isInBar: boolean
   eliteBlocked: boolean
   onSelect: () => void
@@ -903,14 +975,17 @@ function GroupedSkillRow({
   return (
     <button
       type="button"
+      data-skill-id={skill.id}
       onClick={() => !disabled && onSelect()}
       disabled={disabled}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={compactMode ? onHoverEnd : undefined}
       className={cn(
         'w-full flex flex-col rounded-lg text-left transition-all duration-150 cursor-pointer',
-        'border border-transparent',
+        // Keep keyboard-scrolled rows clear of the sticky attribute header
+        'border border-transparent scroll-mt-11',
         compactMode ? 'p-2' : 'p-2.5',
+        isSelected && 'bg-bg-hover/80 border-accent-gold/30 shadow-sm',
         disabled
           ? 'opacity-40 cursor-not-allowed'
           : 'hover:bg-bg-hover/80 hover:border-border/50'
@@ -1039,6 +1114,7 @@ function SkillResultRow({
   return (
     <button
       type="button"
+      data-skill-id={skill.id}
       onClick={() => !disabled && onSelect()}
       disabled={disabled}
       onMouseEnter={handleMouseEnter}
