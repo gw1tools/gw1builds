@@ -23,7 +23,7 @@ Provenance: the files originate from `build-wars/gw-skilldata`, but that upstrea
 - **Patch notes**: `https://wiki.guildwars.com/wiki/Feedback:Game_updates/<YYYYMMDD>`. Structure: an `=== ... Balance Update ===` (h3) section containing `==== <Profession> ====` (h4) subsections, whose bullets look like `* {{skill icon|Skill Name}} (PvE|PvP|BOTH) - <change text>`. The variant tag is optional. Bullets *without* `{{skill icon}}` are bulk/prose lines (e.g. "Nature Ritual activation time from 3 to 2. Affects: [[...]], [[...]]"). Sections outside Balance Update (AI changes, bug fixes) are intentionally ignored.
 - **Per-skill pages**: `https://wiki.guildwars.com/wiki/<Skill Name>`. Each carries a `{{Skill infobox}}` with the authoritative numeric `id`, costs, and both `description` and `concise description` in wikitext. PvP variants are separate pages named `<Skill Name> (PvP)`. Some pages carry two ids (`id = 1951<!-- Luxon -->, 2094<!-- Kurzick -->`).
 - **Index of all updates**: queried via the MediaWiki API (`list=allpages`, namespace 202, prefix `Game updates/`) — the human-facing index page builds its list dynamically, so don't scrape it. `scripts/lib/wiki.mjs` exports `listUpdateDates()` for this.
-- Wikitext→our-style rendering (done by `renderWikiText` in `scripts/lib/wiki.mjs`, needed when hand-authoring overrides): `{{gr|a|b}}` → `a...b` (three dots; trailing `|-` arg = negative/degeneration), `[[A|B]]` → `B`, `[s]`/`[y|ies]` markers → singular form, `{{gray|...}}` → `<gray>...</gray>`, bold/italic quotes dropped, whitespace collapsed, and the leading type sentence the wiki shows ("Elite Hex Spell. ...") is **stripped** — our descriptions never include it.
+- Wikitext→our-style rendering (done by `renderWikiText` in `scripts/lib/wiki.mjs`, needed when hand-authoring overrides): `{{gr|a|b}}` → `a...b` (three dots; args may be `+`-prefixed; trailing `|-` arg = negative/degeneration), `[[A|B]]` → `B`, `[s]`/`[es]` markers render the **plural** (`foe[s]` → "foes") while `[y|ies]` → first option, `{{gray|...}}` → `<gray>...</gray>`, bold/italic quotes dropped, whitespace collapsed, and the leading type sentence the wiki shows ("Elite Hex Spell. ...") is **stripped** — our descriptions never include it.
 
 ## Environment requirements
 
@@ -56,6 +56,10 @@ npm run skills:verify -- scripts/changesets/<date>.json
 ```
 
 NOTE the `--` before script arguments — without it npm swallows flags like `--audit` instead of passing them through.
+
+**Hotfix-only updates (no balance section):** some game updates contain no skill changes at all (e.g. 20260625, 20260630 — bug/mobile hotfixes). `build-changeset` then writes an empty changeset (`"entries": []`). **Commit it anyway** — it's the audit trail proving the date was checked rather than missed — and note the verification in the CHANGELOG. No data change, no version bump for this alone.
+
+**Follow-up / reconciliation changesets:** for corrections outside a patch date (a lagged wiki page catching up, reconciling old divergences), hand-author a changeset named `<YYYYMMDD>-<topic>.json` (e.g. `20260703-june24-followup.json`) with accurate `from`/`to` values and a `notes` entry explaining provenance, and apply it via `skills:apply-changeset` like any other. The guards still protect you; the data files are still never edited by hand.
 
 Step 5 is meaningful only once wiki editors have updated the skill pages — typically a few days after the patch. Run it immediately anyway (expect many "lagged"), and re-run ~3–7 days later. **0 NUMERIC mismatches is the requirement**; "lagged" is fine; TEXT diffs need eyeballing (known noise below). The TEXT check compares the *multiset of numbers/ranges* in our description+concise vs the wiki's — phrasing-agnostic, so it catches missed flat-number changes regardless of wording.
 
@@ -116,6 +120,8 @@ Fields: `data` (numeric, absolute new values), `description`/`concise` (full rep
 ## Edge cases and gotchas (all real, all bit us before)
 
 - **Wiki skill pages lag the patch notes by days.** Right after a patch, author overrides from the patch-notes wording, mark them `WIKI LAGGED`, and rely on the step-5 re-run to confirm.
+- **Patch notes can also lie the other way — the actively-maintained infobox is the tiebreaker.** The Feb 5, 2026 notes announced changes (Predatory Season duration 30...240, Tranquility 30...120) that never landed in game; the infoboxes kept the real values. If a `verify` mismatch *persists* long after a patch (weeks, while the same page absorbed other changes), suspect the notes, check the page's revision history, and reconcile toward the infobox — don't wait forever on "lagged". Open case as of 2026-07-05: Melandru's Shot (853) recharge — notes say 12 (applied locally), infobox still 8.
+- **The wiki itself drifts after you apply.** Editors reword pages days later (e.g. Cleave "foe" → "foes" was edited hours after our follow-up). Periodic `verify` TEXT re-runs catch number changes; wording-only drift is cosmetic — fix it in a follow-up changeset when noticed, don't chase it.
 - **Flat-number / flat-% text changes are NOT auto-applied** (e.g. "50% → 100% more adrenaline", "duration 8 → 12 seconds", "Dazed 5 → 10s"). Only cost fields and `A..B → C..D` *range* swaps are automatic. Never assume a text change happened because the numeric one did.
 - **AoE "damage from 100% to 75%"** isn't a numeric field; the wiki encodes it in text as "…and all adjacent/nearby foes take 75% of that damage." Override with that phrasing.
 - **`(PvE)`/`(PvP)` variants**: a name embedding the suffix is its own skill/page/id. A `(PvP)`-tagged change targets the base skill's `split_id`; `(BOTH)` targets base + split; `(BOTH)` with no local split correctly applies to the base only.
@@ -125,6 +131,7 @@ Fields: `data` (numeric, absolute new values), `description`/`concise` (full rep
 - **Known pre-existing noise in `verify` TEXT diffs**: ~10 Nature Ritual spirit-lifespan divergences from the 2026-02-05 patch (e.g. Winnowing 30…150 local vs 30…240 wiki). NOT caused by your patch — don't fix them inside a patch changeset; they need their own reconciliation pass.
 - **`lib/constants.ts` `SKILL_TYPE_BY_ID` is misaligned** with the data's `type` numbers (type 20 = Shouts, not Nature Ritual). Never use it to select skills by type; the pipeline never does.
 - **`--audit` checks the POST-apply state** — running it before applying reports failures that just mean "not applied yet".
+- **Superseded changesets audit-fail forever — that's expected, not corruption.** When a follow-up changeset replaces text an earlier changeset applied (e.g. `20260703-june24-followup.json` supersedes the Cleave entries in `20260624.json`), the *older* changeset's `--audit` will permanently fail on those fields. Audit results are only meaningful for the **newest** changeset touching a skill; before treating an audit failure as corruption, check `scripts/changesets/` (and the changesets' `notes`) for a later superseding entry.
 
 ## Validation checklist (all must pass before PR)
 
