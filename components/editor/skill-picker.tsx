@@ -245,7 +245,8 @@ export function SpotlightSkillPicker({
       inputRef.current?.focus()
       setActiveFilters(
         [primary, secondary]
-          .filter((p): p is string => Boolean(p))
+          // The editor stores 'None' for a missing secondary; it's not a real profession chip
+          .filter((p): p is string => Boolean(p) && p !== 'None' && p !== 'Unknown')
           .map(value => ({ type: 'profession' as const, value }))
       )
       setCollapsedAttributes(new Set(defaultCollapsed))
