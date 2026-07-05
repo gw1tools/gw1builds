@@ -1015,6 +1015,8 @@ export function SkillBarEditor({
         onSelect={handleSkillSelect}
         currentSkills={loadedSkills.filter((s): s is Skill => s !== null)}
         attributes={effectiveAttributes}
+        primary={data.primary}
+        secondary={data.secondary}
       />
 
       {/* Clear Confirmation Modal */}

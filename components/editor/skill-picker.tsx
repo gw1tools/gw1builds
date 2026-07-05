@@ -22,7 +22,7 @@ import { SkillIcon } from '@/components/ui/skill-icon'
 import { CostStat } from '@/components/ui/cost-stat'
 import { ScaledDescription } from '@/components/ui/scaled-description'
 import { SkillTooltipContent } from '@/components/ui/skill-tooltip'
-import { ATTRIBUTES_BY_PROFESSION, PROFESSION_TO_ID, PROFESSION_BY_ID, ATTRIBUTE_BY_ID } from '@/lib/constants'
+import { ATTRIBUTES_BY_PROFESSION, PROFESSION_TO_ID, PROFESSION_BY_ID, ATTRIBUTE_BY_ID, TITLE_TRACK_ATTRIBUTES } from '@/lib/constants'
 import { PROFESSIONS, professionToKey } from '@/types/gw1'
 import type { Profession } from '@/types/gw1'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
@@ -98,6 +98,12 @@ type NavigableItem =
   | { type: 'category'; cat: SkillCategoryMatch }
   | { type: 'skill'; skill: Skill }
 
+/** Highlight for the keyboard-selected row, shared by flat and grouped views */
+const SELECTED_ROW_CLASSES = 'bg-bg-hover/80 border-accent-gold/30 shadow-sm'
+
+/** A removable filter chip in the search bar. Either N profession chips (union) or a single attribute chip. */
+type SkillFilter = { type: 'profession' | 'attribute'; value: string }
+
 export interface SpotlightSkillPickerProps {
   isOpen: boolean
   onClose: () => void
@@ -105,6 +111,10 @@ export interface SpotlightSkillPickerProps {
   currentSkills: Skill[]
   /** Current attribute values for scaling skill descriptions */
   attributes?: Record<string, number>
+  /** Build's primary profession name — seeded as a filter chip when the picker opens */
+  primary?: string
+  /** Build's secondary profession name — seeded as a filter chip when the picker opens */
+  secondary?: string
 }
 
 export function SpotlightSkillPicker({
@@ -113,12 +123,14 @@ export function SpotlightSkillPicker({
   onSelect,
   currentSkills,
   attributes,
+  primary,
+  secondary,
 }: SpotlightSkillPickerProps) {
   const [query, setQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [allSkills, setAllSkills] = useState<Skill[]>([])
-  const [activeFilter, setActiveFilter] = useState<{ type: 'profession' | 'attribute'; value: string } | null>(null)
+  const [activeFilters, setActiveFilters] = useState<SkillFilter[]>([])
   const [collapsedAttributes, setCollapsedAttributes] = useState<Set<string>>(new Set())
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
@@ -164,6 +176,17 @@ export function SpotlightSkillPicker({
   // eslint-disable-next-line react-hooks/exhaustive-deps -- refs object is stable from useFloating
   }, [])
 
+  // Clear hover tooltip immediately (no delay), e.g. when keyboard scrolling
+  // could pop it under a stationary cursor
+  const clearHover = useCallback(() => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current)
+    }
+    setHoveredSkill(null)
+    refs.setReference(null)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs object is stable from useFloating
+  }, [])
+
   // Cleanup hover timeout on unmount
   useEffect(() => {
     return () => {
@@ -175,10 +198,9 @@ export function SpotlightSkillPicker({
 
   // Clear hovered skill when query changes (skill may no longer be visible)
   useEffect(() => {
-    setHoveredSkill(null)
-    refs.setReference(null)
+    clearHover()
   // eslint-disable-next-line react-hooks/exhaustive-deps -- only clear on query/filter change
-  }, [query, activeFilter])
+  }, [query, activeFilters])
 
   useEffect(() => {
     getAllSkills().then(skills => {
@@ -210,16 +232,30 @@ export function SpotlightSkillPicker({
     return { skillsWithLower, professionCounts, attributeCounts }
   }, [allSkills])
 
-  // Reset state when modal closes
+  // Groups that start folded: attributes without points invested (in-game-style default).
+  // 'No Attribute' and title tracks can never hold points, so they always start folded.
+  const defaultCollapsed = useMemo(
+    () => new Set(['No Attribute', ...ALL_ATTRIBUTES].filter(attr => (attributes?.[attr] ?? 0) === 0)),
+    [attributes]
+  )
+
+  // Seed filter chips from the build's professions on open; reset state on close
   useEffect(() => {
     if (isOpen) {
       inputRef.current?.focus()
+      setActiveFilters(
+        [primary, secondary]
+          .filter((p): p is string => Boolean(p))
+          .map(value => ({ type: 'profession' as const, value }))
+      )
+      setCollapsedAttributes(new Set(defaultCollapsed))
     } else {
       setQuery('')
       setSelectedIndex(0)
-      setActiveFilter(null)
+      setActiveFilters([])
       setCollapsedAttributes(new Set())
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- seed only on open/close, not when props drift while open
   }, [isOpen])
 
   // Reset textarea height when query is cleared
@@ -235,8 +271,15 @@ export function SpotlightSkillPicker({
 
     const searchQuery = query.trim().toLowerCase()
 
-    if (activeFilter?.type === 'profession') {
-      const professionSkills = searchIndex.skillsWithLower.filter(s => s.skill.profession === activeFilter.value)
+    const professionFilters = activeFilters.filter(f => f.type === 'profession')
+    if (professionFilters.length > 0) {
+      // Union of the chip professions, plus common skills (profession 'None':
+      // Resurrection Signet, title-track PvE skills, ...) — like the in-game panel.
+      // Skill id 0 is the "No Skill" placeholder; the Clear slot button covers that.
+      const profNames = new Set(professionFilters.map(f => f.value))
+      const professionSkills = searchIndex.skillsWithLower.filter(
+        s => profNames.has(s.skill.profession) || (s.skill.profession === 'None' && s.skill.id !== 0)
+      )
 
       // Track description-only matches for highlighting
       const descriptionMatchIds = new Set<number>()
@@ -263,14 +306,20 @@ export function SpotlightSkillPicker({
         attributeMap.get(attr)!.push(skill)
       }
 
-      const profId = PROFESSION_TO_ID[activeFilter.value as keyof typeof PROFESSION_TO_ID]
-      const profAttrs = profId ? ATTRIBUTES_BY_PROFESSION[profId] || [] : []
+      // Group order: each chip profession's attributes in chip order (primary attribute
+      // first within each), then title tracks, then 'No Attribute' last — in-game order
+      const attrOrder: string[] = []
+      for (const f of professionFilters) {
+        const profId = PROFESSION_TO_ID[f.value as keyof typeof PROFESSION_TO_ID]
+        attrOrder.push(...(profId ? ATTRIBUTES_BY_PROFESSION[profId] || [] : []))
+      }
+      attrOrder.push(...TITLE_TRACK_ATTRIBUTES)
 
       const sortedAttrs = Array.from(attributeMap.keys()).sort((a, b) => {
         if (a === 'No Attribute') return 1
         if (b === 'No Attribute') return -1
-        const aIdx = profAttrs.indexOf(a)
-        const bIdx = profAttrs.indexOf(b)
+        const aIdx = attrOrder.indexOf(a)
+        const bIdx = attrOrder.indexOf(b)
         if (aIdx >= 0 && bIdx >= 0) return aIdx - bIdx
         if (aIdx >= 0) return -1
         if (bIdx >= 0) return 1
@@ -285,8 +334,9 @@ export function SpotlightSkillPicker({
       return { categories: [], skills: [], groupedByAttribute, searchQuery, descriptionMatchIds }
     }
 
-    if (activeFilter?.type === 'attribute') {
-      const filteredSkills = searchIndex.skillsWithLower.filter(s => s.skill.attribute === activeFilter.value)
+    const attributeFilter = activeFilters.find(f => f.type === 'attribute')
+    if (attributeFilter) {
+      const filteredSkills = searchIndex.skillsWithLower.filter(s => s.skill.attribute === attributeFilter.value)
 
       if (!searchQuery) {
         return {
@@ -378,7 +428,7 @@ export function SpotlightSkillPicker({
     const descriptionMatchIds = new Set(descriptionOnlyMatches.map(s => s.id))
 
     return { categories, skills: skillMatches, groupedByAttribute: [], searchQuery, descriptionMatchIds }
-  }, [query, isOpen, searchIndex, isLoading, activeFilter])
+  }, [query, isOpen, searchIndex, isLoading, activeFilters])
 
   const isSkillInBar = useCallback((skill: Skill) => currentSkills.some(s => s.id === skill.id), [currentSkills])
   const hasEliteInBar = useMemo(() => currentSkills.some(s => s.elite), [currentSkills])
@@ -387,20 +437,27 @@ export function SpotlightSkillPicker({
     [isSkillInBar, hasEliteInBar]
   )
 
+  // While searching, ignore fold state so matches inside folded groups stay visible;
+  // user toggles survive underneath and return when the query clears
+  const effectiveCollapsed = useMemo<Set<string>>(
+    () => (smartSearchResults.searchQuery ? new Set() : collapsedAttributes),
+    [smartSearchResults.searchQuery, collapsedAttributes]
+  )
+
   const totalVisibleSkills = useMemo(() => {
     if (smartSearchResults.groupedByAttribute.length > 0) {
       return smartSearchResults.groupedByAttribute.reduce((sum, g) =>
-        sum + (collapsedAttributes.has(g.attribute) ? 0 : g.skills.length), 0
+        sum + (effectiveCollapsed.has(g.attribute) ? 0 : g.skills.length), 0
       )
     }
     return smartSearchResults.skills.length
-  }, [smartSearchResults, collapsedAttributes])
+  }, [smartSearchResults, effectiveCollapsed])
 
   // Flat list of keyboard-navigable rows, in render order
   const navigableItems = useMemo<NavigableItem[]>(() => {
     if (smartSearchResults.groupedByAttribute.length > 0) {
       return smartSearchResults.groupedByAttribute.flatMap(g =>
-        collapsedAttributes.has(g.attribute)
+        effectiveCollapsed.has(g.attribute)
           ? []
           : g.skills.map(skill => ({ type: 'skill' as const, skill }))
       )
@@ -409,25 +466,22 @@ export function SpotlightSkillPicker({
       ...smartSearchResults.categories.map(cat => ({ type: 'category' as const, cat })),
       ...smartSearchResults.skills.map(skill => ({ type: 'skill' as const, skill })),
     ]
-  }, [smartSearchResults, collapsedAttributes])
+  }, [smartSearchResults, effectiveCollapsed])
 
-  // Keep selection valid when results shrink (e.g. collapsing an attribute group)
-  useEffect(() => {
-    setSelectedIndex(i => Math.min(i, Math.max(0, navigableItems.length - 1)))
-  }, [navigableItems.length])
-
-  const selectedItem = navigableItems[selectedIndex] as NavigableItem | undefined
+  // Clamp at read time so the selection stays valid when results shrink
+  // (e.g. collapsing an attribute group); selectedIndex itself may be stale
+  const clampedIndex = Math.min(selectedIndex, Math.max(0, navigableItems.length - 1))
+  const selectedItem = navigableItems[clampedIndex] as NavigableItem | undefined
   const selectedSkillId = selectedItem?.type === 'skill' ? selectedItem.skill.id : null
 
   // Keep the keyboard-selected row visible while arrowing through results
   useEffect(() => {
-    const item = navigableItems[selectedIndex]
-    if (!item || !listRef.current) return
-    const selector = item.type === 'skill'
-      ? `[data-skill-id="${item.skill.id}"]`
-      : `[data-cat="${item.cat.type}:${item.cat.name}"]`
+    if (!selectedItem || !listRef.current) return
+    const selector = selectedItem.type === 'skill'
+      ? `[data-skill-id="${selectedItem.skill.id}"]`
+      : `[data-cat="${selectedItem.cat.type}:${selectedItem.cat.name}"]`
     listRef.current.querySelector(selector)?.scrollIntoView({ block: 'nearest' })
-  }, [selectedIndex, navigableItems])
+  }, [selectedItem])
 
   const toggleAttributeCollapse = useCallback((attr: string) => {
     setCollapsedAttributes(prev => {
@@ -442,67 +496,52 @@ export function SpotlightSkillPicker({
   }, [])
 
   const handleCategoryClick = useCallback((cat: SkillCategoryMatch) => {
-    setActiveFilter({ type: cat.type, value: cat.name })
+    setActiveFilters([{ type: cat.type, value: cat.name }])
     setQuery('')
     setSelectedIndex(0)
+    setCollapsedAttributes(new Set(defaultCollapsed))
     inputRef.current?.focus()
-  }, [])
-
-  // Clear hover tooltip immediately (keyboard scrolling can pop it under a stationary cursor)
-  const clearHover = useCallback(() => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current)
-    }
-    setHoveredSkill(null)
-    refs.setReference(null)
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs object is stable from useFloating
-  }, [])
+  }, [defaultCollapsed])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.nativeEvent.isComposing) return
     if (e.key === 'Escape') {
+      // Always close: chips are seeded on open, so "clear filter first" would swallow the first Esc
       e.preventDefault()
-      if (activeFilter) {
-        setActiveFilter(null)
-        setSelectedIndex(0)
-        setCollapsedAttributes(new Set())
-      } else {
-        onClose()
-      }
+      onClose()
     } else if (e.key === 'ArrowDown') {
       e.preventDefault()
       clearHover()
-      setSelectedIndex(i => Math.min(i + 1, Math.max(0, navigableItems.length - 1)))
+      setSelectedIndex(Math.min(clampedIndex + 1, Math.max(0, navigableItems.length - 1)))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       clearHover()
-      setSelectedIndex(i => Math.max(i - 1, 0))
+      setSelectedIndex(Math.max(clampedIndex - 1, 0))
     } else if (e.key === 'Enter') {
       // Always prevent default: the search box is a textarea and must never get a newline
       e.preventDefault()
-      const item = navigableItems[selectedIndex]
-      if (!item) return
-      if (item.type === 'category') {
-        handleCategoryClick(item.cat)
-      } else if (!isSkillDisabled(item.skill)) {
-        onSelect(item.skill)
+      if (!selectedItem) return
+      if (selectedItem.type === 'category') {
+        handleCategoryClick(selectedItem.cat)
+      } else if (!isSkillDisabled(selectedItem.skill)) {
+        onSelect(selectedItem.skill)
       }
-    } else if (e.key === 'Backspace' && query === '' && activeFilter) {
+    } else if (e.key === 'Backspace' && query === '' && activeFilters.length > 0) {
       e.preventDefault()
-      setActiveFilter(null)
-      setCollapsedAttributes(new Set())
+      setActiveFilters(f => f.slice(0, -1))
+      setSelectedIndex(0)
+      setCollapsedAttributes(new Set(defaultCollapsed))
     }
-  }, [navigableItems, selectedIndex, activeFilter, onClose, query, handleCategoryClick, isSkillDisabled, onSelect, clearHover])
+  }, [navigableItems.length, clampedIndex, selectedItem, activeFilters, onClose, query, handleCategoryClick, isSkillDisabled, onSelect, clearHover, defaultCollapsed])
 
-  const clearFilter = useCallback(() => {
-    setActiveFilter(null)
-    setQuery('')
+  const removeFilter = useCallback((index: number) => {
+    setActiveFilters(f => f.filter((_, i) => i !== index))
     setSelectedIndex(0)
-    setCollapsedAttributes(new Set())
+    setCollapsedAttributes(new Set(defaultCollapsed))
     inputRef.current?.focus()
-  }, [])
+  }, [defaultCollapsed])
 
-  const isGroupedView = activeFilter?.type === 'profession' && smartSearchResults.groupedByAttribute.length > 0
+  const isGroupedView = activeFilters[0]?.type === 'profession' && smartSearchResults.groupedByAttribute.length > 0
 
   return (
     <AnimatePresence>
@@ -530,31 +569,33 @@ export function SpotlightSkillPicker({
               <div className="relative flex items-center flex-wrap gap-y-2">
                 <Search className="absolute left-4 w-5 h-5 text-text-muted pointer-events-none" />
 
-                {activeFilter && (
+                {activeFilters.map((filter, idx) => (
                   <button
                     type="button"
-                    onClick={clearFilter}
+                    key={`${filter.type}-${filter.value}`}
+                    onClick={() => removeFilter(idx)}
                     className={cn(
-                      'ml-12 shrink-0 flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer',
-                      activeFilter.type === 'profession'
+                      'shrink-0 flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer',
+                      idx === 0 ? 'ml-12' : 'ml-1.5',
+                      filter.type === 'profession'
                         ? 'bg-accent-gold/20 text-accent-gold hover:bg-accent-gold/30'
                         : 'bg-accent-purple/20 text-accent-purple hover:bg-accent-purple/30'
                     )}
                   >
-                    {activeFilter.type === 'profession' ? (
-                      <ProfessionIcon profession={professionToKey(activeFilter.value as Profession)} size="sm" />
-                    ) : PROFESSION_BY_ATTRIBUTE[activeFilter.value] ? (
+                    {filter.type === 'profession' ? (
+                      <ProfessionIcon profession={professionToKey(filter.value as Profession)} size="sm" />
+                    ) : PROFESSION_BY_ATTRIBUTE[filter.value] ? (
                       <ProfessionIcon
-                        profession={professionToKey(PROFESSION_BY_ATTRIBUTE[activeFilter.value] as Profession)}
+                        profession={professionToKey(PROFESSION_BY_ATTRIBUTE[filter.value] as Profession)}
                         size="sm"
                       />
                     ) : (
                       <Search className="w-3 h-3" />
                     )}
-                    {activeFilter.value}
+                    {filter.value}
                     <X className="w-3 h-3" />
                   </button>
-                )}
+                ))}
 
                 <textarea
                   ref={inputRef}
@@ -568,10 +609,10 @@ export function SpotlightSkillPicker({
                     e.target.style.height = `${e.target.scrollHeight}px`
                   }}
                   onKeyDown={handleKeyDown}
-                  placeholder={activeFilter ? 'Search...' : 'Search skills...'}
+                  placeholder={activeFilters.length > 0 ? 'Search...' : 'Search skills...'}
                   className={cn(
                     'flex-1 min-w-0 bg-transparent text-text-primary py-4 pr-16 sm:pr-4 text-lg placeholder:text-text-muted focus:outline-none resize-none overflow-hidden leading-normal',
-                    activeFilter ? 'pl-2' : 'pl-12'
+                    activeFilters.length > 0 ? 'pl-2' : 'pl-12'
                   )}
                 />
                 {/* X button to clear query, or Close button on mobile when empty */}
@@ -595,24 +636,9 @@ export function SpotlightSkillPicker({
               <div ref={listRef} className="max-h-[75vh] sm:max-h-[65vh] overflow-y-auto overscroll-contain">
                 {isLoading ? (
                   <div className="p-8 text-center text-text-muted">Loading skills...</div>
-                ) : query.trim() === '' && !activeFilter ? (
+                ) : query.trim() === '' && activeFilters.length === 0 ? (
                   <div className="p-4">
-                    <button
-                      type="button"
-                      onClick={() => onSelect(EMPTY_SKILL)}
-                      className={cn(
-                        'w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all cursor-pointer',
-                        'bg-bg-hover/50 hover:bg-bg-hover border border-border hover:border-text-muted/30'
-                      )}
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-bg-card border border-border flex items-center justify-center">
-                        <X className="w-5 h-5 text-text-muted" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-medium text-text-primary">Clear slot</div>
-                        <div className="text-xs text-text-muted">Remove skill from this slot</div>
-                      </div>
-                    </button>
+                    <ClearSlotButton onClick={() => onSelect(EMPTY_SKILL)} />
 
                     <div className="text-text-muted text-center text-sm mt-4 mb-3">Or search for:</div>
                     <div className="flex flex-wrap justify-center gap-2">
@@ -625,12 +651,7 @@ export function SpotlightSkillPicker({
                         <button
                           type="button"
                           key={hint.label}
-                          onClick={() => {
-                            setActiveFilter({ type: hint.type, value: hint.label })
-                            setQuery('')
-                            setSelectedIndex(0)
-                            inputRef.current?.focus()
-                          }}
+                          onClick={() => handleCategoryClick({ type: hint.type, name: hint.label, count: 0 })}
                           className="px-3 py-1.5 text-sm bg-bg-card hover:bg-bg-hover text-text-secondary rounded-lg transition-colors cursor-pointer"
                         >
                           {hint.label}
@@ -640,15 +661,20 @@ export function SpotlightSkillPicker({
                   </div>
                 ) : isGroupedView ? (
                   <div className="relative">
+                    {query.trim() === '' && (
+                      <div className="p-2 pb-1">
+                        <ClearSlotButton onClick={() => onSelect(EMPTY_SKILL)} />
+                      </div>
+                    )}
                     {smartSearchResults.groupedByAttribute.map((group) => (
                       <AttributeGroupSection
                         key={group.attribute}
                         group={group}
-                        isCollapsed={collapsedAttributes.has(group.attribute)}
+                        isCollapsed={effectiveCollapsed.has(group.attribute)}
                         onToggleCollapse={() => toggleAttributeCollapse(group.attribute)}
                         onSelectSkill={onSelect}
                         isSkillInBar={isSkillInBar}
-                        hasEliteInBar={hasEliteInBar}
+                        isSkillDisabled={isSkillDisabled}
                         selectedSkillId={selectedSkillId}
                         attributes={attributes}
                         compactMode={canHover}
@@ -673,7 +699,8 @@ export function SpotlightSkillPicker({
                             onClick={() => handleCategoryClick(cat)}
                             className={cn(
                               'w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all cursor-pointer',
-                              selectedItem?.type === 'category' && selectedItem.cat.type === cat.type && selectedItem.cat.name === cat.name
+                              // Reference equality: navigableItems wraps these same category objects
+                              selectedItem?.type === 'category' && selectedItem.cat === cat
                                 ? 'bg-bg-hover ring-1 ring-accent-gold/50'
                                 : 'hover:bg-bg-hover'
                             )}
@@ -714,7 +741,7 @@ export function SpotlightSkillPicker({
                         skill={skill}
                         isSelected={skill.id === selectedSkillId}
                         isInBar={isSkillInBar(skill)}
-                        eliteBlocked={skill.elite && hasEliteInBar && !isSkillInBar(skill)}
+                        disabled={isSkillDisabled(skill)}
                         onSelect={() => onSelect(skill)}
                         attributes={attributes}
                         compactMode={canHover}
@@ -732,16 +759,16 @@ export function SpotlightSkillPicker({
                 <span className="hidden sm:inline">
                   <kbd className="px-1.5 py-0.5 bg-bg-card rounded">↑↓</kbd> navigate
                   {' '}<kbd className="px-1.5 py-0.5 bg-bg-card rounded">↵</kbd> select
-                  {activeFilter && (
-                    <>{' '}<kbd className="px-1.5 py-0.5 bg-bg-card rounded">⌫</kbd> back</>
+                  {activeFilters.length > 0 && (
+                    <>{' '}<kbd className="px-1.5 py-0.5 bg-bg-card rounded">⌫</kbd> remove filter</>
                   )}
                   {' '}<kbd className="px-1.5 py-0.5 bg-bg-card rounded">esc</kbd> close
                 </span>
                 <span className="ml-auto">
                   {isGroupedView
                     ? `${totalVisibleSkills} skills in ${smartSearchResults.groupedByAttribute.length} attributes`
-                    : activeFilter
-                      ? `${smartSearchResults.skills.length} ${activeFilter.value} skills`
+                    : activeFilters.length > 0
+                      ? `${smartSearchResults.skills.length} ${activeFilters[0].value} skills`
                       : smartSearchResults.categories.length + smartSearchResults.skills.length > 0
                         ? `${smartSearchResults.categories.length + smartSearchResults.skills.length} results`
                         : ''
@@ -773,6 +800,27 @@ export function SpotlightSkillPicker({
         </>
       )}
     </AnimatePresence>
+  )
+}
+
+function ClearSlotButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all cursor-pointer',
+        'bg-bg-hover/50 hover:bg-bg-hover border border-border hover:border-text-muted/30'
+      )}
+    >
+      <div className="w-10 h-10 rounded-lg bg-bg-card border border-border flex items-center justify-center">
+        <X className="w-5 h-5 text-text-muted" />
+      </div>
+      <div className="flex-1">
+        <div className="text-sm font-medium text-text-primary">Clear slot</div>
+        <div className="text-xs text-text-muted">Remove skill from this slot</div>
+      </div>
+    </button>
   )
 }
 
@@ -858,7 +906,7 @@ function AttributeGroupSection({
   onToggleCollapse,
   onSelectSkill,
   isSkillInBar,
-  hasEliteInBar,
+  isSkillDisabled,
   selectedSkillId,
   attributes,
   compactMode = false,
@@ -872,7 +920,7 @@ function AttributeGroupSection({
   onToggleCollapse: () => void
   onSelectSkill: (skill: Skill) => void
   isSkillInBar: (skill: Skill) => boolean
-  hasEliteInBar: boolean
+  isSkillDisabled: (skill: Skill) => boolean
   selectedSkillId: number | null
   attributes?: Record<string, number>
   compactMode?: boolean
@@ -923,7 +971,7 @@ function AttributeGroupSection({
                     skill={skill}
                     isSelected={skill.id === selectedSkillId}
                     isInBar={isSkillInBar(skill)}
-                    eliteBlocked={skill.elite && hasEliteInBar && !isSkillInBar(skill)}
+                    disabled={isSkillDisabled(skill)}
                     onSelect={() => onSelectSkill(skill)}
                     attributes={attributes}
                     compactMode={compactMode}
@@ -945,7 +993,7 @@ function GroupedSkillRow({
   skill,
   isSelected,
   isInBar,
-  eliteBlocked,
+  disabled,
   onSelect,
   attributes,
   compactMode = false,
@@ -956,7 +1004,7 @@ function GroupedSkillRow({
   skill: Skill
   isSelected: boolean
   isInBar: boolean
-  eliteBlocked: boolean
+  disabled: boolean
   onSelect: () => void
   attributes?: Record<string, number>
   compactMode?: boolean
@@ -964,8 +1012,6 @@ function GroupedSkillRow({
   onHoverEnd?: () => void
   descriptionSnippet?: string
 }) {
-  const disabled = isInBar || eliteBlocked
-
   const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (compactMode && onHover) {
       onHover(skill, e.currentTarget)
@@ -985,7 +1031,7 @@ function GroupedSkillRow({
         // Keep keyboard-scrolled rows clear of the sticky attribute header
         'border border-transparent scroll-mt-11',
         compactMode ? 'p-2' : 'p-2.5',
-        isSelected && 'bg-bg-hover/80 border-accent-gold/30 shadow-sm',
+        isSelected && SELECTED_ROW_CLASSES,
         disabled
           ? 'opacity-40 cursor-not-allowed'
           : 'hover:bg-bg-hover/80 hover:border-border/50'
@@ -1082,7 +1128,7 @@ function SkillResultRow({
   skill,
   isSelected,
   isInBar,
-  eliteBlocked,
+  disabled,
   onSelect,
   attributes,
   compactMode = false,
@@ -1093,7 +1139,7 @@ function SkillResultRow({
   skill: Skill
   isSelected: boolean
   isInBar: boolean
-  eliteBlocked: boolean
+  disabled: boolean
   onSelect: () => void
   attributes?: Record<string, number>
   /** Desktop compact mode - shows only name, tooltip on hover */
@@ -1103,8 +1149,6 @@ function SkillResultRow({
   /** Search query for showing description snippet (description search mode) */
   descriptionSnippet?: string
 }) {
-  const disabled = isInBar || eliteBlocked
-
   const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (compactMode && onHover) {
       onHover(skill, e.currentTarget)
@@ -1123,7 +1167,7 @@ function SkillResultRow({
         'w-full flex flex-col rounded-lg text-left transition-all duration-150',
         'border border-transparent',
         compactMode ? 'p-2' : 'p-2.5',
-        isSelected && 'bg-bg-hover/80 border-accent-gold/30 shadow-sm',
+        isSelected && SELECTED_ROW_CLASSES,
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:bg-bg-hover/60'
       )}
     >
