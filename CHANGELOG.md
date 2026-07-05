@@ -1,5 +1,17 @@
 # What's New
 
+## July 5, 2026
+
+**Mobile Launch Celebration & Skill Data Accuracy**
+
+- New **Mobile-Friendly** tag highlights builds that play great on the Guild Wars mobile app — plus quick links to grab the app
+- Game updates are now detected automatically, so skill data lands here faster after every balance patch
+- Verified the June 25 and June 30 game updates: mobile hotfixes only, no skill changes
+- **Cleave** got its final wording from the updated wiki — the 1...2 adjacent hits deal 10...40 slashing damage
+- Fixed out-of-date lifespans on 8 Nature Ritual spirits: Winnowing, Primal Echoes, Favorable Winds and Nature's Renewal now show 30...240s, Energizing Wind 1...60s, Quickening Zephyr 15...90s — and Predatory Season (30...150s) and Tranquility (15...120s) corrected to their real in-game values
+- Public pages load noticeably faster thanks to smarter caching
+- Search terms you type now turn into filter pills, and fixed a scroll bug plus assorted UI polish
+
 ## June 25, 2026
 
 **June 24, 2026 Skill Balance Update**
