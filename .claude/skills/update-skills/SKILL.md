@@ -146,9 +146,10 @@ Fields: `data` (numeric, absolute new values), `description`/`concise` (full rep
 ## Shipping
 
 1. Commit the data files **and** `scripts/changesets/<date>.json` + `.overrides.mjs` (the changeset is the review artifact — always committed). Message: `feat: update <Month D, YYYY> skill balance data`.
-2. Add a `CHANGELOG.md` entry: `## <today's date>` heading, `**<patch date> Skill Balance Update**` subtitle, then player-facing bullets (highlights first, aggregate the rest — copy the tone of the existing June 24 / April 28 entries). Bump the minor version in `package.json` (`feat:` → minor, per the release process in CLAUDE.md).
-3. PR against `develop`.
-4. ~3–7 days later, re-run `skills:verify` and resolve anything still lagged or mismatched.
+2. Add a `CHANGELOG.md` entry: `## <today's date>` heading, `**<patch date> Skill Balance Update**` subtitle, then player-facing bullets (highlights first, aggregate the rest — copy the tone of the existing July 5 / February 8 entries). Bump the minor version in `package.json` (`feat:` → minor, per the release process in CLAUDE.md).
+3. Generate the full per-skill breakdown for the entry: `npm run skills:render-notes -- scripts/changesets/<date>.json` prints collapsible per-profession `<details>` blocks (rendered as expandable sections on `/changes`). Paste them below the entry's bullets, and proofread the generated lines — they're cleaned patch-note text, so smooth out anything awkward (e.g. terse bulk-line notes like "Nature Ritual activation → 2"). Only the entry's title bullets need hand-writing; the breakdown is generated.
+4. PR against `develop`.
+5. ~3–7 days later, re-run `skills:verify` and resolve anything still lagged or mismatched.
 
 ## Relationship to the update detector
 

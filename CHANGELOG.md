@@ -2,32 +2,227 @@
 
 ## July 5, 2026
 
-**Mobile Launch Celebration & Skill Data Accuracy**
+**June 24 Skill Balance Update & Automated Skill Data**
 
-- New **Mobile-Friendly** tag highlights builds that play great on the Guild Wars mobile app — plus quick links to grab the app
-- Game updates are now detected automatically, so skill data lands here faster after every balance patch
-- Verified the June 25 and June 30 game updates: mobile hotfixes only, no skill changes
-- **Cleave** got its final wording from the updated wiki — the 1...2 adjacent hits deal 10...40 slashing damage
-- Fixed out-of-date lifespans on 8 Nature Ritual spirits: Winnowing, Primal Echoes, Favorable Winds and Nature's Renewal now show 30...240s, Energizing Wind 1...60s, Quickening Zephyr 15...90s — and Predatory Season (30...150s) and Tranquility (15...120s) corrected to their real in-game values
-- Public pages load noticeably faster thanks to smarter caching
-- Search terms you type now turn into filter pills, and fixed a scroll bug plus assorted UI polish
+- Updated skill data for 156 skills across all 10 professions from the [June 24, 2026 game balance patch](https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260624) — full breakdown below
+- Minion masters rejoice: every Animate spell now casts in 1 second (from 3) and most cost far less Energy
+- Paragon party support got much more spammable — Aria, Ballad, Song of Restoration, Zealous Anthem and more had recharge cut roughly in half
+- Nature Rituals all cast faster now (2 seconds), **Signet of Illusions** was reworked to convert only your next 1...3 non-Illusion spells, and Mesmer AoE nukes (Energy Surge, Cry of Frustration, Mistrust and friends) now deal 75% damage to secondary targets
+- Big-hitter buffs: **Eviscerate**, **Cruel Spear**, **Stunning Strike**, and **Cleave** (now also strikes 1...2 adjacent foes)
+- Game updates are now detected automatically, so skill data lands here faster after every balance patch — the new system already verified the June 25 and June 30 updates as mobile-only hotfixes with no skill changes
+- Follow-up accuracy pass from the updated wiki: **Cleave**'s final wording (10...40 damage on the adjacent hits) and corrected lifespans on 8 Nature Ritual spirits (Winnowing, Favorable Winds, Quickening Zephyr and friends)
 
 **Minor fixes**
 
-- Shields and focus items no longer offer weapon-only inscriptions (like "Guided by Fate" Damage +15%) in the equipment picker — they now show only their proper offhand inscriptions
-- Skill picker quality of life improvements — it now opens with your build's professions pre-selected and skills grouped by attribute like the in-game panel, with attributes you've invested in expanded and the rest folded
+- New **Mobile-Friendly** tag highlights builds that play great on the Guild Wars mobile app — plus quick links to grab the app
+- Public pages load noticeably faster and are easier to discover through search engines and AI assistants
+- Search terms now turn into filter pills, the skill picker opens pre-filtered to your build's professions, and shields/focus items no longer offer weapon-only inscriptions
 
-## June 25, 2026
+<details>
+<summary>Warrior — 13 skills</summary>
 
-**June 24, 2026 Skill Balance Update**
+- **"To the Limit!"** — Reduce recharge from 15 to 10
+- **Hamstring** — Reduce energy cost from 10 to 5, reduce recharge from 15 to 10
+- **Cleave** — Increase damage from 10...30 to 10...40, and also hits 1...2 random adjacent foes
+- **Eviscerate** — Increase damage from 1...31 to 10...45
+- **Disrupting Chop** — Increase recharge from 0 to 1
+- **"Fear Me!"** — Reduce recharge from 6 to 4, increase energy loss from 1...4 to 2...6
+- **Berserker Stance** — Increase energy cost from 5 to 10, reduce recharge from 20 to 10, increase effect duration from 5...11 to 8...14, increase adrenaline gain from 50% to 100%
+- **Gladiator's Defense** — Reduce recharge from 30 to 20
+- **Hundred Blades** — Decrease recharge from 25 to 20, increase damage from 10...25 to 10...35
+- **Savage Slash** — Reduce recharge from 15 to 10
+- **Quivering Blade** — Increase damage from 10 to 10...40. (This skill was accidentally nerfed in the last balance update when updating its daze duration from 5 to 10.)
+- **Dragon Slash** — Reduce adrenaline cost from 10 to 8
+- **Headbutt** — Decrease recharge from 15 to 10, decrease energy cost from 15 to 10, increase daze duration from 5 to 10
+</details>
 
-- Updated skill data for 156 skills across all 10 professions from the [June 24, 2026 game balance patch](https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260624)
-- Minion masters rejoice: every Animate spell now casts in 1 second (from 3) and most cost far less Energy
-- Paragon party support got much more spammable — Aria, Ballad, Song of Restoration, Zealous Anthem and more had recharge cut roughly in half
-- Nature Rituals all cast faster now (2 seconds)
-- **Signet of Illusions** reworked to convert only your next 1...3 non-Illusion spells
-- Mesmer AoE nukes (Energy Surge, Cry of Frustration, Mistrust, Overload and friends) now deal 75% damage to secondary targets
-- Big-hitter buffs: **Eviscerate**, **Cruel Spear**, **Stunning Strike**, and **Cleave** (now also strikes 1...2 adjacent foes)
+<details>
+<summary>Ranger — 32 skills</summary>
+
+- **Maiming Strike** — Remove condition to hit a moving foe and apply Crippled if the attack hits
+- **Disrupting Lunge** — Reduce recharge from 20 to 10
+- **Barbed Trap** — Reduce energy cost from 15 to 10
+- **Winter** — Nature Ritual activation → 2
+- **Winnowing** — Nature Ritual activation → 2
+- **Edge of Extinction** — Nature Ritual activation → 2
+- **Greater Conflagration** — Nature Ritual activation → 2
+- **Conflagration** — Nature Ritual activation → 2
+- **Fertile Season** — Nature Ritual activation → 2
+- **Symbiosis** — Nature Ritual activation → 2
+- **Primal Echoes** — Nature Ritual activation → 2
+- **Predatory Season** — Nature Ritual activation → 2
+- **Frozen Soil** — Nature Ritual activation → 2
+- **Favorable Winds** — Nature Ritual activation → 2
+- **Energizing Wind** — Nature Ritual activation → 2
+- **Quickening Zephyr** — Nature Ritual activation → 2
+- **Nature's Renewal** — Nature Ritual activation → 2
+- **Muddy Terrain** — Nature Ritual activation → 2
+- **Melandru's Shot** — Increase recharge from 8 to 12
+- **Pestilence** — Nature Ritual activation → 2
+- **Brambles** — Nature Ritual activation → 2
+- **Lacerate** — Nature Ritual activation → 2
+- **Famine** — Nature Ritual activation → 2
+- **Broad Head Arrow** — Reduce energy cost from 15 to 10, reduce recharge from 15 to 10
+- **Bestial Mauling** — Reduce recharge from 20 to 10
+- **Pounce** — Reduce recharge from 15 to 10
+- **Equinox** — Nature Ritual activation → 2
+- **Tranquility** — Nature Ritual activation → 2
+- **Toxicity** — Nature Ritual activation → 2
+- **Quicksand** — Nature Ritual activation → 2
+- **Roaring Winds** — Nature Ritual activation → 2
+- **Infuriating Heat** — Nature Ritual activation → 2
+</details>
+
+<details>
+<summary>Monk — 10 skills</summary>
+
+- **Symbol of Wrath** — Reduce activation time from 2 to 1, reduce recharge from 30 to 20, increase damage from 8...32 to 10...40. Change functionality so that the AoE pulse happens at the target’s location instead of the caster’s
+- **Guardian** — Increase recharge time from 4 to 6
+- **Shield of Deflection** — Reduce recharge time from 10 to 5
+- **Shield of Regeneration** — Reduce energy cost from 15 to 10, adjust armor increase to scaling (20...45)
+- **Balthazar's Aura** — Reduce energy cost from 25 to 15, reduce activation time from 2 to 1, reduce recharge from 25 to 20, increase damage from 10...25 to 10...30
+- **Healing Hands** — Reduce recharge from 25 to 15
+- **Ray of Judgment** — Reduce activation time from 2 to 1, reduce recharge from 20 to 15, increase damage from 5...45 to 10...50
+- **Healing Burst** — Increase recharge time from 4 to 6, adjust healing amount from 10...160 to 20...120
+- **Divert Hexes** — Increase recharge time from 5 to 8, reduce activation time from 1 to 0.75
+- **Cure Hex** — Reduce heal amount from 30...120 to 30...100
+</details>
+
+<details>
+<summary>Necromancer — 16 skills</summary>
+
+- **Animate Bone Horror** — Reduce energy cost from 10 to 5, reduce activation time from 3 to 1
+- **Animate Bone Fiend** — Reduce energy cost from 25 to 15, reduce activation time from 3 to 1
+- **Animate Bone Minions** — Reduce energy cost from 15 to 10, reduce activation time from 3 to 1
+- **Verata's Gaze** — Add “…and heal it for 60...80.” when claiming masterless minions
+- **Consume Corpse** — Reduce energy cost from 10 to 5
+- **Spiteful Spirit** — Increase effect duration from 8...20 to 10...25, increase damage from 5...35 to 15...45
+- **Lingering Curse** — Increase health degeneration from 0...3 to 1...4, increase healing benefit reduction from 20% to 25%
+- **Feast of Corruption** — Reduce recharge from 20 to 15
+- **Blood Ritual** — Reduce activation time from 2 to 1
+- **Weaken Armor** — Reduce activation time from 1 to 0.5
+- **Wail of Doom** — Increase effect duration from 1...4 to 2...6
+- **Animate Vampiric Horror** — Reduce energy cost from 15 to 10, reduce activation time from 3 to 1
+- **Vampiric Spirit** — Reduce activation time from 2 to 1, increase health steal from 5...50 to 15...60
+- **Animate Flesh Golem** — Reduce activation time from 3 to 1
+- **Ravenous Gaze** — Increase damage and health steal from 15...30 to 20...40
+- **Animate Shambling Horror** — Reduce energy cost from 15 to 10, reduce activation time from 3 to 1
+</details>
+
+<details>
+<summary>Mesmer — 28 skills</summary>
+
+- **Shatter Delusions** — Reduce AoE damage from 100% to 75%
+- **Conjure Phantasm** — Increase effect duration from 2...16 to 4...18
+- **Illusionary Weaponry** — Reduce recharge from 25 to 15, increase damage from 8...40 to 16...50
+- **Arcane Conundrum** — Increase recharge from 20 to 30
+- **Energy Surge** — Reduce damage per energy from 9 to 7, reduce AoE damage from 100% to 75%
+- **Clumsiness** — Increase recharge from 8 to 12, reduce damage from 10...92 to 10...80
+- **Wastrel's Worry** — Increase recharge from 1 to 4, reduce AoE damage from 100% to 75%
+- **Cry of Frustration** — Increase recharge from 15 to 20, reduce AoE damage from 100% to 75%
+- **Signet of Humility** — Reduce “Your non-Mesmer skills are disabled for X seconds.” from 10 to 4
+- **Energy Drain** — Reduce recharge from 30/25 to 20
+- **Overload** — Reduce AoE damage from 100% to 75%
+- **Images of Remorse** — Reduce activation time from 2 to 1
+- **Auspicious Incantation** — Reduce recharge from 25 to 20
+- **Power Flux** — Increase recharge from 10 to 15
+- **Mistrust** — Reduce damage from 10...100 to 10...80, reduce AoE damage from 100% to 75% (PvE)
+- **Psychic Instability** — Increase recharge from 12 to 20
+- **Wastrel's Demise** — Increase recharge from 3 to 5 (PvE)
+- **Tease** — Increase recharge from 15 to 20
+- **Enchanter's Conundrum** — Reduce AoE damage from 100% to 75%
+- **Signet of Illusions** — Changed functionality to “Your next 1...3 non-Illusion spells use your Illusion attribute instead of their normal attribute.”
+- **Power Lock** — Increase recharge from 12 to 20
+- **Crippling Anguish (PvP)** — Reduce energy cost from 15 to 10, increase health degeneration from 1...5 to 2...6
+- **Shatter Delusions (PvP)** — Reduce AoE damage from 100% to 75%
+- **Illusionary Weaponry (PvP)** — Reduce recharge from 25 to 15, increase damage from 8...40 to 16...50
+- **Migraine (PvP)** — Increase duration from 3...12 to 4...16
+- **Psychic Instability (PvP)** — Increase recharge from 12 to 20
+- **Mistrust (PvP)** — Reduce damage from 10...75 to 10...60, reduce AoE damage from 100% to 75%
+- **Enchanter's Conundrum (PvP)** — Reduce AoE damage from 100% to 75%
+</details>
+
+<details>
+<summary>Elementalist — 10 skills</summary>
+
+- **Kinetic Armor** — Increase effect duration from 8 to 12, decrease recharge from 60 to 30
+- **Fireball** — Increase range of effect from adjacent to nearby
+- **Lightning Surge** — Increase energy cost from 10 to 15
+- **Lightning Strike** — Decrease damage and conditional damage from 5...50 to 5...40
+- **Thunderclap** — Increase range from adjacent to nearby
+- **Gust** — Increase recharge from 10 to 15, reduce range of cold damage on cast from nearby to adjacent
+- **Teinai's Wind** — Increase energy cost from 5 to 10
+- **Ash Blast** — Reduce recharge time from 15 to 10
+- **Double Dragon** — Decrease recharge from 20 to 15, increase damage per second to 10...40, increase “set on fire” duration from 0...3 to 1...4
+- **Sandstorm** — Decrease recharge from 25 to 20, increase damage per second from 10...30 to 20...40 (additional DPS stays the same)
+</details>
+
+<details>
+<summary>Assassin — 10 skills</summary>
+
+- **Mark of Insecurity** — Reduce enchantment expiration increase from 30...80 to 20...60
+- **Jagged Strike** — Increase recharge time from 1 to 2
+- **Beguiling Haze** — Reduce energy cost from 15 to 10
+- **Way of the Fox** — Reduce recharge time from 45 to 30
+- **Way of the Empty Palm** — Reduce effect duration from 5...20 to 5...15, add “…your off-hand and dual attacks cost no energy and recharge 25...50% faster.”
+- **Jungle Strike** — Decrease recharge time from 10 to 6. Adjust text to remove '+' before conditional damage
+- **Locust's Fury** — Reduce activation time from 1 to 0.5
+- **Seeping Wound** — Reduce energy cost from 15 to 10, reduce recharge from 12 to 10
+- **Black Spider Strike** — Reduce recharge time from 12 to 8
+- **Falling Lotus Strike** — Reduce recharge time from 12 to 8
+</details>
+
+<details>
+<summary>Ritualist — 12 skills</summary>
+
+- **Vengeful Was Khanhei** — Reduce recharge from 20 to 15, increase health steal from 5...35 to 10...45
+- **Tranquil Was Tanasen** — Reduce energy cost from 10 to 5, reduce recharge from 20 to 15
+- **Protective Was Kaolai** — Reduce recharge from 25 to 20
+- **Spirit Siphon** — Increase energy gain percentage from 15...50% to 30...60%
+- **Spirit Light Weapon** — Increase heal per second and additional heal per second within earshot of a spirit from 1...15 to 5...25
+- **Weapon of Quickening** — Reduce energy cost from 10 to 5
+- **Spirit's Strength** — Reduce recharge from 30 to 20
+- **Shadowsong (PvP)** — Reduce activation time from 5 to 2, reduce recharge from 45 to 30
+- **Pain (PvP)** — Reduce activation time from 3 to 1.5
+- **Dissonance (PvP)** — Reduce activation time from 5 to 2, reduce recharge from 45 to 30
+- **Bloodsong (PvP)** — Reduce activation time from 3 to 1.5
+- **Anguish (PvP)** — Reduce activation time from 3 to 1.5, reduce recharge from 45 to 30
+</details>
+
+<details>
+<summary>Paragon — 15 skills</summary>
+
+- **Mighty Throw** — Reduce activation time from 3 to 1
+- **Cruel Spear** — Decrease adrenaline cost from 7 to 6, increase damage from 1...31 to 10...50
+- **Unblockable Throw** — Reduce activation time from 3 to 1, reduce adrenaline cost from 7 to 4
+- **Zealous Anthem** — Reduce recharge from 20 to 10
+- **Aria of Zeal** — Reduce energy cost from 10 to 5, reduce activation time from 2 to 1, reduce recharge from 20 to 10
+- **Ballad of Restoration** — Reduce recharge from 20 to 10 (PvE)
+- **Aria of Restoration** — Reduce recharge from 20 to 10
+- **Stunning Strike** — Reduce adrenaline cost from 10 to 8, increase damage from 5...30 to 10...50
+- **Song of Restoration** — Reduce recharge from 20 to 10 (PvE)
+- **Lyric of Purification** — Reduce recharge from 20 to 10
+- **Aggressive Refrain** — Reduce energy cost from 25 to 15, reduce activation time from 2 to 1
+- **"The Power Is Yours!"** — Increase effect time from 3 to 2...4, increase energy regen from 0...1 to 1...2
+- **Inspirational Speech** — Reduce recharge from 20 to 10
+- **Ballad of Restoration (PvP)** — Reduce recharge from 30 to 20
+- **Song of Restoration (PvP)** — Reduce recharge from 30 to 20
+</details>
+
+<details>
+<summary>Dervish — 10 skills</summary>
+
+- **Pious Assault** — Increase conditional damage from 10...30 to 15...40
+- **Mystic Twister** — Decrease activation time from 1 to 0.5
+- **Mirage Cloak** — Increase recharge from 10 to 15, reduce block chance from 40...80% to 30...60%
+- **Fleeting Stability** — Increase recharge from 10 to 15, increase effect duration from 2...6 to 4...10
+- **Mystic Regeneration** — Increase energy cost from 10 to 15
+- **Whirling Charge** — Decrease energy cost from 10 to 5, increase recharge from 6 to 10, decrease damage from 10...60 to 10...50
+- **Rending Aura** — Increase recharge from 6 to 10
+- **Mystic Regeneration (PvP)** — Increase energy cost from 10 to 15
+- **Pious Assault (PvP)** — Increase conditional damage from 10...30 to 15...40
+- **Signet of Pious Restraint (PvP)** — Reduce recharge bonus on enchantment removal from 75% to 50%
+</details>
 
 ## May 4, 2026
 

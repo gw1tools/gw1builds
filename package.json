@@ -13,7 +13,8 @@
     "db:link-prod": "supabase link --project-ref iaqbfleijvzdffahhqtc",
     "skills:build-changeset": "node scripts/build-changeset.mjs",
     "skills:apply-changeset": "node scripts/apply-changeset.mjs",
-    "skills:verify": "node scripts/verify-changeset.mjs"
+    "skills:verify": "node scripts/verify-changeset.mjs",
+    "skills:render-notes": "node scripts/render-changeset-notes.mjs"
   },
   "dependencies": {
     "@buildwars/gw-templates": "^1.0.1",
