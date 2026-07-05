@@ -12,6 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { getBuilds, type BuildSortType } from '@/lib/supabase/queries'
 import { createBuild, addCollaborator, ValidationError } from '@/lib/services/builds'
 import { createClient } from '@/lib/supabase/server'
@@ -86,6 +87,11 @@ export async function POST(request: NextRequest) {
           failures.map(f => (f as PromiseRejectedResult).reason?.message)
         )
       }
+    }
+
+    // Refresh the cached feed so a newly published build appears.
+    if (!(is_private ?? false)) {
+      revalidatePath('/')
     }
 
     return NextResponse.json({ id: build.id }, { status: 201 })

@@ -64,10 +64,6 @@ export function trackSessionIdentified(data: { is_logged_in: boolean }) {
   safeTrack('session_identified', data)
 }
 
-export function trackTacticsModalSeen() {
-  safeTrack('tactics_modal_seen')
-}
-
-export function trackTacticsModalClicked() {
-  safeTrack('tactics_modal_clicked')
+export function trackMobileLaunchBannerClicked() {
+  safeTrack('mobile_launch_banner_clicked')
 }

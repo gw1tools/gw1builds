@@ -1,6 +1,6 @@
 {
   "name": "gw1builds",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -10,7 +10,11 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "db:link-dev": "supabase link --project-ref aqjfurwosiiicfxqmbjd",
-    "db:link-prod": "supabase link --project-ref iaqbfleijvzdffahhqtc"
+    "db:link-prod": "supabase link --project-ref iaqbfleijvzdffahhqtc",
+    "skills:build-changeset": "node scripts/build-changeset.mjs",
+    "skills:apply-changeset": "node scripts/apply-changeset.mjs",
+    "skills:verify": "node scripts/verify-changeset.mjs",
+    "skills:render-notes": "node scripts/render-changeset-notes.mjs"
   },
   "dependencies": {
     "@buildwars/gw-templates": "^1.0.1",

@@ -15,19 +15,19 @@ const dotVariants = {
     },
   }),
 }
-import { Plus, LogOut, Loader2, FileText, Megaphone, Swords } from 'lucide-react'
+import { Plus, LogOut, Loader2, FileText, Megaphone } from 'lucide-react'
 import { useAuth } from '@/components/providers/auth-provider'
 import { useAuthModal } from '@/components/auth/auth-modal'
 import { UserAvatar } from '@/components/ui/user-avatar'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { FeedbackModal } from '@/components/feedback/feedback-modal'
 import { dropdownVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
-import { TACTICS_URL } from '@/lib/constants'
 import { toast } from 'sonner'
 
 export function Header() {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile, loading, signOut } = useAuth()
   const { openModal } = useAuthModal()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
@@ -117,19 +117,6 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            {TACTICS_URL && (
-              <a
-                href="/api/tactics"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden md:flex items-center gap-2 h-8 px-3 rounded-full bg-bg-card border border-accent-gold-dim/40 text-text-primary hover:text-accent-gold hover:bg-bg-hover hover:border-accent-gold-dim shadow-sticky transition-all cursor-pointer"
-                aria-label="Open GW1 Tactics in a new tab"
-              >
-                <Swords className="h-4 w-4 text-accent-gold" />
-                <span className="text-xs font-medium">Play Tactics</span>
-              </a>
-            )}
-
             {/* Feedback Button - icon only on mobile, with text on desktop */}
             <button
               onClick={handleFeedbackClick}
@@ -141,7 +128,9 @@ export function Header() {
             </button>
 
             {/* Auth Section */}
-            {user && profile ? (
+            {loading ? (
+              <Skeleton className="h-8 w-8 rounded-full" />
+            ) : user && profile ? (
               <div className="relative">
                 <button
                   id="user-menu-button"

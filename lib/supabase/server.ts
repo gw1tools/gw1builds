@@ -56,6 +56,30 @@ export async function createClient() {
 }
 
 /**
+ * Creates a Supabase client for public, cacheable reads.
+ *
+ * Unlike createClient(), this never touches cookies(), so pages and data
+ * fetches that use it can be statically rendered / ISR-cached instead of
+ * being forced dynamic. It runs as the anon role and respects RLS.
+ *
+ * Use for public content reads on cacheable routes (build pages, the build
+ * feed, profile pages). Never use for per-user state (ownership, stars,
+ * sessions) -- those must stay client-side or on a dynamic route.
+ */
+export function createPublicClient() {
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll: () => [],
+        setAll: () => {},
+      },
+    }
+  )
+}
+
+/**
  * Creates a Supabase client with admin/service role privileges.
  *
  * CRITICAL SECURITY NOTES:

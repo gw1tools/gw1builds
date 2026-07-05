@@ -12,6 +12,7 @@
  */
 
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import {
   getBuildById,
@@ -151,6 +152,10 @@ export async function PATCH(
     // 6. Update build (validation happens in service layer)
     await updateBuild(id, buildUpdate)
 
+    // Refresh the cached build page and feed so edits show immediately.
+    revalidatePath(`/b/${id}`)
+    revalidatePath('/')
+
     return NextResponse.json({ success: true })
   } catch (error) {
     if (error instanceof NotFoundError) {
@@ -205,6 +210,10 @@ export async function DELETE(
 
     // 3. Soft delete
     await deleteBuild(id)
+
+    // Refresh the cached build page and feed so the removal shows immediately.
+    revalidatePath(`/b/${id}`)
+    revalidatePath('/')
 
     return NextResponse.json({ success: true })
   } catch (error) {

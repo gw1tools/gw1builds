@@ -40,14 +40,6 @@ export const SITE_NAME = 'GW1 Builds'
 export const SITE_DESCRIPTION = 'A lightweight tool for Guild Wars 1 build sharing.'
 
 /**
- * GW1 Tactics (sibling product) demo URL — surfaced in the announcement modal
- * and header nav. Defaults to the production subdomain; override per-env via
- * NEXT_PUBLIC_TACTICS_URL (e.g. staging or localhost during tactics dev).
- */
-export const TACTICS_URL =
-  process.env.NEXT_PUBLIC_TACTICS_URL || 'https://tactics.gw1builds.com'
-
-/**
  * Discord invite link — surfaced in the header and future CTAs.
  * Defaults to the permanent community invite; override per-env via
  * NEXT_PUBLIC_DISCORD_INVITE_URL if needed.
@@ -321,6 +313,7 @@ export const CHARACTERISTICS = [
   'budget',
   'niche',
   'meme',
+  'mobile-friendly',
 ] as const
 
 /**
@@ -375,6 +368,7 @@ export const TAG_LABELS: Record<string, string> = {
   budget: 'Budget',
   niche: 'Niche',
   meme: 'Meme',
+  'mobile-friendly': 'Mobile Friendly',
   // Build types
   player: 'Player',
   hero: 'Hero',
@@ -410,6 +404,8 @@ export const TAG_TOOLTIPS: Record<string, string> = {
   'hard-mode': 'Harder enemies, better drops',
   'speed-clear': 'Optimized team runs',
   running: 'Movement/escort builds',
+  // Characteristics
+  'mobile-friendly': 'Easy to play on the GW1 mobile app',
 }
 
 /**

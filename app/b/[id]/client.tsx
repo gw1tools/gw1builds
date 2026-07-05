@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils'
 import { useVariantData, useEffectiveAttributes } from '@/hooks'
 import { mapSkillsFromIds, type Skill } from '@/lib/gw/skills'
 import { useAuthModal } from '@/components/auth/auth-modal'
+import { useAuth } from '@/components/providers/auth-provider'
 import { SkillMentionTooltip } from '@/components/ui/skill-mention-tooltip'
 import { SkillBar } from '@/components/ui/skill-bar'
 import { AttributeBar } from '@/components/ui/attribute-bar'
@@ -44,28 +45,44 @@ interface BuildPageClientProps {
   build: BuildWithAuthor
   /** Pre-fetched skill data from server, keyed by skill ID */
   skillMap: Record<number, Skill>
-  isOwner: boolean
-  /** Whether user can edit (owner or collaborator) */
-  canEdit: boolean
   professionColors: Record<string, string>
-  /** Whether current user has starred this build */
-  initialStarred: boolean
   /** Current star count */
   starCount: number
-  /** Whether user is authenticated */
-  isAuthenticated: boolean
 }
 
 export function BuildPageClient({
   build,
   skillMap,
-  isOwner,
-  canEdit,
   professionColors,
-  initialStarred,
   starCount,
-  isAuthenticated,
 }: BuildPageClientProps) {
+  // Per-user state derived client-side so the page can be statically cached.
+  const { user } = useAuth()
+  const isAuthenticated = !!user
+  const isOwner = !!user && user.id === build.author_id
+  const canEdit =
+    isOwner ||
+    (build.collaborators?.some(c => c.user_id === user?.id) ?? false)
+
+  // Star state is per-user — fetched client-side after mount.
+  const [starred, setStarred] = useState(false)
+  useEffect(() => {
+    if (!user) {
+      setStarred(false)
+      return
+    }
+    let active = true
+    fetch(`/api/builds/${build.id}/star`)
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (active && data) setStarred(Boolean(data.starred))
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [user, build.id])
+
   // Calculate total players to determine if this is a team build
   const totalPlayers = build.bars.reduce(
     (sum, bar) => sum + (bar.playerCount || 1),
@@ -76,7 +93,6 @@ export function BuildPageClient({
   const [reportModalOpen, setReportModalOpen] = useState(false)
   // Track active variant for each bar in team builds { barIndex: variantIndex }
   const [activeVariants, setActiveVariants] = useState<Record<number, number>>({})
-  const isDelisted = build.moderation_status === 'delisted'
   const isPrivate = build.is_private === true
   const [isScrolled, setIsScrolled] = useState(false)
   const { openModal } = useAuthModal()
@@ -109,28 +125,14 @@ export function BuildPageClient({
         ['PvE', 'PvP', 'GvG', 'HA', 'RA'].includes(t)
       ),
     })
+    // Record the view server-side. The page is now cached, so this can no
+    // longer happen during render. Fire-and-forget.
+    fetch(`/api/builds/${build.id}/view`, { method: 'POST' }).catch(() => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [build.id])
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 pb-12">
-      {/* Delisted banner - only shown to author */}
-      {isOwner && isDelisted && (
-        <div className="mb-6 p-4 rounded-xl border border-accent-red/30 bg-accent-red/5">
-          <div className="flex items-start gap-3">
-            <Flag className="w-5 h-5 text-accent-red shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-accent-red">
-                This build has been delisted
-              </p>
-              <p className="text-sm text-text-secondary mt-1">
-                {build.moderation_reason || 'This build is no longer visible to other users due to community reports.'}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Private build banner */}
       {isPrivate && (
         <div className="mb-6 p-4 rounded-xl border border-text-muted/30 bg-bg-secondary/50">
@@ -174,7 +176,7 @@ export function BuildPageClient({
             <PageActions
               build={build}
               canEdit={canEdit}
-              initialStarred={initialStarred}
+              initialStarred={starred}
               starCount={starCount}
               isAuthenticated={isAuthenticated}
             />
@@ -198,7 +200,7 @@ export function BuildPageClient({
         <PageActions
           build={build}
           canEdit={canEdit}
-          initialStarred={initialStarred}
+          initialStarred={starred}
           starCount={starCount}
           isAuthenticated={isAuthenticated}
         />

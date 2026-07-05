@@ -40,11 +40,19 @@ export interface ModalProps {
   /** Whether the modal can be closed at all - use for mandatory flows (default: true) */
   canClose?: boolean
   /** Max width class (default: 'max-w-md') */
-  maxWidth?: 'max-w-sm' | 'max-w-md' | 'max-w-lg' | 'max-w-xl' | 'max-w-2xl'
+  maxWidth?:
+    | 'max-w-sm'
+    | 'max-w-md'
+    | 'max-w-lg'
+    | 'max-w-xl'
+    | 'max-w-2xl'
+    | 'max-w-3xl'
   /** Additional class for the modal card */
   className?: string
   /** Whether to show the header (default: true if title provided) */
   showHeader?: boolean
+  /** Center on mobile instead of anchoring as a bottom sheet (default: false) */
+  centerOnMobile?: boolean
   /** Custom header content (replaces default header) */
   headerContent?: ReactNode
   /** Footer content */
@@ -64,6 +72,7 @@ export function Modal({
   maxWidth = 'max-w-md',
   className,
   showHeader,
+  centerOnMobile = false,
   headerContent,
   footerContent,
 }: ModalProps) {
@@ -107,7 +116,8 @@ export function Modal({
       'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
 
     const focusFirst = () => {
-      const focusable = modalRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      const focusable =
+        modalRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
       focusable?.[0]?.focus()
     }
 
@@ -117,7 +127,8 @@ export function Modal({
     const handleTab = (e: KeyboardEvent) => {
       if (e.key !== 'Tab' || !modalRef.current) return
 
-      const focusable = modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      const focusable =
+        modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
       if (!focusable.length) return
 
       const first = focusable[0]
@@ -172,7 +183,12 @@ export function Modal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+          className={cn(
+            'fixed inset-0 z-50 flex justify-center',
+            centerOnMobile
+              ? 'items-center p-4'
+              : 'items-end sm:items-center p-0 sm:p-4'
+          )}
           variants={reducedMotion ? undefined : modalOverlayVariants}
           initial={reducedMotion ? undefined : 'hidden'}
           animate={reducedMotion ? undefined : 'visible'}
@@ -196,10 +212,10 @@ export function Modal({
               'relative z-10 w-full',
               maxWidth,
               'bg-bg-card border border-border',
-              'rounded-t-xl sm:rounded-xl',
+              centerOnMobile ? 'rounded-xl' : 'rounded-t-xl sm:rounded-xl',
               'shadow-xl',
               'max-h-[90vh] flex flex-col',
-              'pb-[env(safe-area-inset-bottom)] sm:pb-0',
+              centerOnMobile ? '' : 'pb-[env(safe-area-inset-bottom)] sm:pb-0',
               className
             )}
             variants={reducedMotion ? undefined : modalContentVariants}

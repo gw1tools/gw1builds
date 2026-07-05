@@ -7,7 +7,7 @@
  */
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Star, Clock } from 'lucide-react'
@@ -95,6 +95,16 @@ export function BuildFeed({
     },
     [activeTab, builds, fetchBuilds, router]
   )
+
+  // The page is statically cached and always renders Popular, so honor
+  // ?tab=recent deep-links on the client after mount.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('tab') === 'recent') {
+      handleTabChange('recent')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="w-full">

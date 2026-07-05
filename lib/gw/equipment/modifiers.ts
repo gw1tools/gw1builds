@@ -34,8 +34,8 @@ export type ModifierWeaponType =
   | 'focus'
   | 'shield'
   | 'all-martial' // All martial weapons
-  | 'all-caster' // All caster weapons (wand, staff, focus)
-  | 'all' // Universal
+  | 'all-caster' // Spellcasting weapons (wand, staff) — foci take only focus/offhand inscriptions
+  | 'all' // All weapons (martial + caster); excludes shield and focus offhands
 
 /** Modifier definition */
 export interface Modifier {
@@ -3052,13 +3052,14 @@ export function getModifiersForWeaponType(
   return ALL_WEAPON_MODIFIERS.filter(
     (mod) =>
       mod.weaponTypes.includes(weaponType) ||
-      mod.weaponTypes.includes('all') ||
+      (mod.weaponTypes.includes('all') &&
+        !['shield', 'focus'].includes(weaponType)) ||
       (mod.weaponTypes.includes('all-martial') &&
         ['axe', 'bow', 'hammer', 'sword', 'dagger', 'scythe', 'spear'].includes(
           weaponType
         )) ||
       (mod.weaponTypes.includes('all-caster') &&
-        ['wand', 'staff', 'focus'].includes(weaponType))
+        ['wand', 'staff'].includes(weaponType))
   )
 }
 
