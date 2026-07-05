@@ -23,6 +23,7 @@ import { CostStat } from '@/components/ui/cost-stat'
 import { ScaledDescription } from '@/components/ui/scaled-description'
 import { SkillTooltipContent } from '@/components/ui/skill-tooltip'
 import { ATTRIBUTES_BY_PROFESSION, PROFESSION_TO_ID, PROFESSION_BY_ID, ATTRIBUTE_BY_ID, TITLE_TRACK_ATTRIBUTES } from '@/lib/constants'
+import { getAttributesForProfession } from '@/lib/gw/decoder'
 import { PROFESSIONS, professionToKey } from '@/types/gw1'
 import type { Profession } from '@/types/gw1'
 import { ProfessionIcon } from '@/components/ui/profession-icon'
@@ -275,11 +276,10 @@ export function SpotlightSkillPicker({
     const professionFilters = activeFilters.filter(f => f.type === 'profession')
     if (professionFilters.length > 0) {
       // Union of the chip professions, plus common skills (profession 'None':
-      // Resurrection Signet, title-track PvE skills, ...) — like the in-game panel.
-      // Skill id 0 is the "No Skill" placeholder; the Clear slot button covers that.
+      // Resurrection Signet, title-track PvE skills, ...) — like the in-game panel
       const profNames = new Set(professionFilters.map(f => f.value))
       const professionSkills = searchIndex.skillsWithLower.filter(
-        s => profNames.has(s.skill.profession) || (s.skill.profession === 'None' && s.skill.id !== 0)
+        s => profNames.has(s.skill.profession) || s.skill.profession === 'None'
       )
 
       // Track description-only matches for highlighting
@@ -309,11 +309,9 @@ export function SpotlightSkillPicker({
 
       // Group order: each chip profession's attributes in chip order (primary attribute
       // first within each), then title tracks, then 'No Attribute' last — in-game order
-      const attrOrder: string[] = []
-      for (const f of professionFilters) {
-        const profId = PROFESSION_TO_ID[f.value as keyof typeof PROFESSION_TO_ID]
-        attrOrder.push(...(profId ? ATTRIBUTES_BY_PROFESSION[profId] || [] : []))
-      }
+      const attrOrder: string[] = professionFilters.flatMap(f =>
+        getAttributesForProfession(PROFESSION_TO_ID[f.value as keyof typeof PROFESSION_TO_ID] ?? 0)
+      )
       attrOrder.push(...TITLE_TRACK_ATTRIBUTES)
 
       const sortedAttrs = Array.from(attributeMap.keys()).sort((a, b) => {
@@ -432,10 +430,10 @@ export function SpotlightSkillPicker({
   }, [query, isOpen, searchIndex, isLoading, activeFilters])
 
   const isSkillInBar = useCallback((skill: Skill) => currentSkills.some(s => s.id === skill.id), [currentSkills])
-  const hasEliteInBar = useMemo(() => currentSkills.some(s => s.elite), [currentSkills])
+  // Disabled when already equipped, or when it's an elite and the bar has one (only one elite allowed)
   const isSkillDisabled = useCallback(
-    (skill: Skill) => isSkillInBar(skill) || (skill.elite && hasEliteInBar && !isSkillInBar(skill)),
-    [isSkillInBar, hasEliteInBar]
+    (skill: Skill) => isSkillInBar(skill) || (skill.elite && currentSkills.some(s => s.elite)),
+    [isSkillInBar, currentSkills]
   )
 
   // While searching, ignore fold state so matches inside folded groups stay visible;
@@ -472,8 +470,13 @@ export function SpotlightSkillPicker({
   const selectedItem = navigableItems[clampedIndex] as NavigableItem | undefined
   const selectedSkillId = selectedItem?.type === 'skill' ? selectedItem.skill.id : null
 
-  // Keep the keyboard-selected row visible while arrowing through results
+  // Keep the keyboard-selected row visible while arrowing through results.
+  // Gated to arrow-key presses: selectedItem also changes identity on every
+  // keystroke/open (results rebuild), which must not trigger scrolling.
+  const arrowNavRef = useRef(false)
   useEffect(() => {
+    if (!arrowNavRef.current) return
+    arrowNavRef.current = false
     if (!selectedItem || !listRef.current) return
     const selector = selectedItem.type === 'skill'
       ? `[data-skill-id="${selectedItem.skill.id}"]`
@@ -493,13 +496,18 @@ export function SpotlightSkillPicker({
     })
   }, [])
 
+  // Shared reset when the filter chips change: selection back to top, folds back to default
+  const resetForFilterChange = useCallback(() => {
+    setSelectedIndex(0)
+    setCollapsedAttributes(new Set(defaultCollapsed))
+  }, [defaultCollapsed])
+
   const handleCategoryClick = useCallback((cat: SkillCategoryMatch) => {
     setActiveFilters([{ type: cat.type, value: cat.name }])
     setQuery('')
-    setSelectedIndex(0)
-    setCollapsedAttributes(new Set(defaultCollapsed))
+    resetForFilterChange()
     inputRef.current?.focus()
-  }, [defaultCollapsed])
+  }, [resetForFilterChange])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.nativeEvent.isComposing) return
@@ -510,10 +518,12 @@ export function SpotlightSkillPicker({
     } else if (e.key === 'ArrowDown') {
       e.preventDefault()
       clearHover()
+      arrowNavRef.current = true
       setSelectedIndex(Math.min(clampedIndex + 1, Math.max(0, navigableItems.length - 1)))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       clearHover()
+      arrowNavRef.current = true
       setSelectedIndex(Math.max(clampedIndex - 1, 0))
     } else if (e.key === 'Enter') {
       // Always prevent default: the search box is a textarea and must never get a newline
@@ -527,17 +537,15 @@ export function SpotlightSkillPicker({
     } else if (e.key === 'Backspace' && query === '' && activeFilters.length > 0) {
       e.preventDefault()
       setActiveFilters(f => f.slice(0, -1))
-      setSelectedIndex(0)
-      setCollapsedAttributes(new Set(defaultCollapsed))
+      resetForFilterChange()
     }
-  }, [navigableItems.length, clampedIndex, selectedItem, activeFilters, onClose, query, handleCategoryClick, isSkillDisabled, onSelect, clearHover, defaultCollapsed])
+  }, [navigableItems.length, clampedIndex, selectedItem, activeFilters, onClose, query, handleCategoryClick, isSkillDisabled, onSelect, clearHover, resetForFilterChange])
 
   const removeFilter = useCallback((index: number) => {
     setActiveFilters(f => f.filter((_, i) => i !== index))
-    setSelectedIndex(0)
-    setCollapsedAttributes(new Set(defaultCollapsed))
+    resetForFilterChange()
     inputRef.current?.focus()
-  }, [defaultCollapsed])
+  }, [resetForFilterChange])
 
   const isGroupedView = activeFilters[0]?.type === 'profession' && smartSearchResults.groupedByAttribute.length > 0
 
@@ -735,7 +743,7 @@ export function SpotlightSkillPicker({
                     )}
 
                     {smartSearchResults.skills.map(skill => (
-                      <SkillResultRow
+                      <SkillRow
                         key={skill.id}
                         skill={skill}
                         isSelected={skill.id === selectedSkillId}
@@ -966,7 +974,8 @@ function AttributeGroupSection({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: idx * 0.02, duration: 0.2 }}
                 >
-                  <GroupedSkillRow
+                  <SkillRow
+                    grouped
                     skill={skill}
                     isSelected={skill.id === selectedSkillId}
                     isInBar={isSkillInBar(skill)}
@@ -988,7 +997,12 @@ function AttributeGroupSection({
   )
 }
 
-function GroupedSkillRow({
+/**
+ * A selectable skill row, used by both the grouped (attribute sections) and flat
+ * (search results) views. `grouped` keeps keyboard-scrolled rows clear of the
+ * sticky attribute header and uses the grouped hover treatment.
+ */
+function SkillRow({
   skill,
   isSelected,
   isInBar,
@@ -999,6 +1013,7 @@ function GroupedSkillRow({
   onHover,
   onHoverEnd,
   descriptionSnippet,
+  grouped = false,
 }: {
   skill: Skill
   isSelected: boolean
@@ -1006,10 +1021,13 @@ function GroupedSkillRow({
   disabled: boolean
   onSelect: () => void
   attributes?: Record<string, number>
+  /** Desktop compact mode - shows only name, tooltip on hover */
   compactMode?: boolean
   onHover?: (skill: Skill, el: HTMLElement) => void
   onHoverEnd?: () => void
+  /** Search query for showing description snippet (description search mode) */
   descriptionSnippet?: string
+  grouped?: boolean
 }) {
   const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (compactMode && onHover) {
@@ -1026,14 +1044,16 @@ function GroupedSkillRow({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={compactMode ? onHoverEnd : undefined}
       className={cn(
-        'w-full flex flex-col rounded-lg text-left transition-all duration-150 cursor-pointer',
-        // Keep keyboard-scrolled rows clear of the sticky attribute header
-        'border border-transparent scroll-mt-11',
+        'w-full flex flex-col rounded-lg text-left transition-all duration-150',
+        'border border-transparent',
+        grouped && 'scroll-mt-11',
         compactMode ? 'p-2' : 'p-2.5',
         isSelected && SELECTED_ROW_CLASSES,
         disabled
           ? 'opacity-40 cursor-not-allowed'
-          : 'hover:bg-bg-hover/80 hover:border-border/50'
+          : grouped
+            ? 'cursor-pointer hover:bg-bg-hover/80 hover:border-border/50'
+            : 'cursor-pointer hover:bg-bg-hover/60'
       )}
     >
       {compactMode ? (
@@ -1123,58 +1143,3 @@ function DescriptionSnippet({
   )
 }
 
-function SkillResultRow({
-  skill,
-  isSelected,
-  isInBar,
-  disabled,
-  onSelect,
-  attributes,
-  compactMode = false,
-  onHover,
-  onHoverEnd,
-  descriptionSnippet,
-}: {
-  skill: Skill
-  isSelected: boolean
-  isInBar: boolean
-  disabled: boolean
-  onSelect: () => void
-  attributes?: Record<string, number>
-  /** Desktop compact mode - shows only name, tooltip on hover */
-  compactMode?: boolean
-  onHover?: (skill: Skill, el: HTMLElement) => void
-  onHoverEnd?: () => void
-  /** Search query for showing description snippet (description search mode) */
-  descriptionSnippet?: string
-}) {
-  const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (compactMode && onHover) {
-      onHover(skill, e.currentTarget)
-    }
-  }
-
-  return (
-    <button
-      type="button"
-      data-skill-id={skill.id}
-      onClick={() => !disabled && onSelect()}
-      disabled={disabled}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={compactMode ? onHoverEnd : undefined}
-      className={cn(
-        'w-full flex flex-col rounded-lg text-left transition-all duration-150',
-        'border border-transparent',
-        compactMode ? 'p-2' : 'p-2.5',
-        isSelected && SELECTED_ROW_CLASSES,
-        disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:bg-bg-hover/60'
-      )}
-    >
-      {compactMode ? (
-        <CompactSkillRow skill={skill} isInBar={isInBar} descriptionSnippet={descriptionSnippet} />
-      ) : (
-        <SkillRowContent skill={skill} isInBar={isInBar} attributes={attributes} searchQuery={descriptionSnippet} />
-      )}
-    </button>
-  )
-}
