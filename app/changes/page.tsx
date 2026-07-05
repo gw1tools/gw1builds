@@ -124,7 +124,13 @@ function parseChangelog(markdown: string): ReleaseEntry[] {
       if (!trimmed) continue
 
       if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
-        title = trimmed.slice(2, -2)
+        // First bold line is the entry title; later ones (e.g. "**Minor
+        // fixes**" subheaders) stay in the item flow.
+        if (title === undefined) {
+          title = trimmed.slice(2, -2)
+        } else {
+          items.push(trimmed)
+        }
       } else if (trimmed.startsWith('- ')) {
         items.push(trimmed.slice(2))
       }

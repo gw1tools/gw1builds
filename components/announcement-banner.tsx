@@ -15,6 +15,7 @@ import { useState, useSyncExternalStore } from 'react'
 import Image from 'next/image'
 import { X } from 'lucide-react'
 import { Modal, ModalBody } from '@/components/ui/modal'
+import { Tag } from '@/components/ui/tag'
 import { cn } from '@/lib/utils'
 import { trackMobileLaunchBannerClicked } from '@/lib/analytics'
 
@@ -33,23 +34,29 @@ function StoreBadges() {
       <p className="text-xs font-medium uppercase tracking-wider text-text-muted">
         Get the app
       </p>
-      <div className="flex flex-nowrap gap-2">
+      <div className="flex flex-wrap gap-2.5">
         <a
           href={APP_STORE_URL}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Download on the App Store"
           className={cn(
-            'flex items-center gap-2 rounded-lg bg-black border border-border px-3.5 py-2.5',
+            'flex h-14 items-center gap-2.5 rounded-lg bg-black border border-border px-4',
             'hover:border-border-hover transition-colors'
           )}
         >
-          <svg viewBox="0 0 24 24" className="w-6 h-6 fill-white" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            className="w-7 h-7 shrink-0 fill-white"
+            aria-hidden="true"
+          >
             <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.09-2.383 1.37-2.383 4.19 0 3.26 2.854 4.42 2.955 4.45z" />
           </svg>
-          <span className="flex flex-col leading-none text-white">
-            <span className="text-[10px]">Download on the</span>
-            <span className="text-sm font-semibold">App Store</span>
+          <span className="flex flex-col text-left text-white whitespace-nowrap">
+            <span className="text-[11px] leading-none">Download on the</span>
+            <span className="text-base font-semibold leading-tight">
+              App Store
+            </span>
           </span>
         </a>
         <a
@@ -58,19 +65,37 @@ function StoreBadges() {
           rel="noopener noreferrer"
           aria-label="Get it on Google Play"
           className={cn(
-            'flex items-center gap-2 rounded-lg bg-black border border-border px-3.5 py-2.5',
+            'flex h-14 items-center gap-2.5 rounded-lg bg-black border border-border px-4',
             'hover:border-border-hover transition-colors'
           )}
         >
-          <svg viewBox="0 0 512 512" className="w-5 h-5" aria-hidden="true">
-            <path fill="#00d3ff" d="M48 59.49v393a4.33 4.33 0 0 0 7.37 3.07L260 256 55.37 56.42A4.33 4.33 0 0 0 48 59.49z" />
-            <path fill="#00f076" d="M345.8 174L89.22 32.64l-.16-.09c-4.42-2.4-8.62 3.58-5 7.06l201.13 201.51z" />
-            <path fill="#ff3a44" d="M84.07 472.39c-3.64 3.48.57 9.46 5 7.06l.16-.1L345.8 338l-60.61-67.18z" />
-            <path fill="#ffc400" d="M449.38 231.84l-71.65-39.46-66.5 63.62 66.5 63.61 71.65-39.45c19.49-10.77 19.49-37.99 0-48.86z" />
+          <svg
+            viewBox="0 0 512 512"
+            className="w-6 h-6 shrink-0"
+            aria-hidden="true"
+          >
+            <path
+              fill="#00d3ff"
+              d="M48 59.49v393a4.33 4.33 0 0 0 7.37 3.07L260 256 55.37 56.42A4.33 4.33 0 0 0 48 59.49z"
+            />
+            <path
+              fill="#00f076"
+              d="M345.8 174L89.22 32.64l-.16-.09c-4.42-2.4-8.62 3.58-5 7.06l201.13 201.51z"
+            />
+            <path
+              fill="#ff3a44"
+              d="M84.07 472.39c-3.64 3.48.57 9.46 5 7.06l.16-.1L345.8 338l-60.61-67.18z"
+            />
+            <path
+              fill="#ffc400"
+              d="M449.38 231.84l-71.65-39.46-66.5 63.62 66.5 63.61 71.65-39.45c19.49-10.77 19.49-37.99 0-48.86z"
+            />
           </svg>
-          <span className="flex flex-col leading-none text-white">
-            <span className="text-[10px]">Get it on</span>
-            <span className="text-sm font-semibold">Google Play</span>
+          <span className="flex flex-col text-left text-white whitespace-nowrap">
+            <span className="text-[11px] leading-none">Get it on</span>
+            <span className="text-base font-semibold leading-tight">
+              Google Play
+            </span>
           </span>
         </a>
       </div>
@@ -111,7 +136,7 @@ function writeDismissed() {
   } catch {
     // Swallow — worst case the banner reappears next load.
   }
-  listeners.forEach((l) => l())
+  listeners.forEach(l => l())
 }
 
 export function AnnouncementBanner() {
@@ -158,7 +183,7 @@ export function AnnouncementBanner() {
             <span className="font-medium text-text-primary">
               GW1 is on mobile!
             </span>{' '}
-            Get it now <span aria-hidden="true">→</span>
+            More infos <span aria-hidden="true">→</span>
           </span>
         </button>
         <button
@@ -181,7 +206,7 @@ export function AnnouncementBanner() {
         showHeader={false}
         showCloseButton={false}
         centerOnMobile
-        maxWidth="max-w-2xl"
+        maxWidth="max-w-3xl"
       >
         <ModalBody className="p-0 relative">
           <button
@@ -209,7 +234,7 @@ export function AnnouncementBanner() {
 
             {/* Right column — copy + store badges */}
             <div className="flex flex-col justify-center gap-4 p-6 sm:p-8">
-              <h2 className="text-xl font-semibold text-text-primary leading-tight">
+              <h2 className="text-2xl font-semibold text-text-primary leading-tight">
                 GW1 is on mobile!
               </h2>
               <div className="flex flex-col gap-4 text-text-secondary leading-relaxed">
@@ -220,7 +245,15 @@ export function AnnouncementBanner() {
                   </span>
                   .
                 </p>
-                <p>Take your builds anywhere.</p>
+                <p>
+                  Take your builds anywhere, and look for the{' '}
+                  <Tag
+                    label="mobile-friendly"
+                    size="sm"
+                    className="mx-0.5 align-middle"
+                  />{' '}
+                  tag to find builds that shine on mobile.
+                </p>
               </div>
 
               <div className="mt-2">

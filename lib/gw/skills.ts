@@ -169,6 +169,10 @@ async function loadSkillData(): Promise<void> {
       // Skip skills without descriptions (invalid/removed skills)
       if (!desc) continue
 
+      // Skip the id-0 "No Skill" placeholder (empty slot marker, not a real skill);
+      // all empty-slot code paths short-circuit id 0 before looking it up here
+      if (id === 0) continue
+
       // Strip <sic/> tags from descriptions (marks preserved errors in original data)
       const cleanDescription = desc.description.replace(/<sic\/>/g, '')
       const cleanConcise = desc.concise.replace(/<sic\/>/g, '')
