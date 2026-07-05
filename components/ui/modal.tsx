@@ -40,7 +40,13 @@ export interface ModalProps {
   /** Whether the modal can be closed at all - use for mandatory flows (default: true) */
   canClose?: boolean
   /** Max width class (default: 'max-w-md') */
-  maxWidth?: 'max-w-sm' | 'max-w-md' | 'max-w-lg' | 'max-w-xl' | 'max-w-2xl'
+  maxWidth?:
+    | 'max-w-sm'
+    | 'max-w-md'
+    | 'max-w-lg'
+    | 'max-w-xl'
+    | 'max-w-2xl'
+    | 'max-w-3xl'
   /** Additional class for the modal card */
   className?: string
   /** Whether to show the header (default: true if title provided) */
@@ -110,7 +116,8 @@ export function Modal({
       'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
 
     const focusFirst = () => {
-      const focusable = modalRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      const focusable =
+        modalRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
       focusable?.[0]?.focus()
     }
 
@@ -120,7 +127,8 @@ export function Modal({
     const handleTab = (e: KeyboardEvent) => {
       if (e.key !== 'Tab' || !modalRef.current) return
 
-      const focusable = modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      const focusable =
+        modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
       if (!focusable.length) return
 
       const first = focusable[0]
