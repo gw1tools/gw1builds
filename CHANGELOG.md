@@ -15,6 +15,7 @@
 **Minor fixes**
 
 - Shields and focus items no longer offer weapon-only inscriptions (like "Guided by Fate" Damage +15%) in the equipment picker — they now show only their proper offhand inscriptions
+- Skill picker quality of life improvements — it now opens with your build's professions pre-selected and skills grouped by attribute like the in-game panel, with attributes you've invested in expanded and the rest folded
 
 ## June 25, 2026
 

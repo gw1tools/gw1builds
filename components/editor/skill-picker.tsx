@@ -244,8 +244,8 @@ export function SpotlightSkillPicker({
     if (isOpen) {
       inputRef.current?.focus()
       setActiveFilters(
-        [primary, secondary]
-          // The editor stores 'None' for a missing secondary; it's not a real profession chip
+        // The editor stores 'None' for a missing secondary; it's not a real profession chip
+        Array.from(new Set([primary, secondary]))
           .filter((p): p is string => Boolean(p) && p !== 'None' && p !== 'Unknown')
           .map(value => ({ type: 'profession' as const, value }))
       )
@@ -445,14 +445,11 @@ export function SpotlightSkillPicker({
     [smartSearchResults.searchQuery, collapsedAttributes]
   )
 
-  const totalVisibleSkills = useMemo(() => {
-    if (smartSearchResults.groupedByAttribute.length > 0) {
-      return smartSearchResults.groupedByAttribute.reduce((sum, g) =>
-        sum + (effectiveCollapsed.has(g.attribute) ? 0 : g.skills.length), 0
-      )
-    }
-    return smartSearchResults.skills.length
-  }, [smartSearchResults, effectiveCollapsed])
+  // Footer count: everything in the listed groups, regardless of fold state
+  const totalGroupedSkills = useMemo(
+    () => smartSearchResults.groupedByAttribute.reduce((sum, g) => sum + g.skills.length, 0),
+    [smartSearchResults]
+  )
 
   // Flat list of keyboard-navigable rows, in render order
   const navigableItems = useMemo<NavigableItem[]>(() => {
@@ -575,6 +572,7 @@ export function SpotlightSkillPicker({
                     type="button"
                     key={`${filter.type}-${filter.value}`}
                     onClick={() => removeFilter(idx)}
+                    aria-label={`Remove ${filter.value} filter`}
                     className={cn(
                       'shrink-0 flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer',
                       idx === 0 ? 'ml-12' : 'ml-1.5',
@@ -767,9 +765,9 @@ export function SpotlightSkillPicker({
                 </span>
                 <span className="ml-auto">
                   {isGroupedView
-                    ? `${totalVisibleSkills} skills in ${smartSearchResults.groupedByAttribute.length} attributes`
+                    ? `${totalGroupedSkills} skills in ${smartSearchResults.groupedByAttribute.length} attributes`
                     : activeFilters.length > 0
-                      ? `${smartSearchResults.skills.length} ${activeFilters[0].value} skills`
+                      ? `${smartSearchResults.skills.length} ${activeFilters.map(f => f.value).join('/')} skills`
                       : smartSearchResults.categories.length + smartSearchResults.skills.length > 0
                         ? `${smartSearchResults.categories.length + smartSearchResults.skills.length} results`
                         : ''
