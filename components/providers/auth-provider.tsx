@@ -16,6 +16,7 @@ import {
   type ReactNode,
 } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { DEAD_SESSION_CODES } from '@/lib/supabase/cookies'
 import { SITE_URL } from '@/lib/constants'
 import { trackSessionIdentified } from '@/lib/analytics'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
@@ -38,6 +39,38 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 // Singleton Supabase client at module level
 const supabase = createClient()
 
+/**
+ * Expires every Supabase auth cookie under all scopes it may live under.
+ * This bypasses the Supabase client which can deadlock
+ * (https://github.com/supabase/supabase/issues/35754).
+ *
+ * Clears three scopes: no-domain, exact host, and .gw1builds.com in prod.
+ * The explicit .gw1builds.com clear is required for cross-subdomain
+ * sign-out (tactics.gw1builds.com) and for users on www.gw1builds.com
+ * where the host-scoped variant alone leaves the apex cookie intact.
+ * Middleware can only expire one scope per cookie name (Next collapses
+ * same-name Set-Cookie headers), so this is the authoritative cleanup.
+ */
+function clearSupabaseAuthCookies() {
+  const clearDomains: (string | undefined)[] = [
+    undefined,
+    window.location.hostname,
+    ...(process.env.NODE_ENV === 'production' ? ['.gw1builds.com'] : []),
+  ]
+  const cookies = document.cookie.split(';')
+  for (const cookie of cookies) {
+    const cookieName = cookie.split('=')[0].trim()
+    if (!cookieName.startsWith('sb-') || !cookieName.includes('-auth-token'))
+      continue
+    for (const domain of clearDomains) {
+      const expires = 'expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
+      document.cookie = domain
+        ? `${cookieName}=; ${expires}; domain=${domain}`
+        : `${cookieName}=; ${expires}`
+    }
+  }
+}
+
 interface AuthProviderProps {
   children: ReactNode
 }
@@ -56,8 +89,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     let active = true
     supabase.auth
       .getUser()
-      .then(({ data: { user: fetchedUser } }) => {
+      .then(({ data: { user: fetchedUser }, error }) => {
         if (!active) return
+        // A revoked refresh token never recovers on retry — clear the
+        // cookies (all scopes, including legacy host-scoped ones the
+        // middleware can't expire) so this device stops hammering the
+        // Supabase auth endpoint on every request.
+        if (error?.code && DEAD_SESSION_CODES.has(error.code)) {
+          clearSupabaseAuthCookies()
+        }
         // Mirror the server-side anon-session filter (lib/supabase/server.ts).
         const currentUser = fetchedUser?.is_anonymous ? null : fetchedUser
 
@@ -228,31 +268,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Brief delay to show logout spinner (feels more intentional)
     await new Promise((resolve) => setTimeout(resolve, 500))
 
-    // Clear all Supabase auth cookies directly
-    // This bypasses the Supabase client which can deadlock
-    // See: https://github.com/supabase/supabase/issues/35754
-    //
-    // Clears three scopes: no-domain, exact host, and .gw1builds.com in prod.
-    // The explicit .gw1builds.com clear is required for cross-subdomain
-    // sign-out (tactics.gw1builds.com) and for users on www.gw1builds.com
-    // where the host-scoped variant alone leaves the apex cookie intact.
-    const clearDomains: (string | undefined)[] = [
-      undefined,
-      window.location.hostname,
-      ...(process.env.NODE_ENV === 'production' ? ['.gw1builds.com'] : []),
-    ]
-    const cookies = document.cookie.split(';')
-    for (const cookie of cookies) {
-      const cookieName = cookie.split('=')[0].trim()
-      if (!cookieName.startsWith('sb-') || !cookieName.includes('-auth-token'))
-        continue
-      for (const domain of clearDomains) {
-        const expires = 'expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
-        document.cookie = domain
-          ? `${cookieName}=; ${expires}; domain=${domain}`
-          : `${cookieName}=; ${expires}`
-      }
-    }
+    clearSupabaseAuthCookies()
 
     // Clear local state (this triggers re-render)
     setUser(null)
