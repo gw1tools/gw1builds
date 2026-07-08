@@ -128,7 +128,8 @@ export function SpotlightSkillPicker({
   secondary,
 }: SpotlightSkillPickerProps) {
   const [query, setQuery] = useState('')
-  const [selectedIndex, setSelectedIndex] = useState(0)
+  // -1 = no keyboard selection: Enter must not grab a skill the user never highlighted
+  const [selectedIndex, setSelectedIndex] = useState(-1)
   const [isLoading, setIsLoading] = useState(true)
   const [allSkills, setAllSkills] = useState<Skill[]>([])
   const [activeFilters, setActiveFilters] = useState<SkillFilter[]>([])
@@ -251,9 +252,10 @@ export function SpotlightSkillPicker({
           .map(value => ({ type: 'profession' as const, value }))
       )
       setCollapsedAttributes(new Set(defaultCollapsed))
+      setSelectedIndex(-1)
     } else {
       setQuery('')
-      setSelectedIndex(0)
+      setSelectedIndex(-1)
       setActiveFilters([])
       setCollapsedAttributes(new Set())
     }
@@ -464,8 +466,8 @@ export function SpotlightSkillPicker({
     ]
   }, [smartSearchResults, effectiveCollapsed])
 
-  // Clamp at read time so the selection stays valid when results shrink
-  // (e.g. collapsing an attribute group); selectedIndex itself may be stale
+  // Clamp the upper bound at read time so the selection stays valid when results
+  // shrink (e.g. collapsing an attribute group); the -1 sentinel passes through
   const clampedIndex = Math.min(selectedIndex, Math.max(0, navigableItems.length - 1))
   const selectedItem = navigableItems[clampedIndex] as NavigableItem | undefined
   const selectedSkillId = selectedItem?.type === 'skill' ? selectedItem.skill.id : null
@@ -494,11 +496,14 @@ export function SpotlightSkillPicker({
       }
       return next
     })
+    // Indices shift when a group folds; drop the keyboard selection rather than
+    // letting the highlight silently jump to a different skill
+    setSelectedIndex(-1)
   }, [])
 
-  // Shared reset when the filter chips change: selection back to top, folds back to default
+  // Shared reset when the filter chips change: clear the keyboard selection, folds back to default
   const resetForFilterChange = useCallback(() => {
-    setSelectedIndex(0)
+    setSelectedIndex(-1)
     setCollapsedAttributes(new Set(defaultCollapsed))
   }, [defaultCollapsed])
 
@@ -547,7 +552,8 @@ export function SpotlightSkillPicker({
     inputRef.current?.focus()
   }, [resetForFilterChange])
 
-  const isGroupedView = activeFilters[0]?.type === 'profession' && smartSearchResults.groupedByAttribute.length > 0
+  // Only the profession-filter branch of smartSearchResults ever populates groupedByAttribute
+  const isGroupedView = smartSearchResults.groupedByAttribute.length > 0
 
   return (
     <AnimatePresence>
@@ -610,7 +616,9 @@ export function SpotlightSkillPicker({
                   value={query}
                   onChange={e => {
                     setQuery(e.target.value)
-                    setSelectedIndex(0)
+                    // Highlight the first result while typing so Enter picks it;
+                    // an emptied query goes back to "nothing selected"
+                    setSelectedIndex(e.target.value.trim() ? 0 : -1)
                     // Auto-resize height
                     e.target.style.height = 'auto'
                     e.target.style.height = `${e.target.scrollHeight}px`
@@ -764,12 +772,16 @@ export function SpotlightSkillPicker({
               <div className="h-px bg-border" />
               <div className="px-4 py-2 text-xs text-text-muted flex items-center justify-between">
                 <span className="hidden sm:inline">
-                  <kbd className="px-1.5 py-0.5 bg-bg-card rounded">↑↓</kbd> navigate
-                  {' '}<kbd className="px-1.5 py-0.5 bg-bg-card rounded">↵</kbd> select
-                  {activeFilters.length > 0 && (
-                    <>{' '}<kbd className="px-1.5 py-0.5 bg-bg-card rounded">⌫</kbd> remove filter</>
+                  {navigableItems.length > 0 && (
+                    <>
+                      <kbd className="px-1.5 py-0.5 bg-bg-card rounded">↑↓</kbd> navigate
+                      {' '}<kbd className="px-1.5 py-0.5 bg-bg-card rounded">↵</kbd> select{' '}
+                    </>
                   )}
-                  {' '}<kbd className="px-1.5 py-0.5 bg-bg-card rounded">esc</kbd> close
+                  {activeFilters.length > 0 && (
+                    <><kbd className="px-1.5 py-0.5 bg-bg-card rounded">⌫</kbd> remove filter{' '}</>
+                  )}
+                  <kbd className="px-1.5 py-0.5 bg-bg-card rounded">esc</kbd> close
                 </span>
                 <span className="ml-auto">
                   {isGroupedView
