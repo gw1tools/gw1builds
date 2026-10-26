@@ -920,11 +920,14 @@ export async function addCollaborator(
 
   const supabase = await createClient()
 
-  // Find user by username
+  // Find user by username (case-insensitive; usernames keep their original
+  // casing, uniqueness is on lower(username)). Escape LIKE wildcards so "_"
+  // can't match other users.
+  const escapedUsername = username.trim().replace(/[%_\\]/g, '\\$&')
   const { data: user, error: userError } = await supabase
     .from('users')
     .select('id, username, avatar_url')
-    .eq('username', username.toLowerCase())
+    .ilike('username', escapedUsername)
     .single()
 
   if (userError || !user) {
