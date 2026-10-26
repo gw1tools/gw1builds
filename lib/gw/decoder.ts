@@ -16,6 +16,7 @@
 // @ts-expect-error - Package doesn't have type definitions
 import { SkillTemplate } from '@buildwars/gw-templates'
 import { asValidTemplateCode, type ValidTemplateCode } from '@/types/database'
+import { withCorrectPadSize } from '@/lib/gw/template-pad'
 import {
   PROFESSION_BY_ID,
   ATTRIBUTE_BY_ID,
@@ -312,7 +313,7 @@ export function encodeTemplate(
   skills: number[]
 ): string | null {
   try {
-    const encoder = new SkillTemplate()
+    const encoder = withCorrectPadSize(new SkillTemplate())
 
     // Convert profession names to IDs
     const primaryId = PROFESSION_TO_ID[primary] || 0
