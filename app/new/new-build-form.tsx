@@ -5,7 +5,7 @@
  * @module app/new/new-build-form
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Share2, Users } from 'lucide-react'
@@ -13,6 +13,7 @@ import { trackBuildCreated } from '@/lib/analytics'
 import { useAuth } from '@/components/providers/auth-provider'
 import { useAuthModal } from '@/components/auth/auth-modal'
 import { useBuildDraft } from '@/hooks/use-build-draft'
+import { useDraftAutosave } from '@/hooks/use-draft-autosave'
 import { SkillBarEditor } from '@/components/editor/skill-bar-editor'
 import { TeamSummary } from '@/components/editor/team-summary'
 import { NotesEditor } from '@/components/editor/notes-editor'
@@ -142,6 +143,8 @@ export function NewBuildForm() {
   // Track pending auto-submit after OAuth (waiting for auth to complete)
   const [pendingAutoSubmit, setPendingAutoSubmit] = useState(false)
   const initialized = useRef(false)
+  // Draft found on load, kept until the user restores or dismisses it
+  const previousDraftRef = useRef<DraftData | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
   const totalTeamPlayers = bars.reduce((sum, bar) => sum + (bar.playerCount || 1), 0)
@@ -155,11 +158,11 @@ export function NewBuildForm() {
     setTags(draft.tags)
     setIsPrivate(draft.is_private ?? false)
     setPendingCollaborators(draft.collaborators ?? [])
-    setShowDraftPrompt(false)
   }, [])
 
   // Single initialization effect - handles all sources of initial data
-  // Priority: pending publish > template > URL params > saved draft prompt
+  // Priority: pending publish > template > URL params; any older saved draft
+  // is offered via the restore prompt
   useEffect(() => {
     if (initialized.current) return
     initialized.current = true
@@ -174,6 +177,14 @@ export function NewBuildForm() {
         setPendingAutoSubmit(true) // Will submit when auth is ready
         return
       }
+    }
+
+    // An older draft is offered for restore whatever fills the form below.
+    // Held in memory because autosave will overwrite the stored copy.
+    const existingDraft = loadDraft()
+    if (existingDraft && draftIsMeaningful(existingDraft)) {
+      previousDraftRef.current = existingDraft
+      setShowDraftPrompt(true)
     }
 
     // Priority 2: Template data (from "Use as Template" feature)
@@ -195,13 +206,6 @@ export function NewBuildForm() {
       setBars(shared.bars)
       setTags(shared.tags)
       window.history.replaceState({}, '', '/new')
-      return
-    }
-
-    // Priority 4: Saved draft - show recovery prompt
-    const draft = loadDraft()
-    if (draft && draftIsMeaningful(draft)) {
-      setShowDraftPrompt(true)
     }
   }, [loadDraft, applyDraft])
 
@@ -217,44 +221,46 @@ export function NewBuildForm() {
     }
   }, [user, profile?.username, pendingAutoSubmit])
 
-  // Save draft on blur/visibility change
-  useEffect(() => {
-    const currentData = {
+  // Memoized so re-renders that don't change the form don't trigger a save
+  const currentDraft = useMemo<DraftData>(
+    () => ({
       name: teamName,
       bars,
       notes,
       tags,
       is_private: isPrivate,
       collaborators: pendingCollaborators,
-    }
+    }),
+    [teamName, bars, notes, tags, isPrivate, pendingCollaborators]
+  )
 
-    const handleSave = () => {
-      if (draftIsMeaningful(currentData)) {
-        saveDraft(currentData)
-      }
-    }
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) handleSave()
-    }
-
-    window.addEventListener('blur', handleSave)
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-
-    return () => {
-      window.removeEventListener('blur', handleSave)
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-    }
-  }, [teamName, bars, notes, tags, isPrivate, pendingCollaborators, saveDraft])
+  // Autosave (clearDraft() after a successful publish blocks further saves).
+  // This overwrites the stored draft, so an undecided older draft is kept in
+  // previousDraftRef until the user restores or dismisses it.
+  const persistDraft = useCallback(
+    (data: DraftData) => {
+      if (draftIsMeaningful(data)) saveDraft(data)
+    },
+    [saveDraft]
+  )
+  useDraftAutosave(currentDraft, persistDraft)
 
   const restoreDraft = () => {
-    const draft = loadDraft()
-    if (draft) applyDraft(draft)
+    if (previousDraftRef.current) applyDraft(previousDraftRef.current)
+    previousDraftRef.current = null
+    setShowDraftPrompt(false)
   }
 
   const dismissDraft = () => {
-    clearDraft()
+    previousDraftRef.current = null
     setShowDraftPrompt(false)
+    // Drop the old draft unless autosave already replaced it with current work
+    if (draftIsMeaningful(currentDraft)) {
+      saveDraft(currentDraft)
+    } else {
+      // keepSaving: dismissing must not stop autosaving new work
+      clearDraft({ keepSaving: true })
+    }
   }
 
   const handleShareDraft = useCallback(async () => {

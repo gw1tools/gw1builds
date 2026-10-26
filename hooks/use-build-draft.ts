@@ -3,7 +3,7 @@
  * @module hooks/use-build-draft
  *
  * Simple draft management for build forms.
- * Saves on blur/visibility change, clears on successful submit.
+ * Callers decide when to save; clears on successful submit.
  */
 
 'use client'
@@ -15,8 +15,11 @@ const DRAFT_PREFIX = 'build-draft:'
 export interface UseBuildDraftReturn<T> {
   /** Load draft from localStorage (returns null if none or empty) */
   loadDraft: () => T | null
-  /** Clear draft from localStorage */
-  clearDraft: () => void
+  /**
+   * Clear draft from localStorage. Blocks later saves (e.g. after submit)
+   * unless keepSaving is set.
+   */
+  clearDraft: (options?: { keepSaving?: boolean }) => void
   /** Manually save draft to localStorage */
   saveDraft: (data: T) => void
   /** Timestamp of last save (for showing "Draft saved" indicator) */
@@ -80,16 +83,19 @@ export function useBuildDraft<T>(key: string): UseBuildDraftReturn<T> {
   }, [storageKey])
 
   // Clear draft from localStorage
-  const clearDraft = useCallback(() => {
-    clearedRef.current = true
-    try {
-      localStorage.removeItem(storageKey)
-      localStorage.removeItem(`${storageKey}:timestamp`)
-      setLastSaved(null)
-    } catch (error) {
-      console.error('Failed to clear draft:', error)
-    }
-  }, [storageKey])
+  const clearDraft = useCallback(
+    (options?: { keepSaving?: boolean }) => {
+      clearedRef.current = !options?.keepSaving
+      try {
+        localStorage.removeItem(storageKey)
+        localStorage.removeItem(`${storageKey}:timestamp`)
+        setLastSaved(null)
+      } catch (error) {
+        console.error('Failed to clear draft:', error)
+      }
+    },
+    [storageKey]
+  )
 
   // Reset cleared flag if component remounts
   useEffect(() => {

@@ -15,6 +15,7 @@
 
 // @ts-expect-error - Package doesn't have type definitions
 import { EquipmentTemplate } from '@buildwars/gw-templates'
+import { withCorrectPadSize } from '@/lib/gw/template-pad'
 import { getItemById, type EquipmentItem, type EquipmentSlot } from './items'
 import { getModifierById, type Modifier } from './modifiers'
 import type { ArmorSetConfig, ArmorSlotConfig, WeaponConfig } from '@/types/database'
@@ -220,7 +221,7 @@ export function encodeEquipmentTemplate(
   if (!items || items.length === 0) return null
 
   try {
-    const encoder = new EquipmentTemplate()
+    const encoder = withCorrectPadSize(new EquipmentTemplate())
 
     for (const item of items) {
       const colorId = item.color ? DYE_COLOR_IDS[item.color] : 0

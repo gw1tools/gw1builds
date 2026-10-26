@@ -1013,7 +1013,11 @@ export function SkillBarEditor({
         isOpen={isPickerOpen}
         onClose={handlePickerClose}
         onSelect={handleSkillSelect}
-        currentSkills={loadedSkills.filter((s): s is Skill => s !== null)}
+        // Exclude the slot being replaced, so swapping an elite for another
+        // elite in the same slot isn't blocked by the one-elite rule
+        currentSkills={loadedSkills.filter(
+          (s, i): s is Skill => s !== null && i !== activeSlotIndex
+        )}
         attributes={effectiveAttributes}
         primary={data.primary}
         secondary={data.secondary}

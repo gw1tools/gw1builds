@@ -31,6 +31,10 @@ const fetchLatestUpdateDate = async (): Promise<string> => {
   const url = `${WIKI_API}?action=query&list=allpages&apnamespace=${NS_FEEDBACK}&apprefix=${encodeURIComponent('Game updates/')}&apdir=descending&aplimit=500&format=json`
   const res = await fetch(url, { headers: { 'user-agent': 'gw1builds-skill-update-check/1.0' } })
   if (!res.ok) throw new Error(`wiki HTTP ${res.status}`)
+  // During outages the wiki serves an HTML maintenance page with HTTP 200
+  if (!res.headers.get('content-type')?.includes('json')) {
+    throw new Error('wiki API returned non-JSON (wiki likely down for maintenance)')
+  }
   const json = await res.json()
   if (json.error) throw new Error(`wiki API error: ${json.error.info}`)
   const pages: Array<{ title: string }> = json?.query?.allpages ?? []
@@ -38,6 +42,27 @@ const fetchLatestUpdateDate = async (): Promise<string> => {
   const dates = pages.map(p => p.title.match(/Game updates\/(\d{8})$/)?.[1]).filter(Boolean) as string[]
   if (dates.length === 0) throw new Error('wiki: no dated update pages matched')
   return dates.sort().at(-1)!
+}
+
+// Posts to SKILL_UPDATE_WEBHOOK_URL. Sends `text` (Slack) and `content`
+// (Discord): Slack rejects a body without `text`, which silently dropped every
+// alert while the payload was Discord-only. Returns the outcome so it shows up
+// in the function response instead of being swallowed.
+const notify = async (message: string): Promise<string> => {
+  const webhook = Deno.env.get('SKILL_UPDATE_WEBHOOK_URL')
+  if (!webhook) return 'no webhook configured'
+  try {
+    const res = await fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: message, content: message }),
+      // A hanging webhook must not eat the function's wall-clock budget
+      signal: AbortSignal.timeout(10_000),
+    })
+    return res.ok ? 'sent' : `webhook HTTP ${res.status}: ${await res.text()}`
+  } catch (err) {
+    return `webhook failed: ${String(err)}`
+  }
 }
 
 Deno.serve(async req => {
@@ -87,20 +112,16 @@ Deno.serve(async req => {
       .eq('id', true)
     if (advErr) throw new Error(`db advance: ${advErr.message}`)
 
-    const webhook = Deno.env.get('SKILL_UPDATE_WEBHOOK_URL')
-    if (webhook) {
-      await fetch(webhook, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: `New GW1 game update detected: ${latest}. Review and run the skill-data pipeline: ${pageUrl}`,
-        }),
-      }).catch(() => {})
-    }
+    const notified = await notify(
+      `New GW1 game update detected: ${latest}. Review and run the skill-data pipeline: ${pageUrl}`
+    )
 
-    return Response.json({ ok: true, latest, lastKnown, newUpdate: true, url: pageUrl })
+    return Response.json({ ok: true, latest, lastKnown, newUpdate: true, url: pageUrl, notified })
   } catch (err) {
-    // Surface the real reason instead of a silent null / generic 500.
-    return Response.json({ ok: false, error: String(err) }, { status: 500 })
+    // Surface the real reason instead of a silent null / generic 500, and alert:
+    // a failing check (e.g. wiki down) otherwise goes unnoticed. Cron is daily,
+    // so this pings at most once a day while the failure lasts.
+    const notified = await notify(`GW1 skill-update check failed: ${String(err)}`)
+    return Response.json({ ok: false, error: String(err), notified }, { status: 500 })
   }
 })
