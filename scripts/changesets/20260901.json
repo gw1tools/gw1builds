@@ -1,0 +1,123 @@
+{
+  "date": "20260901",
+  "source": "https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260901",
+  "generatedAt": "2026-11-05T08:05:24.356Z",
+  "entries": [
+    {
+      "id": 832,
+      "name": "Animate Flesh Golem",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Pull the (somehow) living Vabbian peasant from the corpse pool.",
+        "override: corpse-pool bug fix; no data change"
+      ]
+    },
+    {
+      "id": 898,
+      "name": "Overload",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Fix bug where original target was being treated as an AoE target.",
+        "override: AoE targeting bug fix; text unchanged"
+      ]
+    },
+    {
+      "id": 909,
+      "name": "Focused Shot",
+      "profession": "Ranger",
+      "data": {
+        "activation": {
+          "from": 4,
+          "to": 0,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Removed errant cast time.",
+        "override: errant 4s cast time from Aug 26 removed"
+      ]
+    },
+    {
+      "id": 979,
+      "name": "Mistrust",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Fix bug where original target was being treated as an AoE target.",
+        "override: AoE targeting bug fix; text unchanged"
+      ]
+    },
+    {
+      "id": 1339,
+      "name": "Symbols of Inspiration",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 1...31 seconds, this skill becomes the Elite of target foe. Elite skills you cast use your Fast Casting attribute instead of their normal attributes.",
+          "to": "For 6...40 seconds, this skill becomes the Elite of target foe. Elite skills you cast use your Fast Casting attribute instead of their normal attributes."
+        },
+        "concise": {
+          "from": "(1...31 seconds.) This skill becomes the Elite of target foe. Elite skills you cast use your Fast Casting attribute instead of their normal attributes.",
+          "to": "(6...40 seconds.) This skill becomes the Elite of target foe. Elite skills you cast use your Fast Casting attribute instead of their normal attributes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 15 to 10 and increase duration from 1..31 to 6..40. (This change was in the original update notes, but the game data wasn't properly updated.)",
+        "override: recharge 15 -> 10, duration 1...31 -> 6...40 (did not land Aug 26)"
+      ]
+    },
+    {
+      "id": 1500,
+      "name": "Mirage Cloak",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 20 seconds, you have a 40% chance to block and an additional 10% for each enchantment (max 80%). Each time an enchantment is removed from you, all nearby foes are struck for 10...40 earth damage.",
+          "to": "For 20 seconds, you have a 40% chance to block and an extra 4...10% for each additional enchantment (max 80%). All nearby foes are struck for 10...40 earth damage each time a Dervish enchantment is removed from you."
+        },
+        "concise": {
+          "from": "(20 seconds.) You have 40% chance to block and an additional 10% for each enchantment (max 80%). Deals 10...40 earth damage to nearby foes each time an enchantment is removed from you.",
+          "to": "(20 seconds.) 40% chance to block and an extra 4...10% for each additional enchantment. 10...40 earth damage to nearby foes when you lose a Dervish enchantment."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Adjust additional block chance to 4..10 (so that Earth investment is required) and fixed a bug where damage from enchantment removal was getting improperly multiplied.",
+        "override: extra block per enchantment 10% -> 4...10%, only Dervish enchantments trigger damage (wiki text)"
+      ]
+    },
+    {
+      "id": 3461,
+      "name": "Soul Twisting (PvP)",
+      "profession": "Ritualist",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Fix typos in in-game description.",
+        "override: description typo fix; our text already uses the fixed wording"
+      ]
+    }
+  ],
+  "acknowledged": []
+}

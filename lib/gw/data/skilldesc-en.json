@@ -4907,8 +4907,8 @@
 		"1339": {
 			"id": 1339,
 			"name": "Symbols of Inspiration",
-			"description": "For 1...31 seconds, this skill becomes the Elite of target foe. Elite skills you cast use your Fast Casting attribute instead of their normal attributes.",
-			"concise": "(1...31 seconds.) This skill becomes the Elite of target foe. Elite skills you cast use your Fast Casting attribute instead of their normal attributes."
+			"description": "For 6...40 seconds, this skill becomes the Elite of target foe. Elite skills you cast use your Fast Casting attribute instead of their normal attributes.",
+			"concise": "(6...40 seconds.) This skill becomes the Elite of target foe. Elite skills you cast use your Fast Casting attribute instead of their normal attributes."
 		},
 		"1340": {
 			"id": 1340,
@@ -5513,8 +5513,8 @@
 		"1500": {
 			"id": 1500,
 			"name": "Mirage Cloak",
-			"description": "For 20 seconds, you have a 40% chance to block and an additional 10% for each enchantment (max 80%). Each time an enchantment is removed from you, all nearby foes are struck for 10...40 earth damage.",
-			"concise": "(20 seconds.) You have 40% chance to block and an additional 10% for each enchantment (max 80%). Deals 10...40 earth damage to nearby foes each time an enchantment is removed from you."
+			"description": "For 20 seconds, you have a 40% chance to block and an extra 4...10% for each additional enchantment (max 80%). All nearby foes are struck for 10...40 earth damage each time a Dervish enchantment is removed from you.",
+			"concise": "(20 seconds.) 40% chance to block and an extra 4...10% for each additional enchantment. 10...40 earth damage to nearby foes when you lose a Dervish enchantment."
 		},
 		"1502": {
 			"id": 1502,

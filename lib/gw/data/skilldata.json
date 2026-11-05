@@ -11091,7 +11091,7 @@
 			"split_id": 0,
 			"upkeep": 0,
 			"energy": 5,
-			"activation": 4,
+			"activation": 0,
 			"recharge": 8,
 			"adrenaline": 0,
 			"sacrifice": 0,
@@ -15538,7 +15538,7 @@
 			"upkeep": 0,
 			"energy": 5,
 			"activation": 1,
-			"recharge": 15,
+			"recharge": 10,
 			"adrenaline": 0,
 			"sacrifice": 0,
 			"overcast": 0
