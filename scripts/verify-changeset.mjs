@@ -84,10 +84,16 @@ const worker = async () => {
       continue // don't miscount an outage/rename as "lagged"
     }
 
-    // NUMERIC
-    for (const [field, rec] of Object.entries(entry.data ?? {})) {
+    // NUMERIC (a created skill has no from/to; check its full record instead)
+    const numeric = entry.create
+      ? Object.fromEntries(
+          NUMERIC.map(f => [f, { from: undefined, to: entry.create.data[f] }])
+        )
+      : (entry.data ?? {})
+    for (const [field, rec] of Object.entries(numeric)) {
       if (!NUMERIC.includes(field)) continue
-      const w = wiki?.[field]
+      // Infoboxes omit zero costs, so an absent field means 0 for a full record
+      const w = wiki?.[field] ?? (entry.create ? 0 : undefined)
       if (w == null) numLag += 1
       else if (w === rec.to) numOk += 1
       else if (w === rec.from) numLag += 1

@@ -39,6 +39,38 @@ const arg = name => {
 }
 const date = arg('--date') || '20260624'
 
+// Overrides module (optional): default export keyed by skill id, plus an optional
+// `acknowledged` export — [{ name?, line?, note }] — for patch lines that
+// intentionally produce no data change (prose, skills absent from our data). An
+// acknowledged line is recorded in the changeset instead of being flagged.
+const overridesFile =
+  arg('--overrides') ||
+  path.join(rootDir, 'scripts/changesets', `${date}.overrides.mjs`)
+const overridesMod = fs.existsSync(overridesFile)
+  ? await import(`file://${path.resolve(overridesFile)}`)
+  : {}
+const overrides = overridesMod.default || overridesMod.overrides || {}
+const acknowledgements = (overridesMod.acknowledged ?? []).map(a => ({
+  ...a,
+  used: false,
+}))
+const acknowledged = [] // what this run skipped, written to the changeset
+const acknowledge = (kind, text) => {
+  const a = acknowledgements.find(x =>
+    kind === 'name' ? x.name === text : x.line && text.includes(x.line)
+  )
+  if (!a) return false
+  a.used = true
+  acknowledged.push({ [kind]: text, note: a.note })
+  return true
+}
+
+// New skills (e.g. a fresh PvP split) are introduced via an override `create`
+// block; the patch-notes name then resolves to that id instead of "unknown".
+const createdIdByName = {}
+for (const [id, ov] of Object.entries(overrides))
+  if (ov.create) createdIdByName[ov.create.desc.name] = Number(id)
+
 const skillData = JSON.parse(
   fs.readFileSync(path.join(rootDir, 'lib/gw/data/skilldata.json'), 'utf8')
 ).skilldata
@@ -131,6 +163,14 @@ const getSkill = async title => {
 const resolveLocalId = (name, wiki, flags) => {
   const ids = localIdsByName[name]
   if (!ids || ids.length === 0) {
+    const created = createdIdByName[name]
+    if (created != null) {
+      if (wiki?.id != null && wiki.id !== created)
+        flags.push(
+          `local/wiki id disagree for "${name}": create ${created}, wiki ${wiki.id}`
+        )
+      return created
+    }
     flags.push(`unknown skill name "${name}" (not in local data)`)
     return null
   }
@@ -165,7 +205,10 @@ const resolveTargets = async (name, variant) => {
   if (baseId == null) return { targets, flags }
 
   const base = skillData[String(baseId)]
-  const splitId = base?.pvp_split ? base.split_id : 0
+  // A split this changeset creates counts as the PvP target too
+  const splitId = base?.pvp_split
+    ? base.split_id
+    : (createdIdByName[`${name} (PvP)`] ?? 0)
   const v = (variant || '').toUpperCase()
 
   const wantBase = !v || v === 'PVE' || v === 'BOTH'
@@ -187,14 +230,19 @@ const resolveTargets = async (name, variant) => {
 
 const entries = new Map() // id -> entry
 
+// Mirrors PROFESSION_BY_ID in lib/constants.ts. Fallback for pages without
+// per-profession subheadings (e.g. Jul 8, 2026), so every entry has one.
+const PROFESSION_BY_ID = ['None', 'Warrior', 'Ranger', 'Monk', 'Necromancer', 'Mesmer', 'Elementalist', 'Assassin', 'Ritualist', 'Paragon', 'Dervish']
+
 const entryFor = (id, name, profession) => {
   const key = String(id)
   if (!entries.has(key)) {
     const numericId = Number(id)
+    const localProf = skillData[key]?.profession ?? overrides[key]?.create?.data.profession
     entries.set(key, {
       id: Number.isNaN(numericId) ? id : numericId,
       name,
-      profession,
+      profession: profession ?? PROFESSION_BY_ID[localProf] ?? null,
       data: {},
       desc: {},
       flags: [],
@@ -213,7 +261,11 @@ const run = async () => {
   // against the raw count of skill-icon lines on the page so that can't hide.
   const pageText = await fetchWikitext(`Feedback:Game updates/${date}`)
   const iconLineCount = (pageText.match(/\{\{\s*skill icon/gi) ?? []).length
-  if (changes.length === 0 && iconLineCount > 0) {
+  // A page whose only skill-icon lines are outside the balance section (e.g. AI
+  // tweaks) opts out explicitly via `export const noBalanceSection = '<why>'`.
+  if (overridesMod.noBalanceSection)
+    acknowledged.push({ page: date, note: overridesMod.noBalanceSection })
+  else if (changes.length === 0 && iconLineCount > 0) {
     throw new Error(
       `parsed 0 balance changes but the page has ${iconLineCount} {{skill icon}} lines — ` +
         `the "Balance Update" section heading may have changed. Inspect ${date} manually.`
@@ -221,6 +273,7 @@ const run = async () => {
   }
 
   for (const { profession, name, variant, text } of changes) {
+    if (acknowledge('name', name)) continue
     const { targets, flags } = await resolveTargets(name, variant)
     for (const f of flags) {
       const e = entryFor(`unresolved:${name}`, name, profession)
@@ -246,7 +299,9 @@ const run = async () => {
       e.notes.push(`[${variant ?? 'base'}] ${text}`)
 
       if (!localD || !localT) {
-        e.flags.push('missing local skill entry')
+        // A skill this changeset creates: its override `create` block carries
+        // the full post-patch state, so there's nothing to parse here.
+        if (!overrides[id]?.create) e.flags.push('missing local skill entry')
         continue
       }
       if (
@@ -351,6 +406,7 @@ const run = async () => {
     source: `https://wiki.guildwars.com/wiki/Feedback:Game_updates/${date}`,
     generatedAt: new Date().toISOString(),
     entries: list,
+    acknowledged,
   }
   const outPath = path.join(rootDir, 'scripts/changesets', `${date}.json`)
   fs.mkdirSync(path.dirname(outPath), { recursive: true })
@@ -368,22 +424,51 @@ const run = async () => {
     `coverage: parsed ${changes.length} balance lines (page has ${iconLineCount} skill-icon lines total incl. non-balance sections)` +
       (wikiFetchErrors > 0 ? `; ⚠️ ${wikiFetchErrors} wiki fetch errors — cross-check degraded` : '')
   )
+  const created = list.filter(e => e.create).length
+  if (created) console.log(`creates ${created} new skills`)
+  if (acknowledged.length)
+    console.log(`acknowledged ${acknowledged.length} lines (no data change, see changeset)`)
+  const stale = acknowledgements.filter(a => !a.used)
+  for (const a of stale)
+    console.log(`⚠️  acknowledgement matched nothing: ${a.name ?? a.line}`)
   console.log(`\n${flagged.length} skills with flags (need review):`)
   for (const e of flagged)
     console.log(`  [${e.id}] ${e.name}: ${e.flags.join('; ')}`)
 }
 
+// Canonical key order of a skilldata / skilldesc record (taken from the data).
+const DATA_KEYS = Object.keys(Object.values(skillData)[0])
+const DESC_KEYS = ['id', 'name', 'description', 'concise']
+
+const buildCreate = (id, ov) => {
+  const { data, desc } = ov.create
+  const keysMatch = (obj, keys) =>
+    Object.keys(obj).length === keys.length && keys.every(k => k in obj)
+  if (skillData[String(id)] || skillDesc[String(id)])
+    throw new Error(`override create ${id}: skill already exists locally`)
+  const fullData = { ...data, id: Number(id) }
+  const fullDesc = { ...desc, id: Number(id) }
+  if (!keysMatch(fullData, DATA_KEYS) || !keysMatch(fullDesc, DESC_KEYS))
+    throw new Error(`override create ${id}: fields must be exactly ${DATA_KEYS} / ${DESC_KEYS}`)
+  return {
+    data: Object.fromEntries(DATA_KEYS.map(k => [k, fullData[k]])),
+    desc: Object.fromEntries(DESC_KEYS.map(k => [k, fullDesc[k]])),
+  }
+}
+
 const applyOverrides = async () => {
-  const file =
-    arg('--overrides') ||
-    path.join(rootDir, 'scripts/changesets', `${date}.overrides.mjs`)
-  if (!fs.existsSync(file)) return
-  const mod = await import(`file://${path.resolve(file)}`)
-  const overrides = mod.default || mod.overrides || {}
   for (const [id, ov] of Object.entries(overrides)) {
     const localT = skillDesc[String(id)]
-    const e = entryFor(id, localT?.name ?? `id ${id}`, ov.profession)
+    const name = ov.create?.desc.name ?? localT?.name ?? `id ${id}`
+    const e = entryFor(id, name, ov.profession)
+    if (ov.profession) e.profession = ov.profession
     if (ov.note) e.notes.push(`override: ${ov.note}`)
+    if (ov.create) {
+      e.name = name // the change loop may have labelled it with the base name
+      e.create = buildCreate(id, ov)
+      e.flags = e.flags.filter(f => !/missing local/i.test(f))
+      continue
+    }
     if (ov.data)
       for (const [f, v] of Object.entries(ov.data)) {
         const cur = skillData[String(id)]?.[f]
@@ -417,6 +502,7 @@ const surfaceOtherBullets = async () => {
   const bullets = await parseBalanceOtherBullets(date)
   for (const text of bullets) {
     if (NATURE_RITUAL_RE.test(text)) continue // handled by applyNatureRitual
+    if (acknowledge('line', text)) continue
     const e = entryFor(
       `unhandled:${text.slice(0, 40)}`,
       '(bulk/prose line)',
