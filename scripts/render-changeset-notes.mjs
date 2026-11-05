@@ -58,16 +58,29 @@ function cleanNote(note) {
 }
 
 function skillLine(entry) {
-  const notes = entry.notes
-    .filter(n => !n.startsWith('override:'))
-    .map(cleanNote)
-  return `- **${entry.name}** — ${notes.join('; ')}`
+  let notes = entry.notes.filter(n => !n.startsWith('override:'))
+  // No patch line (e.g. a fix listed outside the balance section): use the
+  // override's explanation instead of rendering an empty line.
+  if (notes.length === 0)
+    notes = entry.notes.map(n => n.replace(/^override:\s*/, ''))
+  return `- **${entry.name}** — ${notes.map(cleanNote).join('; ')}`
 }
+
+// Only entries that change our data: skips no-op notes (unreflected bug fixes,
+// changes that never landed) and base skills whose only change is the link to
+// their new PvP split (the split gets its own line).
+const LINK_FIELDS = ['pvp_split', 'split_id']
+const changesData = entry =>
+  entry.create ||
+  Object.keys(entry.desc ?? {}).length > 0 ||
+  Object.keys(entry.data ?? {}).some(f => !LINK_FIELDS.includes(f))
 
 // Group by profession, folding qualifiers like "Ranger (Nature Ritual)" into
 // the base profession.
 const byProfession = new Map()
-for (const entry of changeset.entries) {
+for (const entry of changeset.entries.filter(
+  e => typeof e.id === 'number' && changesData(e)
+)) {
   const profession = entry.profession.replace(/\s*\(.*\)$/, '')
   if (!byProfession.has(profession)) byProfession.set(profession, [])
   byProfession.get(profession).push(entry)

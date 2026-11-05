@@ -1,5 +1,249 @@
 # What's New
 
+## November 5, 2026
+
+**July – September 2026 Skill Balance Updates**
+
+- Skill data now matches the [July 8](https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260708), [August 26](https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260826) and [September 1, 2026](https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260901) game updates — 182 skills, full breakdown below
+- 31 skills now have their own PvP version, including **Frenzy**, **Primal Rage**, **Hundred Blades**, **Dash**, **Mirage Cloak**, **Shield Guardian** and **Mighty Throw**
+- New PvE-only Elementalist skill: **Soul Ignition**, an Energy Storage enchantment that burns off Overcast and sets you and adjacent foes on fire
+- Reworks for **Frenzy** and **Primal Rage** (damage taken now scales down with Strength, Frenzy moves to Strength), **Mirage Cloak**, **Focused Shot**, **Shove**, **Necrotic Traversal** and **Spear of Lightning**. **Dash** moves to Shadow Arts
+- The whole Warrior sword line costs 1 less adrenaline, and Water and Air Magic got cheaper and faster
+- Where the patch notes and the game disagree, we follow the game: **Dancing Daggers** and **Crippling Dagger** didn't change, **Symbols of Inspiration** only fully landed on September 1, and **Melandru's Shot** is back to an 8 second recharge in PvE
+- Also checked: the other 11 game updates from July to November had no skill changes
+
+<details>
+<summary>Warrior — 30 skills</summary>
+
+- **Axe Rake** — Increase additional damage from 1...10 to 4...16
+- **Executioner's Strike** — Reduce adrenaline cost from 8 to 7, increase additional damage from 10...40 to 15...45
+- **Penetrating Blow** — Increase additional damage from 5...20 to 10...25
+- **Disrupting Chop** — Reduce recharge from 1 to 0, reduce adrenaline cost from 6 to 5
+- **Axe Twist** — Increase additional damage from 1...20 to 5...25
+- **Frenzy** — Reworked: you take 175...125% damage instead of double damage. Moved to Strength
+- **Shield Bash** — Only triggers on melee attack skills (no longer on ranged attack skills)
+- **Sever Artery** — Reduce adrenaline cost from 4 to 3
+- **Galrath Slash** — Reduce adrenaline cost from 8 to 7
+- **Gash** — Reduce adrenaline cost from 6 to 5
+- **Final Thrust** — Increase damage from 1...40 to 5...40, reduce adrenaline cost from 10 to 8
+- **Primal Rage** — Reworked: you take 150...125% damage instead of double damage
+- **Quivering Blade** — Reduce adrenaline cost from 5 to 4
+- **Dragon Slash** — Reduce adrenaline cost from 8 to 7
+- **Penetrating Chop** — Increase additional damage from 5...20 to 10...25
+- **Silverwing Slash** — Reduce adrenaline cost from 8 to 7
+- **Shove** — Reworked: target touched foe takes 15...75 damage, their stance ends, and they are knocked down (no longer needs a moving target)
+- **Crippling Slash** — Reduce adrenaline cost from 6 to 5
+- **Decapitate** — Now unblockable; if the target dies, nearby foes are Weakened for 8 seconds
+- **Steelfang Slash** — Reduce adrenaline cost from 8 to 7
+- **Enraged Smash (PvP)** — Reduce adrenaline gain from 1...4 to 1...3
+- **Frenzy (PvP)** — Split for PvP. Reworked: you take 200...150% damage instead of double damage. Moved to Strength
+- **Hundred Blades (PvP)** — Split for PvP. Reduce damage from 10...35 to 10...30
+- **Protector's Strike (PvP)** — Split for PvP. Increase recharge from 3 to 6
+- **Auspicious Blow (PvP)** — Split for PvP. Reduce energy gain from 3...8 to 2...4
+- **"Coward!" (PvP)** — Split for PvP. Increase recharge from 2 to 4
+- **Protector's Defense (PvP)** — Split for PvP. Reduce duration from 5...11 to 4...8
+- **Primal Rage (PvP)** — Split for PvP. Reworked: you take 200...150% damage instead of double damage
+- **Flail (PvP)** — Split for PvP. Add "Flail ends if you use a ranged attack skill."
+- **Charging Strike (PvP)** — Split for PvP. Reduce damage from 10...90 to 10...80
+</details>
+
+<details>
+<summary>Ranger — 18 skills</summary>
+
+- **Crippling Shot** — Increase Cripple duration from 1...12 to 4...14. Reduce energy cost from 10 to 5
+- **Comfort Animal** — Increase health gain from 20...104 to 40...120
+- **Melandru's Shot** — Recharge corrected to 8 (the June increase to 12 only applied to the new PvP version)
+- **Focused Shot** — Reworked: moves three times faster, cannot be blocked, and strikes for +10...40 damage; other attack skills are disabled for 8...4 seconds (from 5...3). Recharge increased from 2 to 8
+- **Glass Arrows** — Increase damage from +5...20 to +6...20
+- **Burning Arrow** — Increase Burning duration from 1...7 to 2...8
+- **Penetrating Attack (PvP)** — Increase damage from +3...10 to +5...15
+- **Sundering Attack (PvP)** — Increase damage from +3...10 to +5...15
+- **Comfort Animal (PvP)** — Increase health gain from 20...104 to 40...120. Add "If you have Comfort Animal equipped, your animal companion will travel with you."
+- **Enraged Lunge (PvP)** — Reduce maximum damage cap from 80 to 60
+- **Glass Arrows (PvP)** — Increase damage from +5...12 to +6...18
+- **Keen Arrow (PvP)** — Increase unconditional damage from +1...5 to +5...15
+- **Nature's Renewal (PvP)** — Split for PvP. Reduce enchantment/hex casting penalty from 200% to 50...75%
+- **Crippling Shot (PvP)** — Split for PvP. Increase Cripple duration from 1...12 to 4...14
+- **Otyugh's Cry (PvP)** — Split for PvP. Reduce duration from 10...25 to 5...15
+- **Melandru's Shot (PvP)** — Split for PvP. Increase recharge from 8 to 12
+- **Tranquility (PvP)** — Split for PvP. Reduce enchantment expiration speed increase from 20...50% to 10...30%
+- **Infuriating Heat (PvP)** — Split for PvP. Increase recharge from 15 to 30, reduce adrenaline gain from double to an additional 33...66%
+</details>
+
+<details>
+<summary>Monk — 19 skills</summary>
+
+- **Banish** — Increase damage from 20...56 to 20...65
+- **Aegis** — Increase effect duration from 5...11 to 6...15 (PvE)
+- **Orison of Healing** — Increase healing from 20...70 to 30...80
+- **Dwayna's Kiss** — Increase unconditional healing from 15...60 to 20...65, increase per-enchantment/hex healing from 10...35 to 15...40
+- **Signet of Devotion** — Increase healing from 14...100 to 20...120
+- **Bane Signet** — Increase damage from 26...56 to 30...60, reduce recharge from 20 to 15
+- **Healing Touch** — Increase healing from 16...60 to 20...80
+- **Healing Light** — Reduce activation from 1 to 0.75, increase healing from 40...100 to 40...120
+- **Shield Guardian** — Increase effect time from 1...4 to 2...6
+- **Blessed Light** — Reduce energy cost from 10 to 5, reduce healing from 10...140 to 10...120, increase recharge from 3 to 5
+- **Kirin's Wrath** — Reduce activation from 2 to 1, reduce recharge from 30 to 10
+- **Words of Comfort** — Increase unconditional healing from 15...60 to 20...65, conditional healing from 15...45 to 20...50
+- **Holy Haste** — Reduce energy cost from 10 to 5
+- **Defender's Zeal** — Increase effect duration from 5...25 to 10...30
+- **Castigation Signet** — Reduce recharge from 20 to 15, increase energy gain from 1...10 to 4...14
+- **Light of Deliverance (PvP)** — Reduce recharge from 10 to 8
+- **Heal Party (PvP)** — Reduce recharge from 20 to 10
+- **Peace and Harmony (PvP)** — Split for PvP. Increase recharge from 10 to 15, reduce hex and condition removal from 0...9 to 0...4
+- **Shield Guardian (PvP)** — Split for PvP. Increase recharge from 20 to 25, reduce healing from 10...40 to 10...35
+</details>
+
+<details>
+<summary>Necromancer — 16 skills</summary>
+
+- **Well of Power** — Reduce recharge from 15 to 10, increase duration from 8...20 to 10...30
+- **Necrotic Traversal** — Reworked: exploit a random corpse or sacrifice 30...20% Health to teleport to target foe. You are Diseased for 6 seconds and nearby foes are Poisoned for 5...20 seconds
+- **Soul Barbs** — Reduce recharge from 20 to 10
+- **Barbs** — Reduce activation from 2 to 1, increase damage from 1...15 to 4...16
+- **Insidious Parasite** — Reduce energy cost from 15 to 10, reduce recharge from 12 to 8
+- **Dark Pact** — Increase damage from 10...48 to 20...60
+- **Faintheartedness** — Increase duration from 3...16 to 4...18, increase health degeneration from 0...3 to 1...3
+- **Cultist's Fervor** — Reduce recharge from 25 to 15
+- **Reaper's Mark** — Reduce recharge from 15 to 10
+- **Animate Flesh Golem** — Golem leaves 1...4 exploitable corpses on death (from 1)
+- **Envenom Enchantments** — Reduce recharge from 20 to 15
+- **Contagion** — Reduce recharge from 20 to 10
+- **Ulcerous Lungs** — Increase duration from 10...25 to 10...30, increase Bleeding duration from 3...15 to 5...20
+- **Corrupt Enchantment** — Reduce recharge from 10 to 5
+- **Foul Feast** — Increase energy gain from 0...2 to 2...4
+- **Putrid Bile** — Increase duration from 5...20 to 5...25
+</details>
+
+<details>
+<summary>Mesmer — 18 skills</summary>
+
+- **Blackout** — Increase duration from 2...6 to 2...8
+- **Illusionary Weaponry** — Reduce recharge from 15 to 10, increase damage from 16...50 to 20...60
+- **Channeling** — Reduce recharge from 15 to 10
+- **Phantom Pain** — Reduce recharge from 15 to 10
+- **Ethereal Burden** — Change effect duration from 10 to 6...12
+- **Wastrel's Worry** — Reduce recharge from 4 to 2
+- **Kitah's Burden** — Change effect duration from 10 to 6...12
+- **Wastrel's Demise** — Reduce recharge from 5 to 4
+- **Symbols of Inspiration** — Now affects Elite skills, not just Elite spells. Reduce recharge from 15 to 10, increase duration from 1...31 to 6...40 (this part landed September 1)
+- **Tease** — Reduce recharge from 20 to 15
+- **Sum of All Fears** — Increase duration from 1...10 to 4...12
+- **Fragility (PvP)** — Give the PvE functionality of affecting adjacent foes
+- **Illusionary Weaponry (PvP)** — Reduce recharge from 15 to 10, increase damage from 16...50 to 20...60
+- **Mirror of Disenchantment (PvP)** — Reduce energy cost from 15 to 10
+- **Fevered Dreams (PvP)** — Reduce recharge from 20 to 15
+- **Time Ward** — Increase duration from 3...15 to 6...20
+- **Wastrel's Worry (PvP)** — Split for PvP
+- **Tease (PvP)** — Split for PvP
+</details>
+
+<details>
+<summary>Elementalist — 21 skills</summary>
+
+- **Kinetic Armor** — Description fixed to match the game: renews for 12 seconds (was listed as 8)
+- **Elemental Attunement** — Energy refund is now 1 Energy plus 50% of the base cost
+- **Aftershock** — Both damage values changed to 15...85 (from 26...100 and 10...68)
+- **Conjure Flame** — Reduce recharge from 45 to 30
+- **Rust** — Increase damage from 10...70 to 10...85
+- **Lightning Surge** — Reduce energy cost from 15 to 10. Cracked Armor now applies before the damage
+- **Conjure Frost** — Reduce recharge from 45 to 30
+- **Maelstrom** — Reduce energy cost from 25 to 15, reduce activation from 2 to 1.5, reduce recharge from 30 to 20
+- **Conjure Lightning** — Reduce recharge from 45 to 30
+- **Lightning Strike** — Increase damage from 5...40 to 10...60, increase Overcast conditional damage from 5...40 to 20...40
+- **Lightning Orb** — Reduce energy cost from 15 to 10
+- **Lightning Touch** — Reduce recharge from 10 to 5
+- **Shatterstone** — Target also moves 66% slower
+- **Ride the Lightning** — Reduce energy cost from 10 to 5
+- **Steam** — Now also deals 20...60 fire damage to a burning target
+- **Icy Prism** — Reduce energy cost from 10 to 5
+- **Master of Magic** — Energy refund is now 1 Energy plus 30% of the cost
+- **Ward Against Harm (PvP)** — Reduce recharge from 30 to 20
+- **Ride the Lightning (PvP)** — Reduce energy cost from 15 to 5
+- **Over the Limit** — Cast time bonus increased from 15...20 to 20...50, recharge bonus increased from 15...50 to 40...80. Increased amount of Overcast generated from 1 to 3
+- **Soul Ignition** — New PvE-only Energy Storage skill. While you maintain it, Overcast drops by 1...2 per second and you and adjacent foes are Burning. 10 Energy, 1/2 second cast, 30 second recharge
+</details>
+
+<details>
+<summary>Assassin — 14 skills</summary>
+
+- **Aura of Displacement** — Reduce energy cost from 10 to 5
+- **Black Lotus Strike** — Reduce energy cost from 10 to 5
+- **Recall** — Reduce energy cost from 15 to 10, reduce skill disable when the enchantment ends from 10 to 3 seconds
+- **Sharpen Daggers** — Reduce activation from 1 to 0.5
+- **Mantis Touch** — Reduce recharge from 20 to 10
+- **Caltrops** — Reduce energy cost from 10 to 5, now also inflicts Bleeding
+- **Expunge Enchantments** — Reduce skill disable from 10...5 to 8...4
+- **Seeping Wound** — Change activation range from half to full
+- **Dash** — Moved to Shadow Arts
+- **Black Spider Strike** — Reduce energy cost from 10 to 5
+- **Shadow Prison** — Reduce energy cost from 10 to 5
+- **Shadow Meld** — Reduce recharge from 20 to 10
+- **Shadow Shroud (PvP)** — Split for PvP. Reduce duration from 3...9 to 2...7
+- **Dash (PvP)** — Split for PvP. Moved to Shadow Arts. Recharge increased from 8 to 12, lowered by 1 second per 2 points of Shadow Arts (max 6 seconds)
+</details>
+
+<details>
+<summary>Ritualist — 13 skills</summary>
+
+- **Protective Was Kaolai** — Increase armor bonus from +10 to +20, increase healing from 10...85 to 20...95
+- **Soul Twisting** — Lower the Energy cost floor from 10 to 5
+- **Wielder's Strike** — Increase unconditional damage from 5...50 to 10...60, increase conditional weapon spell bonus damage from 10...40 to 10...50
+- **Caretaker's Charge** — Increase energy gain from 5 to 7, increase damage from 20...75 to 20...85
+- **Mending Grip** — Increase healing from 20...80 to 30...90
+- **Flesh of My Flesh (PvP)** — Reduce recharge from 10 to 6
+- **Ancestors' Rage (PvP)** — Increase damage from 1...41 to 4...50
+- **Splinter Weapon (PvP)** — Increase damage from 5...30 to 5...40
+- **Earthbind (PvP)** — Reduce activation from 5 to 3, reduce recharge from 60 to 45
+- **Disenchantment (PvP)** — Reduce activation from 5 to 3, increase duration from 10...35 to 15...40, reduce recharge from 45 to 30
+- **Wanderlust (PvP)** — Reduce activation time from 5 to 3
+- **Soul Twisting (PvP)** — Split for PvP. Lower the Energy cost floor from 10 to 5, and Binding Rituals now recharge 25...50% faster instead of instantly
+- **Guided Weapon (PvP)** — Split for PvP. Increase recharge from 5 to 12
+</details>
+
+<details>
+<summary>Paragon — 18 skills</summary>
+
+- **Mighty Throw** — Increase adrenaline cost from 2 to 4
+- **Unblockable Throw** — Increase recharge from 0 to 1 (July 8), increase adrenaline cost from 4 to 6
+- **Spear of Lightning** — Reworked: strikes all foes between you and your target, +10...20 lightning damage (from +8...20), 25% armor penetration
+- **Anthem of Fury** — Increase adrenaline gain from 1...4 to 2...5
+- **Crippling Anthem** — Reduce adrenaline cost from 4 to 3
+- **Defensive Anthem** — Reduce recharge from 25 to 15
+- **Anthem of Flame** — Increase Burning duration from 1...3 to 1...5
+- **Lyric of Zeal** — Reduce recharge from 5 to 0
+- **Focused Anger** — Reduce recharge from 60 to 45
+- **Natural Temper** — Increase duration from 4...10 to 4...15
+- **Signet of Return** — Reduce activation from 5 to 4, increase Health per party member from 5...15% to 5...20%
+- **"Can't Touch This!"** — Reduce recharge from 20 to 10
+- **Hasty Refrain** — Increase duration from 3...15 to 8...20
+- **Defensive Anthem (PvP)** — Reduce recharge from 25 to 15
+- **Blazing Finale (PvP)** — Increase Burning duration from 1...3 to 1...5
+- **Signet of Return (PvP)** — Reduce activation from 5 to 4, increase Health per party member from 5...15% to 5...20%
+- **"Can't Touch This!" (PvP)** — Reduce recharge from 20 to 10
+- **Mighty Throw (PvP)** — Split for PvP (July 8). Increase adrenaline cost from 2 to 4, recharge 1
+</details>
+
+<details>
+<summary>Dervish — 15 skills</summary>
+
+- **Mirage Cloak** — Reworked: for 20 seconds, 40% chance to block plus 4...10% for each additional enchantment (max 80%); nearby foes take 10...40 earth damage each time a Dervish enchantment is removed from you. Energy cost 10 → 15, recharge 15 → 24 (per-enchantment block finalized September 1)
+- **Fleeting Stability** — Reduce recharge from 15 to 10
+- **Mystic Sandstorm** — Increase unconditional damage per second from 10...20 to 10...40
+- **Whirling Charge** — Decrease recharge from 10 to 8, increase damage from 10...50 to 10...60
+- **Test of Faith** — Reduce activation from 0.75 to 0.5, increase Daze duration from 1...4 to 2...6
+- **Grenth's Grasp** — Remove the cold-weapon requirement
+- **Mystic Regeneration (PvP)** — Increase recharge from 12 to 15
+- **Signet of Pious Restraint (PvP)** — Increase recharge from 10 to 16
+- **Mystic Corruption (PvP)** — Split for PvP. Adjust Disease duration from 1...10 to 2...6
+- **Harrier's Grasp (PvP)** — Split for PvP. Now only melee attacks against moving foes Cripple them
+- **Mirage Cloak (PvP)** — Split for PvP
+- **Fleeting Stability (PvP)** — Split for PvP. Reduce duration from 4...10 to 2...8, reduce recharge from 15 to 10
+- **Pious Restoration (PvP)** — Split for PvP. Increase recharge from 8 to 15, reduce hexes removed from 1...3 to 1
+- **Whirling Charge (PvP)** — Split for PvP
+- **Aura Slicer (PvP)** — Split for PvP. Increase adrenaline cost from 4 to 5
+</details>
+
 ## July 5, 2026
 
 **June 24 Skill Balance Update & Automated Skill Data**
