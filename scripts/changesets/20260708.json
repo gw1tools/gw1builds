@@ -1,0 +1,117 @@
+{
+  "date": "20260708",
+  "source": "https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260708",
+  "generatedAt": "2026-11-05T07:46:27.444Z",
+  "entries": [
+    {
+      "id": 166,
+      "name": "Kinetic Armor",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 12 seconds, you gain +20...80 armor. Whenever you cast a spell, Kinetic Armor is renewed for 8 seconds.",
+          "to": "For 12 seconds, you gain +20...80 armor. Whenever you cast a spell, Kinetic Armor is renewed for 12 seconds."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "override: description fixed to match game: renewal 8 -> 12 seconds"
+      ]
+    },
+    {
+      "id": 1547,
+      "name": "Mighty Throw",
+      "profession": "Paragon",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3442,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split skill into PvE/PvP versions.",
+        "override: split into PvE/PvP versions; PvP version is id 3442"
+      ]
+    },
+    {
+      "id": 1550,
+      "name": "Unblockable Throw",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 0,
+          "to": 1,
+          "noteFrom": 0,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Changed recharge time from 0 to 1."
+      ]
+    },
+    {
+      "id": 3442,
+      "name": "Mighty Throw (PvP)",
+      "profession": "Paragon",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[PVP] Changed recharge time from 0 to 2.",
+        "override: new PvP split (wiki id 3442): base copy, recharge 0 -> 2"
+      ],
+      "create": {
+        "data": {
+          "id": 3442,
+          "campaign": 3,
+          "profession": 9,
+          "attribute": 37,
+          "type": 12,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 0,
+          "activation": 1,
+          "recharge": 2,
+          "adrenaline": 2,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3442,
+          "name": "Mighty Throw (PvP)",
+          "description": "Your spear moves three times faster. If it hits, you deal +10...40 damage.",
+          "concise": "Deals +10...40 damage. This spear moves three times faster."
+        }
+      }
+    }
+  ],
+  "acknowledged": [
+    {
+      "name": "Dhuum's Rest",
+      "note": "Underworld-only skill (id 3087), not in our data; nothing to update"
+    },
+    {
+      "line": "{{P}} Paragon",
+      "note": "profession group label, not a change"
+    },
+    {
+      "line": "Underworld",
+      "note": "group label, not a change"
+    }
+  ]
+}

@@ -953,7 +953,7 @@
 		"166": {
 			"id": 166,
 			"name": "Kinetic Armor",
-			"description": "For 12 seconds, you gain +20...80 armor. Whenever you cast a spell, Kinetic Armor is renewed for 8 seconds.",
+			"description": "For 12 seconds, you gain +20...80 armor. Whenever you cast a spell, Kinetic Armor is renewed for 12 seconds.",
 			"concise": "(12 seconds.) You have +20...80 armor. Renewal bonus: cast a spell."
 		},
 		"167": {
@@ -8911,6 +8911,12 @@
 			"name": "Farmer's Scythe (PvP)",
 			"description": "If this attack hits, you deal +5...35 damage. If you hit more than one foe, this attack recharges instantly.",
 			"concise": "Deals +5...35 damage. Instant recharge if you hit more than one foe."
+		},
+		"3442": {
+			"id": 3442,
+			"name": "Mighty Throw (PvP)",
+			"description": "Your spear moves three times faster. If it hits, you deal +10...40 damage.",
+			"concise": "Deals +10...40 damage. This spear moves three times faster."
 		}
 	}
 }
