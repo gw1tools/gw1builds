@@ -102,7 +102,8 @@ const numFields = [
   ],
   [
     'activation',
-    /activation time[^.]*?from (\d+(?:\.\d+)?) to (\d+(?:\.\d+)?)(?![%\d/])/i,
+    // "activation time from" (Jun 2026) or bare "activation from" (Aug 2026)
+    /\bactivation(?: time)?[^.]*?from (\d+(?:\.\d+)?) to (\d+(?:\.\d+)?)(?![%\d/])/i,
   ],
   [
     'adrenaline',
@@ -129,7 +130,7 @@ const parseRanges = text => {
 }
 
 const structuralRe =
-  /\b(add\b|adds\b|added\b|remove\b|removed\b|changed functionality|also hits|scaling|set on fire|range of|adjust text|increase range|reduce range)\b/i
+  /\b(add\b|adds\b|added\b|remove\b|removed\b|rework\b|reworked\b|changed functionality|also hits|scaling|set on fire|range of|adjust text|increase range|reduce range)\b/i
 const aoeRe = /AoE damage from 100% to 75%/i
 
 // --- target (id) resolution ---------------------------------------------------
@@ -473,6 +474,7 @@ const applyOverrides = async () => {
       for (const [f, v] of Object.entries(ov.data)) {
         const cur = skillData[String(id)]?.[f]
         if (cur !== v) e.data[f] = { from: cur, to: v, wiki: 'override' }
+        else delete e.data[f] // override pins the current value: drop a parsed change
       }
     const w = getWork(id)
     if (ov.description != null) w.description = ov.description

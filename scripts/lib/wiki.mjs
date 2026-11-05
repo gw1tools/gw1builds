@@ -92,9 +92,11 @@ export const renderWikiText = raw => {
     const neg = parts.includes('-')
     const nums = parts.filter(p => /^[+-]?\d/.test(p))
     if (nums.length === 0) return ''
+    // A "%" arg is the unit suffix, e.g. {{gr|175|125||%}} -> 175...125%
+    const unit = parts.includes('%') ? '%' : ''
     const range =
       nums.length === 1 ? nums[0] : `${nums[0]}...${nums[nums.length - 1]}`
-    return neg ? `-${range}` : range
+    return (neg ? `-${range}` : range) + unit
   })
   // bold/italic wiki markup
   t = t.replace(/'''''|'''|''/g, '')
@@ -174,6 +176,9 @@ export const parseSkillInfobox = wikitext => {
     if (v == null) return undefined
     const s = String(v).trim()
     if (s === '') return undefined
+    // generic fraction template, optionally after an integer: {{3/2}} = 1.5
+    const fr = s.match(/^(\d+)?\s*\{\{\s*(\d+)\s*\/\s*(\d+)\s*\}\}/)
+    if (fr) return (fr[1] ? Number(fr[1]) : 0) + Number(fr[2]) / Number(fr[3])
     // fraction templates {{1/4}} / glyphs ¼, optionally with a leading integer
     for (const [g, f] of Object.entries(FRAC)) {
       if (s.includes(g)) {
