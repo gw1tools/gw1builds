@@ -59,6 +59,8 @@ export interface SkillSlotProps {
   skill?: SkillSlotData | null
   /** Skill ID when the caller only has numeric list data */
   skillId?: number
+  /** With skillId: show the skill's PvP version if it has one (PvP-only builds) */
+  pvp?: boolean
   size?: keyof typeof slotSizes | number
   /** Slot position (1-8) for accessibility */
   position?: number
@@ -102,6 +104,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
       className,
       skill,
       skillId: skillIdProp,
+      pvp = false,
       size = 'md',
       position,
       disabled = false,
@@ -163,7 +166,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
       let cancelled = false
       setResolutionAttempted(false)
 
-      getSkillById(normalizedSkillId).then(loadedSkill => {
+      getSkillById(normalizedSkillId, pvp).then(loadedSkill => {
         if (cancelled) return
         setResolvedSkill(loadedSkill ?? null)
         setResolutionAttempted(true)
@@ -172,7 +175,7 @@ export const SkillSlot = forwardRef<HTMLDivElement, SkillSlotProps>(
       return () => {
         cancelled = true
       }
-    }, [skill, hasValidSkillId, normalizedSkillId])
+    }, [skill, hasValidSkillId, normalizedSkillId, pvp])
 
     // Get icon URL from skill ID (local files in /public/skills/)
     const iconUrl = hasValidSkillId

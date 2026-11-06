@@ -14,7 +14,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getBuildById } from '@/lib/services/builds'
-import { getSkillsByIds, type Skill } from '@/lib/gw/skills'
+import { getSkillsByIds, isPvpOnlyBuild, type Skill } from '@/lib/gw/skills'
 import { PROFESSION_COLORS, SITE_URL } from '@/lib/constants'
 import { BuildPageClient } from './client'
 import type { SkillBar } from '@/types/database'
@@ -104,10 +104,12 @@ export async function generateMetadata({
 }
 
 /**
- * Collects all skill IDs from build bars (including variants) and fetches skill data
+ * Collects all skill IDs from build bars (including variants) and fetches skill data.
+ * With pvp set, skills that have a PvP version map to it (keyed by the saved id).
  */
 async function getSkillsForBuild(
-  bars: SkillBar[]
+  bars: SkillBar[],
+  pvp: boolean
 ): Promise<Map<number, Skill>> {
   // Collect all unique skill IDs from base bars and variants
   const skillIds = new Set<number>()
@@ -130,7 +132,7 @@ async function getSkillsForBuild(
   const skillIdsArray = Array.from(skillIds)
 
   // Fetch all skills
-  const skills = await getSkillsByIds(skillIdsArray)
+  const skills = await getSkillsByIds(skillIdsArray, pvp)
   const skillMap = new Map<number, Skill>()
 
   skillIdsArray.forEach((id, index) => {
@@ -167,7 +169,10 @@ export default async function BuildPage({ params }: BuildPageProps) {
     notFound()
   }
 
-  const skillMap = await getSkillsForBuild(build.bars as SkillBar[])
+  const skillMap = await getSkillsForBuild(
+    build.bars as SkillBar[],
+    isPvpOnlyBuild(build.tags)
+  )
 
   return (
     <BuildPageClient

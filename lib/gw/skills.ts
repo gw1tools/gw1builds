@@ -100,6 +100,8 @@ export interface Skill {
   isRoleplay: boolean
   /** Whether this has a PvP variant */
   pvpSplit: boolean
+  /** Skill id of the PvP variant (0 if none) */
+  splitId: number
 }
 
 // ============================================================================
@@ -198,6 +200,7 @@ async function loadSkillData(): Promise<void> {
         overcast: data.overcast,
         isRoleplay: data.is_rp,
         pvpSplit: data.pvp_split,
+        splitId: data.pvp_split ? data.split_id : 0,
       }
 
       skillsById.set(id, skill)
@@ -221,20 +224,42 @@ async function loadSkillData(): Promise<void> {
 // ============================================================================
 
 /**
+ * True when a build's tags mark it as PvP only (tagged pvp, not pve or general).
+ * In game, players equip the normal skill and PvP areas use its PvP version,
+ * so these builds should display the PvP version.
+ */
+export function isPvpOnlyBuild(tags: readonly string[]): boolean {
+  return (
+    tags.includes('pvp') && !tags.includes('pve') && !tags.includes('general')
+  )
+}
+
+/** Swaps in the skill's PvP version when asked for and one exists */
+function withPvpVersion(skill: Skill | undefined, pvp: boolean) {
+  return pvp && skill?.splitId
+    ? (skillsById?.get(skill.splitId) ?? skill)
+    : skill
+}
+
+/**
  * Gets a skill by its numeric ID
  *
  * @param id - Skill ID (0 = empty slot, returns undefined)
+ * @param pvp - Return the PvP version if the skill has one
  * @returns Skill or undefined if not found
  *
  * @example
  * const skill = await getSkillById(152) // Energy Surge
  * console.log(skill?.name) // "Energy Surge"
  */
-export async function getSkillById(id: number): Promise<Skill | undefined> {
+export async function getSkillById(
+  id: number,
+  pvp = false
+): Promise<Skill | undefined> {
   await ensureInitialized()
   // ID 0 means "No Skill" (empty slot) in GW1
   if (id === 0) return undefined
-  return skillsById?.get(id)
+  return withPvpVersion(skillsById?.get(id), pvp)
 }
 
 /**
@@ -256,21 +281,28 @@ export async function getSkillByName(name: string): Promise<Skill | undefined> {
  * Useful for loading a full skill bar
  *
  * @param ids - Array of skill IDs
+ * @param pvp - Return PvP versions for skills that have one
  * @returns Array of Skills (undefined for invalid IDs or ID 0 which means empty slot)
  */
 export async function getSkillsByIds(
-  ids: number[]
+  ids: number[],
+  pvp = false
 ): Promise<(Skill | undefined)[]> {
   await ensureInitialized()
   // ID 0 means "No Skill" (empty slot) in GW1
-  return ids.map(id => (id === 0 ? undefined : skillsById?.get(id)))
+  return ids.map(id =>
+    id === 0 ? undefined : withPvpVersion(skillsById?.get(id), pvp)
+  )
 }
 
 /**
  * Searches skills by name substring (case-insensitive).
  * Results are sorted by relevance: startsWith matches first, then contains matches.
  */
-export async function searchSkills(query: string, limit = 10): Promise<Skill[]> {
+export async function searchSkills(
+  query: string,
+  limit = 10
+): Promise<Skill[]> {
   await ensureInitialized()
   if (!allSkills || !query.trim()) return []
 

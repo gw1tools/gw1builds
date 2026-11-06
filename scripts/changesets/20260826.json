@@ -1,0 +1,4912 @@
+{
+  "date": "20260826",
+  "source": "https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260826",
+  "generatedAt": "2026-11-05T08:04:33.228Z",
+  "entries": [
+    {
+      "id": 29,
+      "name": "Blackout",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 2...6 seconds, all of touched target foe's skills are disabled, and all of your skills are disabled for 5 seconds.",
+          "to": "For 2...8 seconds, all of touched target foe's skills are disabled, and all of your skills are disabled for 5 seconds."
+        },
+        "concise": {
+          "from": "(2...6 seconds.) Disables skills. <gray>Your skills are disabled (5 seconds).</gray>",
+          "to": "(2...8 seconds.) Disables skills. <gray>Your skills are disabled (5 seconds).</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase duration from 2..6 to 2..8."
+      ]
+    },
+    {
+      "id": 33,
+      "name": "Illusionary Weaponry",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 30 seconds, your melee attacks neither hit nor fail to hit. Instead, Illusionary Weaponry deals 16...50 damage to your targets for each melee attack. You have +5 armor for each equipped Illusion Magic skill.",
+          "to": "For 30 seconds, your melee attacks neither hit nor fail to hit. Instead, Illusionary Weaponry deals 20...60 damage to your targets for each melee attack. You have +5 armor for each equipped Illusion Magic skill."
+        },
+        "concise": {
+          "from": "(30 seconds.) Deals 16...50 damage to foes in place of other damage or effects from melee attacks. You have +5 armor for each equipped Illusion Magic skill. <gray>Your melee attacks neither hit nor fail to hit.</gray>",
+          "to": "(30 seconds.) Deals 20...60 damage to foes in place of other damage or effects from melee attacks. You have +5 armor for each equipped Illusion Magic skill. <gray>Your melee attacks neither hit nor fail to hit.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 15 to 10, increase damage from 16..50 to 20..60."
+      ]
+    },
+    {
+      "id": 38,
+      "name": "Channeling",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 15 to 10."
+      ]
+    },
+    {
+      "id": 44,
+      "name": "Phantom Pain",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 15 to 10."
+      ]
+    },
+    {
+      "id": 45,
+      "name": "Ethereal Burden",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 10 seconds, target foe moves 50% slower. When Ethereal Burden ends, you gain 10...18 Energy.",
+          "to": "For 6...12 seconds, target foe moves 50% slower. When Ethereal Burden ends, you gain 10...18 Energy."
+        },
+        "concise": {
+          "from": "(10 seconds.) Target foe moves 50% slower. End effect: you gain 10...18 Energy.",
+          "to": "(6...12 seconds.) Target foe moves 50% slower. End effect: you gain 10...18 Energy."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Change effect duration from 10 to 6..12.",
+        "override: duration 10 -> 6...12"
+      ]
+    },
+    {
+      "id": 50,
+      "name": "Wastrel's Worry",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 4,
+          "to": 2,
+          "noteFrom": 4,
+          "wiki": "confirmed"
+        },
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3447,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 4 to 2.",
+        "override: split for PvP; PvP version is id 3447"
+      ]
+    },
+    {
+      "id": 91,
+      "name": "Well of Power",
+      "profession": "Necromancer",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Exploit nearest corpse or sacrifice 66% Health to create a Well of Power at that location. For 8...20 seconds, allies within the area of Well of Power gain +1...6 Health regeneration and +2 Energy regeneration.",
+          "to": "Exploit nearest corpse or sacrifice 66% Health to create a Well of Power at that location. For 10...30 seconds, allies within the area of Well of Power gain +1...6 Health regeneration and +2 Energy regeneration."
+        },
+        "concise": {
+          "from": "(8...20 seconds.) Allies in this well have +1...6 Health regeneration and +2 Energy regeneration. <gray>Exploits a fresh corpse or sacrifices 66% Health.</gray>",
+          "to": "(10...30 seconds.) Allies in this well have +1...6 Health regeneration and +2 Energy regeneration. <gray>Exploits a fresh corpse or sacrifices 66% Health.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 15 to 10, increase duration from 8..20 to 10..30."
+      ]
+    },
+    {
+      "id": 97,
+      "name": "Necrotic Traversal",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Exploit a random corpse. You teleport to that corpse's location and all nearby foes become Poisoned for 5...20 seconds.",
+          "to": "Exploit a random corpse or sacrifice 30...20% Health to teleport to target foe's location. You become Diseased for 6 seconds and all nearby foes become Poisoned for 5...20 seconds."
+        },
+        "concise": {
+          "from": "Teleport to a corpse's location. Inflicts Poisoned condition (5...20 seconds). Affects all nearby foes. <gray>Exploits a fresh corpse.</gray>",
+          "to": "Exploit a random corpse or sacrifice 30...20% Health to teleport to target foe's location. You become Diseased for 6 seconds and all nearby foes become Poisoned for 5...20 seconds."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Rework: \"Exploit a random corpse or sacrifice 30..20% health to teleport to target foe's location. You become Diseased for 6 seconds and all nearby foes become Poisoned for 5..20 second[s].\"",
+        "override: reworked (wiki text; wiki concise repeats the full text)"
+      ]
+    },
+    {
+      "id": 100,
+      "name": "Soul Barbs",
+      "profession": "Necromancer",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 20 to 10."
+      ]
+    },
+    {
+      "id": 101,
+      "name": "Barbs",
+      "profession": "Necromancer",
+      "data": {
+        "activation": {
+          "from": 2,
+          "to": 1,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 30 seconds, target foe takes 1...15 more damage when hit by physical damage.",
+          "to": "For 30 seconds, target foe takes 4...16 more damage when hit by physical damage."
+        },
+        "concise": {
+          "from": "(30 seconds.) Target foe takes 1...15 damage whenever it takes physical damage.",
+          "to": "(30 seconds.) Target foe takes 4...16 damage whenever it takes physical damage."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation from 2 to 1, increase damage from 1..15 to 4..16."
+      ]
+    },
+    {
+      "id": 123,
+      "name": "Insidious Parasite",
+      "profession": "Necromancer",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 12,
+          "to": 8,
+          "noteFrom": 12,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 15 to 10, reduce recharge from 12 to 8."
+      ]
+    },
+    {
+      "id": 133,
+      "name": "Dark Pact",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Deal 10...48 shadow damage to target foe.",
+          "to": "Deal 20...60 shadow damage to target foe."
+        },
+        "concise": {
+          "from": "Deals 10...48 damage.",
+          "to": "Deals 20...60 damage."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from 10..48 to 20..60."
+      ]
+    },
+    {
+      "id": 135,
+      "name": "Faintheartedness",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For the next 3...16 seconds, target foe attacks 50% slower, and that foe suffers -0...3 Health degeneration.",
+          "to": "For the next 4...18 seconds, target foe attacks 50% slower, and that foe suffers -1...3 Health degeneration."
+        },
+        "concise": {
+          "from": "(3...16 seconds.) Target foe attacks 50% slower and has -0...3 Health degeneration.",
+          "to": "(4...18 seconds.) Target foe attacks 50% slower and has -1...3 Health degeneration."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase duration from 3..16 to 4..18, increase health degeneration from 0..3 to 1..3."
+      ]
+    },
+    {
+      "id": 164,
+      "name": "Elemental Attunement",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 25...60 seconds, you are attuned to Air, Fire, Water, and Earth and gain +1...2 to these attributes. You gain 50% of the base Energy cost of the skill each time you use magic associated with any of these elements.",
+          "to": "For 25...60 seconds, you are attuned to Air, Fire, Water, and Earth and gain +1...2 to these attributes. You gain 1 Energy plus 50% of the base Energy cost of the skill each time you use magic associated with any of these elements."
+        },
+        "concise": {
+          "from": "(25...60 seconds.) Your elemental attributes are increased by +1...2. You gain 50% of the Energy cost of any Air, Earth, Fire, and Water Magic skills you use.",
+          "to": "(25...60 seconds.) Your elemental attributes are increased by +1...2. You gain 1 plus 50% of the Energy cost of any Air, Earth, Fire, and Water Magic skills you use."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Change energy refund to \"…you gain 1 Energy plus 50% of the base cost\".",
+        "override: refund now 1 Energy plus 50%"
+      ]
+    },
+    {
+      "id": 174,
+      "name": "Aftershock",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Nearby foes are struck for 26...100 earth damage. Knocked down foes are struck for 10...68 additional earth damage.",
+          "to": "Nearby foes are struck for 15...85 earth damage. Knocked down foes are struck for 15...85 additional earth damage."
+        },
+        "concise": {
+          "from": "Deals 26...100 earth damage to nearby foes. Deals 10...68 more earth damage to knocked down foes.",
+          "to": "Deals 15...85 earth damage to nearby foes. Deals 15...85 more earth damage to knocked down foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Adjust both damage amounts from 26..100/10..68 (respectively) to 15..85 (reduces the unconditional damage, increases conditional knockdown damage, increases overall damage).",
+        "override: both damage values -> 15...85"
+      ]
+    },
+    {
+      "id": 182,
+      "name": "Conjure Flame",
+      "profession": "Elementalist",
+      "data": {
+        "recharge": {
+          "from": 45,
+          "to": 30,
+          "noteFrom": 45,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 45 to 30."
+      ]
+    },
+    {
+      "id": 204,
+      "name": "Rust",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Deals 10...70 cold damage to target and adjacent foes. For 5...20 seconds, target foe and all adjacent foes take twice as long to activate signets. If you are Overcast, foes struck with Rust have their signets interrupted and disabled for 1...10 seconds.",
+          "to": "Deals 10...85 cold damage to target and adjacent foes. For 5...20 seconds, target foe and all adjacent foes take twice as long to activate signets. If you are Overcast, foes struck with Rust have their signets interrupted and disabled for 1...10 seconds."
+        },
+        "concise": {
+          "from": "Deals 10...70 cold damage to target and adjacent foes. Hexes target and adjacent foes (5...20 seconds). Doubles signet activation time. Interrupts and disables signets for 1...10 seconds if you are Overcast.",
+          "to": "Deals 10...85 cold damage to target and adjacent foes. Hexes target and adjacent foes (5...20 seconds). Doubles signet activation time. Interrupts and disables signets for 1...10 seconds if you are Overcast."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from 10..70 to 10..85."
+      ]
+    },
+    {
+      "id": 205,
+      "name": "Lightning Surge",
+      "profession": "Elementalist",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Decrease energy cost from 15 to 10. Cracked armor happens before damage."
+      ]
+    },
+    {
+      "id": 207,
+      "name": "Conjure Frost",
+      "profession": "Elementalist",
+      "data": {
+        "recharge": {
+          "from": 45,
+          "to": 30,
+          "noteFrom": 45,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 45 to 30."
+      ]
+    },
+    {
+      "id": 215,
+      "name": "Maelstrom",
+      "profession": "Elementalist",
+      "data": {
+        "energy": {
+          "from": 25,
+          "to": 15,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 30,
+          "to": 20,
+          "noteFrom": 30,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 2,
+          "to": 1.5,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 25 to 15, reduce activation from 2 to 1.5, reduce recharge from 30 to 20."
+      ]
+    },
+    {
+      "id": 221,
+      "name": "Conjure Lightning",
+      "profession": "Elementalist",
+      "data": {
+        "recharge": {
+          "from": 45,
+          "to": 30,
+          "noteFrom": 45,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 45 to 30."
+      ]
+    },
+    {
+      "id": 222,
+      "name": "Lightning Strike",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Strike target foe for 5...40 lightning damage. This spell has 25% armor penetration. If you are Overcast, that foe is hexed with Lightning Strike for 3 seconds. When this hex ends, that foe is struck again for 5...40 lightning damage.",
+          "to": "Strike target foe for 10...60 lightning damage. This spell has 25% armor penetration. If you are Overcast, that foe is hexed with Lightning Strike for 3 seconds. When this hex ends, that foe is struck again for 20...40 lightning damage."
+        },
+        "concise": {
+          "from": "Deals 5...40 lightning damage. 25% armor penetration. Hex for 3 seconds if Overcast. End effect: deals 5...40 lightning damage.",
+          "to": "Deals 10...60 lightning damage. 25% armor penetration. Hex for 3 seconds if Overcast. End effect: deals 20...40 lightning damage."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from 5..40 to 10..60, increase Overcast conditional damage from 5..40 to 20..40.",
+        "override: damage 5...40 -> 10...60, Overcast damage 5...40 -> 20...40"
+      ]
+    },
+    {
+      "id": 229,
+      "name": "Lightning Orb",
+      "profession": "Elementalist",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 15 to 10."
+      ]
+    },
+    {
+      "id": 232,
+      "name": "Lightning Touch",
+      "profession": "Elementalist",
+      "data": {
+        "recharge": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 10 to 5."
+      ]
+    },
+    {
+      "id": 252,
+      "name": "Banish",
+      "profession": "Monk",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Target foe takes 20...56 holy damage. This spell does double damage to summoned creatures.",
+          "to": "Target foe takes 20...65 holy damage. This spell does double damage to summoned creatures."
+        },
+        "concise": {
+          "from": "Deals 20...56 holy damage. Deals double damage to summoned creatures.",
+          "to": "Deals 20...65 holy damage. Deals double damage to summoned creatures."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from 20..56 to 20..65."
+      ]
+    },
+    {
+      "id": 257,
+      "name": "Aegis",
+      "profession": "Monk",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 5...11 seconds, all party members within earshot have a 50% chance to block attacks.",
+          "to": "For 6...15 seconds, all party members within earshot have a 50% chance to block attacks."
+        },
+        "concise": {
+          "from": "Enchants all party members within earshot (5...11 seconds). 50% chance to block.",
+          "to": "Enchants all party members within earshot (6...15 seconds). 50% chance to block."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[PVE] Increase effect duration from 5..11 to 6..15."
+      ]
+    },
+    {
+      "id": 266,
+      "name": "Peace and Harmony",
+      "profession": "Monk",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3448,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3448"
+      ]
+    },
+    {
+      "id": 281,
+      "name": "Orison of Healing",
+      "profession": "Monk",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Heal target ally for 20...70 Health.",
+          "to": "Heal target ally for 30...80 Health."
+        },
+        "concise": {
+          "from": "Heals for 20...70.",
+          "to": "Heals for 30...80."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase healing from 20..70 to 30..80."
+      ]
+    },
+    {
+      "id": 283,
+      "name": "Dwayna's Kiss",
+      "profession": "Monk",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Heal target other ally for 15...60 Health and an additional 10...35 Health for each enchantment or hex on that ally.",
+          "to": "Heal target other ally for 20...65 Health and an additional 15...40 Health for each enchantment or hex on that ally."
+        },
+        "concise": {
+          "from": "Heals for 15...60. Heals for 10...35 more for each enchantment and hex on target ally. <gray>Cannot self-target.</gray>",
+          "to": "Heals for 20...65. Heals for 15...40 more for each enchantment and hex on target ally. <gray>Cannot self-target.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase unconditional healing from 15..60 to 20..65, increase per-enchantment/hex healing from 10..35 to 15..40."
+      ]
+    },
+    {
+      "id": 293,
+      "name": "Signet of Devotion",
+      "profession": "Monk",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Heal target ally for 14...100 Health.",
+          "to": "Heal target ally for 20...120 Health."
+        },
+        "concise": {
+          "from": "Heals for 14...100.",
+          "to": "Heals for 20...120."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase healing from 14..100 to 20..120."
+      ]
+    },
+    {
+      "id": 296,
+      "name": "Bane Signet",
+      "profession": "Monk",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 15,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Target foe takes 26...56 holy damage. If target foe was attacking, that foe is knocked down.",
+          "to": "Target foe takes 30...60 holy damage. If target foe was attacking, that foe is knocked down."
+        },
+        "concise": {
+          "from": "Deals 26...56 holy damage. Causes knock-down if target foe is attacking.",
+          "to": "Deals 30...60 holy damage. Causes knock-down if target foe is attacking."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from 26..56 to 30..60, reduce recharge from 20 to 15."
+      ]
+    },
+    {
+      "id": 313,
+      "name": "Healing Touch",
+      "profession": "Monk",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Heal target touched ally for 16...60 Health. Health gain from Divine Favor is doubled for this spell.",
+          "to": "Heal target touched ally for 20...80 Health. Health gain from Divine Favor is doubled for this spell."
+        },
+        "concise": {
+          "from": "Touch Spell. Heals for 16...60. Double Health gain from Divine Favor for this spell.",
+          "to": "Touch Spell. Heals for 20...80. Double Health gain from Divine Favor for this spell."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase healing from 16..60 to 20..80."
+      ]
+    },
+    {
+      "id": 326,
+      "name": "Protector's Strike",
+      "profession": "Warrior",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3449,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3449"
+      ]
+    },
+    {
+      "id": 334,
+      "name": "Axe Rake",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If this attack hits a foe suffering from a Deep Wound, you strike for +1...10 damage, and that foe becomes Crippled for 15 seconds.",
+          "to": "If this attack hits a foe suffering from a Deep Wound, you strike for +4...16 damage, and that foe becomes Crippled for 15 seconds."
+        },
+        "concise": {
+          "from": "Deals +1...10 damage and inflicts Crippled condition (15 seconds) if target foe has a Deep Wound.",
+          "to": "Deals +4...16 damage and inflicts Crippled condition (15 seconds) if target foe has a Deep Wound."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase additional damage from 1..10 to 4..16."
+      ]
+    },
+    {
+      "id": 336,
+      "name": "Executioner's Strike",
+      "profession": "Warrior",
+      "data": {
+        "adrenaline": {
+          "from": 8,
+          "to": 7,
+          "noteFrom": 8,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "If this attack hits, you strike for +10...40 damage.",
+          "to": "If this attack hits, you strike for +15...45 damage."
+        },
+        "concise": {
+          "from": "Deals +10...40 damage.",
+          "to": "Deals +15...45 damage."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce adrenaline cost from 8 to 7, increase additional damage from 10..40 to 15..45."
+      ]
+    },
+    {
+      "id": 339,
+      "name": "Penetrating Blow",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If this attack hits, you strike for +5...20 damage. This axe attack has 20% armor penetration.",
+          "to": "If this attack hits, you strike for +10...25 damage. This axe attack has 20% armor penetration."
+        },
+        "concise": {
+          "from": "Deals +5...20 damage. 20% armor penetration.",
+          "to": "Deals +10...25 damage. 20% armor penetration."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase additional damage from 5..20 to 10..25."
+      ]
+    },
+    {
+      "id": 340,
+      "name": "Disrupting Chop",
+      "profession": "Warrior",
+      "data": {
+        "recharge": {
+          "from": 1,
+          "to": 0,
+          "noteFrom": 1,
+          "wiki": "confirmed"
+        },
+        "adrenaline": {
+          "from": 6,
+          "to": 5,
+          "noteFrom": 6,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 1 to 0, reduce adrenaline cost from 6 to 5."
+      ]
+    },
+    {
+      "id": 342,
+      "name": "Axe Twist",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If this attack hits a foe suffering from a Deep Wound, you strike for 1...20 more damage and that foe suffers from Weakness for 20 seconds.",
+          "to": "If this attack hits a foe suffering from a Deep Wound, you strike for 5...25 more damage and that foe suffers from Weakness for 20 seconds."
+        },
+        "concise": {
+          "from": "Deals +1...20 damage and inflicts Weakness condition (20 seconds) if target foe has a Deep Wound.",
+          "to": "Deals +5...25 damage and inflicts Weakness condition (20 seconds) if target foe has a Deep Wound."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase additional damage from 1..20 to 5..25."
+      ]
+    },
+    {
+      "id": 346,
+      "name": "Frenzy",
+      "profession": "Warrior",
+      "data": {
+        "attribute": {
+          "from": 101,
+          "to": 17,
+          "wiki": "override"
+        },
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3443,
+          "wiki": "override"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 8 seconds, you attack 33% faster but take double damage.",
+          "to": "For 8 seconds, you attack 33% faster but take 175...125% damage."
+        },
+        "concise": {
+          "from": "(8 seconds.) You attack 33% faster. <gray>You take double damage.</gray>",
+          "to": "(8 seconds.) You attack 33% faster. <gray>You take 175...125% damage.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Rework: \"For 8 seconds, you attack 33% faster but take 175..125% damage.\" Moved to Strength.",
+        "override: reworked; moved to Strength; split for PvP; PvP version is id 3443"
+      ]
+    },
+    {
+      "id": 363,
+      "name": "Shield Bash",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 5...11 seconds, while wielding a shield, the next attack skill used against you is blocked. If it was a melee skill, your attacker is knocked down and that skill is disabled for an additional 15 seconds.",
+          "to": "For 5...11 seconds, while wielding a shield, the next melee attack skill used against you is blocked, your attacker is knocked down and that skill is disabled for an additional 15 seconds."
+        },
+        "concise": {
+          "from": "(5...11 seconds.) You block the next attack skill. Causes knock-down and +15 second recharge if it was a melee skill. <gray>No effect unless you are wielding a shield.</gray>",
+          "to": "(5...11 seconds.) You block the next melee attack skill. Causes knock-down and +15 second recharge. <gray>No effect unless you are wielding a shield.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Trigger changes from \"attack skill\" to \"melee attack skill\" so the skill is no longer triggered by ranged attack skills.",
+        "override: triggers on melee attack skills only (wiki text)"
+      ]
+    },
+    {
+      "id": 381,
+      "name": "Hundred Blades",
+      "profession": "Warrior",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3444,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3444"
+      ]
+    },
+    {
+      "id": 382,
+      "name": "Sever Artery",
+      "profession": "Warrior",
+      "data": {
+        "adrenaline": {
+          "from": 4,
+          "to": 3,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] from 4 to 3",
+        "override: sword adrenaline 4 -> 3"
+      ]
+    },
+    {
+      "id": 383,
+      "name": "Galrath Slash",
+      "profession": "Warrior",
+      "data": {
+        "adrenaline": {
+          "from": 8,
+          "to": 7,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] from 8 to 7",
+        "override: sword adrenaline 8 -> 7"
+      ]
+    },
+    {
+      "id": 384,
+      "name": "Gash",
+      "profession": "Warrior",
+      "data": {
+        "adrenaline": {
+          "from": 6,
+          "to": 5,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] from 6 to 5",
+        "override: sword adrenaline 6 -> 5"
+      ]
+    },
+    {
+      "id": 385,
+      "name": "Final Thrust",
+      "profession": "Warrior",
+      "data": {
+        "adrenaline": {
+          "from": 10,
+          "to": 8,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Lose all adrenaline. If Final Thrust hits, you deal 1...40 more damage. This damage is doubled if your target was below 50% Health.",
+          "to": "Lose all adrenaline. If Final Thrust hits, you deal 5...40 more damage. This damage is doubled if your target was below 50% Health."
+        },
+        "concise": {
+          "from": "Deals +1...40 damage. Deals +1...40 more damage if target foe is below 50% Health. <gray>Lose all adrenaline.</gray>",
+          "to": "Deals +5...40 damage. Deals +5...40 more damage if target foe is below 50% Health. <gray>Lose all adrenaline.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from 1..40 to 5..40, reduce adrenaline cost from 10 to 8.",
+        "override: damage 1...40 -> 5...40 (concise has it twice)"
+      ]
+    },
+    {
+      "id": 393,
+      "name": "Crippling Shot",
+      "profession": "Ranger",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        },
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3450,
+          "wiki": "override"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "If Crippling Shot hits, your target becomes Crippled for 1...12 seconds. This attack cannot be blocked.",
+          "to": "If Crippling Shot hits, your target becomes Crippled for 4...14 seconds. This attack cannot be blocked."
+        },
+        "concise": {
+          "from": "Unblockable. Inflicts Crippled condition (1...12 seconds).",
+          "to": "Unblockable. Inflicts Crippled condition (4...14 seconds)."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase Cripple duration from 1..12 to 4..14. Reduce energy cost from 10 to 5.",
+        "override: split for PvP; PvP version is id 3450"
+      ]
+    },
+    {
+      "id": 436,
+      "name": "Comfort Animal",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "You heal your animal companion for 20...104 Health. If your companion is dead, it is resurrected with 10...58% Health. If you have Comfort Animal equipped, your animal companion will travel with you.",
+          "to": "You heal your animal companion for 40...120 Health. If your companion is dead, it is resurrected with 10...58% Health. If you have Comfort Animal equipped, your animal companion will travel with you."
+        },
+        "concise": {
+          "from": "Your pet gains 20...104 Health. Resurrects your pet (10...58% Health.) If you have Comfort Animal equipped, your animal companion will travel with you.",
+          "to": "Your pet gains 40...120 Health. Resurrects your pet (10...58% Health.) If you have Comfort Animal equipped, your animal companion will travel with you."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase health gain from 20..104 to 40..120."
+      ]
+    },
+    {
+      "id": 447,
+      "name": "Otyugh's Cry",
+      "profession": "Ranger",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3451,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3451"
+      ]
+    },
+    {
+      "id": 476,
+      "name": "Nature's Renewal",
+      "profession": "Ranger",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3445,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3445"
+      ]
+    },
+    {
+      "id": 571,
+      "name": "Disrupting Dagger",
+      "profession": "Assassin",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Double projectile speed.",
+        "override: projectile speed doubled; not shown in skill text (wiki notes)"
+      ]
+    },
+    {
+      "id": 771,
+      "name": "Aura of Displacement",
+      "profession": "Assassin",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10 to 5."
+      ]
+    },
+    {
+      "id": 779,
+      "name": "Black Lotus Strike",
+      "profession": "Assassin",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10 to 5."
+      ]
+    },
+    {
+      "id": 806,
+      "name": "Cultist's Fervor",
+      "profession": "Necromancer",
+      "data": {
+        "recharge": {
+          "from": 25,
+          "to": 15,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 25 to 15."
+      ]
+    },
+    {
+      "id": 808,
+      "name": "Reaper's Mark",
+      "profession": "Necromancer",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 15 to 10."
+      ]
+    },
+    {
+      "id": 809,
+      "name": "Shatterstone",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Target foe is struck for 25...100 cold damage and is hexed with Shatterstone for 3 seconds. When Shatterstone ends, that foe and all nearby foes are struck for 25...100 cold damage.",
+          "to": "Target foe is struck for 25...100 cold damage, moves 66% slower, and is hexed with Shatterstone for 3 seconds. When Shatterstone ends, that foe and all nearby foes are struck for 25...100 cold damage."
+        },
+        "concise": {
+          "from": "(3 seconds.) Initial effect: deals 25...100 cold damage. End effect: deals 25...100 cold damage to target and all nearby foes.",
+          "to": "(3 seconds.) Initial effect: deals 25...100 cold damage and target moves 66% slower. End effect: deals 25...100 cold damage to target and all nearby foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Add \"…moves 66% slower, and is hexed…\"",
+        "override: now also slows 66%"
+      ]
+    },
+    {
+      "id": 810,
+      "name": "Protector's Defense",
+      "profession": "Warrior",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3457,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3457"
+      ]
+    },
+    {
+      "id": 831,
+      "name": "Primal Rage",
+      "profession": "Warrior",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3458,
+          "wiki": "override"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 1...9 seconds, you attack 33% faster and move 33% faster, but you take double damage.",
+          "to": "For 1...9 seconds, you attack 33% faster and move 33% faster, but you take 150...125% damage."
+        },
+        "concise": {
+          "from": "(1...9 seconds.) You attack 33% faster and move 33% faster. <gray>You take double damage.</gray>",
+          "to": "(1...9 seconds.) You attack 33% faster and move 33% faster. <gray>You take 150...125% damage.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Rework: \"For 1..9 second[s], you attack 33% faster and move 33% faster, but you take 150..125% damage.\"",
+        "override: reworked: takes 150...125% damage; split for PvP; PvP version is id 3458"
+      ]
+    },
+    {
+      "id": 832,
+      "name": "Animate Flesh Golem",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Exploit nearest corpse to animate a level 3...25 Flesh Golem. The Flesh Golem leaves an exploitable corpse. You can have only one Flesh Golem at a time.",
+          "to": "Exploit nearest corpse to animate a level 3...25 Flesh Golem. The Flesh Golem leaves 1...4 exploitable corpse(s). You can have only one Flesh Golem at a time."
+        },
+        "concise": {
+          "from": "Creates a level 3...25 flesh golem which leaves a fresh corpse when it dies. <gray>Exploits a fresh corpse. You can have only one flesh golem at a time.</gray>",
+          "to": "Creates a level 3...25 flesh golem which leaves 1...4 fresh corpse(s) when it dies. <gray>Exploits a fresh corpse. You can have only one flesh golem at a time.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase exploitable corpses left on the golem's death from 1 to 1..4.",
+        "override: corpses left on death 1 -> 1...4"
+      ]
+    },
+    {
+      "id": 836,
+      "name": "Ride the Lightning",
+      "profession": "Elementalist",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10/15 (respectively) to 5.",
+        "override: energy 10 -> 5"
+      ]
+    },
+    {
+      "id": 846,
+      "name": "Steam",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Target foe is struck for 20...60 cold damage. If target foe is on fire, Steam Blinds that foe for 5...10 seconds.",
+          "to": "Target foe is struck for 20...60 cold damage. If target foe is on fire, Steam Blinds that foe for 5...10 seconds and they take an additional 20...60 fire damage."
+        },
+        "concise": {
+          "from": "Deals 20...60 cold damage. Inflicts Blindness condition (5...10 seconds) if target foe is Burning.",
+          "to": "Deals 20...60 cold damage. Inflicts Blindness condition (5...10 seconds) and does 20...60 fire damage if target foe is Burning."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Add \"…and they take an additional 20..60 fire damage\" to the \"on fire\" condition.",
+        "override: adds 20...60 fire damage vs burning foes"
+      ]
+    },
+    {
+      "id": 853,
+      "name": "Melandru's Shot",
+      "profession": "Ranger",
+      "data": {
+        "recharge": {
+          "from": 12,
+          "to": 8,
+          "wiki": "override"
+        },
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3459,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: recharge 12 -> 8: June 24 notes said 12 but the PvE skill stayed 8 (infobox); Aug 26 splits PvP \"from 8 to 12\"; split for PvP; PvP version is id 3459"
+      ]
+    },
+    {
+      "id": 858,
+      "name": "Dancing Daggers",
+      "profession": "Assassin",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Double projectile speed, increase damage from 5..35 to 10..40.",
+        "override: damage/projectile change in notes never landed in game (wiki notes); text kept"
+      ]
+    },
+    {
+      "id": 867,
+      "name": "Healing Light",
+      "profession": "Monk",
+      "data": {
+        "activation": {
+          "from": 1,
+          "to": 0.75,
+          "noteFrom": 1,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Heal target ally for 40...100 Health. If your target has an enchantment, you gain 1...3 Energy.",
+          "to": "Heal target ally for 40...120 Health. If your target has an enchantment, you gain 1...3 Energy."
+        },
+        "concise": {
+          "from": "Heals for 40...100. You gain 1...3 Energy if target ally is enchanted.",
+          "to": "Heals for 40...120. You gain 1...3 Energy if target ally is enchanted."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation from 1 to 0.75, increase healing from 40..100 to 40..120."
+      ]
+    },
+    {
+      "id": 869,
+      "name": "\"Coward!\"",
+      "profession": "Warrior",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3456,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3456"
+      ]
+    },
+    {
+      "id": 885,
+      "name": "Shield Guardian",
+      "profession": "Monk",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3454,
+          "wiki": "override"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 1...4 seconds, all party members in earshot have a 75% chance to block incoming attacks. If an attack is blocked, all allies in earshot are healed for 10...40 and Shield Guardian ends.",
+          "to": "For 2...6 seconds, all party members in earshot have a 75% chance to block incoming attacks. If an attack is blocked, all allies in earshot are healed for 10...40 and Shield Guardian ends."
+        },
+        "concise": {
+          "from": "(1...4 seconds). Party members in earshot have a 75% chance to block attacks. Block effect: Allies in earshot are healed for 10...40, and Shield Guardian ends.",
+          "to": "(2...6 seconds). Party members in earshot have a 75% chance to block attacks. Block effect: Allies in earshot are healed for 10...40, and Shield Guardian ends."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase effect time from 1..4 to 2..6.",
+        "override: split for PvP; PvP version is id 3454"
+      ]
+    },
+    {
+      "id": 892,
+      "name": "Quivering Blade",
+      "profession": "Warrior",
+      "data": {
+        "adrenaline": {
+          "from": 5,
+          "to": 4,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] from 5 to 4.",
+        "override: sword adrenaline 5 -> 4"
+      ]
+    },
+    {
+      "id": 903,
+      "name": "Icy Prism",
+      "profession": "Elementalist",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10 to 5."
+      ]
+    },
+    {
+      "id": 905,
+      "name": "Auspicious Blow",
+      "profession": "Warrior",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3455,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3455"
+      ]
+    },
+    {
+      "id": 907,
+      "name": "Dragon Slash",
+      "profession": "Warrior",
+      "data": {
+        "adrenaline": {
+          "from": 8,
+          "to": 7,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] from 8 to 7",
+        "override: sword adrenaline 8 -> 7"
+      ]
+    },
+    {
+      "id": 909,
+      "name": "Focused Shot",
+      "profession": "Ranger",
+      "data": {
+        "recharge": {
+          "from": 2,
+          "to": 8,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 0,
+          "to": 4,
+          "wiki": "override"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "If Focused Shot hits, you strike for +10...25 damage but all of your other attack skills are disabled for 5...3 seconds.",
+          "to": "This shot moves three times faster, cannot be blocked, and strikes for +10...40 damage but all of your other attack skills are disabled for 8...4 seconds."
+        },
+        "concise": {
+          "from": "Deals +10...25 damage. <gray>Your other attack skills are disabled (5...3 seconds) if this attack hits.</gray>",
+          "to": "Deals +10...40 damage. Unblockable. This shot moves three times faster. <gray>Your other attack skills are disabled (8...4 seconds).</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase recharge from 2 to 8. Increase skill disable from 5..3 to 8..4. Rework: \"This shot moves three times faster, cannot be blocked, and strikes for +10..40 damage but all of your other attack skills are disabled for 8..4 seconds.\"",
+        "override: reworked (wiki text); 4s cast time added by mistake (wiki notes), removed Sep 1"
+      ]
+    },
+    {
+      "id": 925,
+      "name": "Recall",
+      "profession": "Assassin",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "While you maintain Recall, nothing happens. When Recall ends, you Shadow Step to the ally you targeted when you activated this skill and all of your skills are disabled for 10 seconds.",
+          "to": "While you maintain Recall, nothing happens. When Recall ends, you Shadow Step to the ally you targeted when you activated this skill and all of your skills are disabled for 3 seconds."
+        },
+        "concise": {
+          "from": "End effect: Shadow Step to target ally. <gray>Cannot self-target and disables all of your skills for 10 seconds when it ends.</gray>",
+          "to": "End effect: Shadow Step to target ally. <gray>Cannot self-target and disables all of your skills for 3 seconds when it ends.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 15 to 10, reduce skill disable when the enchantment ends from 10 to 3 seconds.",
+        "override: skill disable on end 10 -> 3 seconds"
+      ]
+    },
+    {
+      "id": 926,
+      "name": "Sharpen Daggers",
+      "profession": "Assassin",
+      "data": {
+        "activation": {
+          "from": 1,
+          "to": 0.5,
+          "noteFrom": 1,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation from 1 to 0.5."
+      ]
+    },
+    {
+      "id": 928,
+      "name": "Shadow Shroud",
+      "profession": "Assassin",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3452,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3452"
+      ]
+    },
+    {
+      "id": 936,
+      "name": "Envenom Enchantments",
+      "profession": "Necromancer",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 15,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 20 to 15."
+      ]
+    },
+    {
+      "id": 941,
+      "name": "Blessed Light",
+      "profession": "Monk",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 3,
+          "to": 5,
+          "noteFrom": 3,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Heal target ally for 10...140 Health and remove one condition and one hex.",
+          "to": "Heal target ally for 10...120 Health and remove one condition and one hex."
+        },
+        "concise": {
+          "from": "Heals for 10...140. Removes one condition and one hex.",
+          "to": "Heals for 10...120. Removes one condition and one hex."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10 to 5, reduce healing from 10..140 to 10..120, increase recharge from 3 to 5."
+      ]
+    },
+    {
+      "id": 974,
+      "name": "Mantis Touch",
+      "profession": "Assassin",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 20 to 10."
+      ]
+    },
+    {
+      "id": 985,
+      "name": "Caltrops",
+      "profession": "Assassin",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Target foe and all foes adjacent to your target are Crippled for 5...15 seconds. Caltrops has half the normal range.",
+          "to": "Target foe and all foes adjacent to your target are Crippled and Bleeding for 5...15 seconds. Caltrops has half the normal range."
+        },
+        "concise": {
+          "from": "Half Range Spell. Inflicts Crippled condition (5...15 seconds) on target and adjacent foes.",
+          "to": "Half Range Spell. Inflicts Crippled and Bleeding condition (5...15 seconds) on target and adjacent foes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10 to 5, add Bleeding.",
+        "override: now also inflicts Bleeding"
+      ]
+    },
+    {
+      "id": 990,
+      "name": "Expunge Enchantments",
+      "profession": "Assassin",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Target foe loses 1 enchantment. All of your other non-attack skills are disabled for 10...5 seconds. For each skill disabled in this way, target touched foe loses 1 additional enchantment.",
+          "to": "Target foe loses 1 enchantment. All of your other non-attack skills are disabled for 8...4 seconds. For each skill disabled in this way, target touched foe loses 1 additional enchantment."
+        },
+        "concise": {
+          "from": "Removes one enchantment for each non-attack skill you have. <gray>All your non-attack skills are disabled (10...5 seconds).</gray>",
+          "to": "Removes one enchantment for each non-attack skill you have. <gray>All your non-attack skills are disabled (8...4 seconds).</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce skill disable from 10..5 to 8..4."
+      ]
+    },
+    {
+      "id": 1034,
+      "name": "Seeping Wound",
+      "profession": "Assassin",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 1...7 seconds, target foe moves 33% slower. That foe takes 5...25 damage each second while suffering from a condition. This spell has half the normal range.",
+          "to": "For 1...7 seconds, target foe moves 33% slower. That foe takes 5...25 damage each second while suffering from a condition."
+        },
+        "concise": {
+          "from": "Elite Half Range Hex Spell. (1...7 seconds.) Target foe moves 33% slower. This foe takes 5...25 damage each second while suffering from a condition.",
+          "to": "(1...7 seconds.) Target foe moves 33% slower. This foe takes 5...25 damage each second while suffering from a condition."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Change activation range from half to full.",
+        "override: range half -> full"
+      ]
+    },
+    {
+      "id": 1038,
+      "name": "Crippling Dagger",
+      "profession": "Assassin",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Double projectile speed.",
+        "override: projectile speed not actually changed in game (wiki notes); no data change"
+      ]
+    },
+    {
+      "id": 1043,
+      "name": "Dash",
+      "profession": "Assassin",
+      "data": {
+        "attribute": {
+          "from": 101,
+          "to": 31,
+          "wiki": "override"
+        },
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3453,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Moved to Shadow Arts.",
+        "override: moved to Shadow Arts; split for PvP; PvP version is id 3453"
+      ]
+    },
+    {
+      "id": 1056,
+      "name": "Kitah's Burden",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 10 seconds, target foe moves 50% slower. When Kitah's Burden ends you gain 10...18 Energy.",
+          "to": "For 6...12 seconds, target foe moves 50% slower. When Kitah's Burden ends you gain 10...18 Energy."
+        },
+        "concise": {
+          "from": "(10 seconds.) Target foe moves 50% slower. End effect: you gain 10...18 Energy.",
+          "to": "(6...12 seconds.) Target foe moves 50% slower. End effect: you gain 10...18 Energy."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Change effect duration from 10 to 6..12.",
+        "override: duration 10 -> 6...12"
+      ]
+    },
+    {
+      "id": 1113,
+      "name": "Kirin's Wrath",
+      "profession": "Monk",
+      "data": {
+        "recharge": {
+          "from": 30,
+          "to": 10,
+          "noteFrom": 30,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 2,
+          "to": 1,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation from 2 to 1, reduce recharge from 30 to 10."
+      ]
+    },
+    {
+      "id": 1136,
+      "name": "Penetrating Chop",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If this attack hits, you strike for +5...20 damage. This axe attack has 20% armor penetration.",
+          "to": "If this attack hits, you strike for +10...25 damage. This axe attack has 20% armor penetration."
+        },
+        "concise": {
+          "from": "Deals +5...20 damage. 20% armor penetration.",
+          "to": "Deals +10...25 damage. 20% armor penetration."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase additional damage from 5..20 to 10..25."
+      ]
+    },
+    {
+      "id": 1144,
+      "name": "Silverwing Slash",
+      "profession": "Warrior",
+      "data": {
+        "adrenaline": {
+          "from": 8,
+          "to": 7,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] from 8 to 7",
+        "override: sword adrenaline 8 -> 7"
+      ]
+    },
+    {
+      "id": 1146,
+      "name": "Shove",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Target touched foe is knocked down. If that foe was moving, that foe's stance ends and that foe takes 15...75 damage before being knocked down.",
+          "to": "Target touched foe takes 15...75 damage, their stance ends, and they are knocked down."
+        },
+        "concise": {
+          "from": "Causes knockdown. Initial effect: ends foe's stance and deals 15...75 damage if target foe is moving.",
+          "to": "Target touched foe takes 15...75 damage, their stance ends, and they are knocked down."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Rework: \"Target touched foe takes 15..75 damage, their stance ends, and they are knocked down.\"",
+        "override: reworked (wiki text; wiki concise repeats the full text)"
+      ]
+    },
+    {
+      "id": 1199,
+      "name": "Glass Arrows",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 10...35 seconds, your arrows strike for +5...20 damage if they hit and cause Bleeding for 10...20 seconds if they are blocked.",
+          "to": "For 10...35 seconds, your arrows strike for +6...20 damage if they hit and cause Bleeding for 10...20 seconds if they are blocked."
+        },
+        "concise": {
+          "from": "(10...35 seconds.) Your arrows deal +5...20 damage. Inflicts Bleeding condition if blocked (10...20 seconds).",
+          "to": "(10...35 seconds.) Your arrows deal +6...20 damage. Inflicts Bleeding condition if blocked (10...20 seconds)."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "override: (PvE) damage +5...20 -> +6...20, from the Glass Arrows (PvP) line"
+      ]
+    },
+    {
+      "id": 1213,
+      "name": "Tranquility",
+      "profession": "Ranger",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3460,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3460"
+      ]
+    },
+    {
+      "id": 1219,
+      "name": "Protective Was Kaolai",
+      "profession": "Ritualist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Hold Kaolai's ashes for up to 15...60 seconds. While you hold his ashes, you gain 10 armor. When you drop his ashes, all party members are healed for 10...85 Health.",
+          "to": "Hold Kaolai's ashes for up to 15...60 seconds. While you hold his ashes, you gain 20 armor. When you drop his ashes, all party members are healed for 20...95 Health."
+        },
+        "concise": {
+          "from": "(15...60 seconds.) You have +10 armor. Drop effect: all party members are healed for 10...85.",
+          "to": "(15...60 seconds.) You have +20 armor. Drop effect: all party members are healed for 20...95."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase armor bonus from +10 to +20, increase healing from 10..85 to 20..95.",
+        "override: armor 10 -> 20"
+      ]
+    },
+    {
+      "id": 1240,
+      "name": "Soul Twisting",
+      "profession": "Ritualist",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3461,
+          "wiki": "override"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 5...45 seconds, your Binding Rituals cost 15 less Energy (minimum 10) and recharge instantly. Soul Twisting ends after 1...3 Binding Rituals.",
+          "to": "For 5...45 seconds, your Binding Rituals cost 15 less Energy (minimum 5) and recharge instantly. Soul Twisting ends after 1...3 Binding Rituals."
+        },
+        "concise": {
+          "from": "(5...45 seconds.) Your Binding Rituals cost 15 less Energy (minimum 10) and recharge instantly. <gray>Ends after 1...3 Binding Rituals.</gray>",
+          "to": "(5...45 seconds.) Your Binding Rituals cost 15 less Energy (minimum 5) and recharge instantly. <gray>Ends after 1...3 Binding Rituals.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Minimum threshold reduced from 10 to 5.",
+        "override: Energy cost floor 10 -> 5; split for PvP; PvP version is id 3461"
+      ]
+    },
+    {
+      "id": 1259,
+      "name": "Guided Weapon",
+      "profession": "Ritualist",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3462,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3462"
+      ]
+    },
+    {
+      "id": 1335,
+      "name": "Wastrel's Demise",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 5,
+          "to": 4,
+          "noteFrom": 5,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[PVE] Reduce recharge from 5 to 4."
+      ]
+    },
+    {
+      "id": 1339,
+      "name": "Symbols of Inspiration",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 1...31 seconds, this skill becomes the Elite of target foe. Elite spells you cast use your Fast Casting attribute instead of their normal attributes.",
+          "to": "For 1...31 seconds, this skill becomes the Elite of target foe. Elite skills you cast use your Fast Casting attribute instead of their normal attributes."
+        },
+        "concise": {
+          "from": "(1...31 seconds.) This skill becomes the Elite of target foe. Elite spells you cast use your Fast Casting attribute instead of their normal attributes.",
+          "to": "(1...31 seconds.) This skill becomes the Elite of target foe. Elite skills you cast use your Fast Casting attribute instead of their normal attributes."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Change from \"Elite spells\" to \"Elite skills\" using your Fast Casting attribute, reduce recharge from 15 to 10, increase duration from 1..31 to 6..40.",
+        "override: only \"Elite spells\" -> \"Elite skills\" landed; recharge/duration came Sep 1 (wiki notes)"
+      ]
+    },
+    {
+      "id": 1342,
+      "name": "Tease",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 15,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        },
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3463,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 20 to 15.",
+        "override: split for PvP; PvP version is id 3463"
+      ]
+    },
+    {
+      "id": 1356,
+      "name": "Contagion",
+      "profession": "Necromancer",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 20 to 10."
+      ]
+    },
+    {
+      "id": 1358,
+      "name": "Ulcerous Lungs",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 10...25 seconds, target foe and all nearby foes suffer from -4 Health degeneration when Bleeding, and whenever they use a shout or chant, they Bleed for 3...15 seconds.",
+          "to": "For 10...30 seconds, target foe and all nearby foes suffer from -4 Health degeneration when Bleeding, and whenever they use a shout or chant, they Bleed for 5...20 seconds."
+        },
+        "concise": {
+          "from": "Also hexes foes near your target (10...25 seconds). Causes -4 Health degeneration to any of these foes that are Bleeding. Inflicts Bleeding (3...15 seconds) whenever these foes use a shout or chant.",
+          "to": "Also hexes foes near your target (10...30 seconds). Causes -4 Health degeneration to any of these foes that are Bleeding. Inflicts Bleeding (5...20 seconds) whenever these foes use a shout or chant."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase duration from 10..25 to 10..30, increase Bleeding duration from 3..15 to 5..20."
+      ]
+    },
+    {
+      "id": 1362,
+      "name": "Corrupt Enchantment",
+      "profession": "Necromancer",
+      "data": {
+        "recharge": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 10 to 5."
+      ]
+    },
+    {
+      "id": 1378,
+      "name": "Master of Magic",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 1...61 seconds, all of your elemental attributes are set to 8...14 and your elemental spells return 30% of their Energy cost.",
+          "to": "For 1...61 seconds, all of your elemental attributes are set to 8...14 and your elemental spells return 1 Energy plus 30% of their Energy cost."
+        },
+        "concise": {
+          "from": "(1...61 seconds). Your elemental attributes are set to 8...14 and elemental spells return 30% of their Energy cost.",
+          "to": "(1...61 seconds). Your elemental attributes are set to 8...14 and elemental spells return 1 Energy plus 30% of their Energy cost."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Change energy refund to \"…and you gain 1 Energy plus 30% of the cost when you use an elemental skill.\"",
+        "override: refund now 1 Energy plus 30%"
+      ]
+    },
+    {
+      "id": 1396,
+      "name": "Words of Comfort",
+      "profession": "Monk",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Target ally is healed for 15...60 Health and an additional 15...45 Health if that ally is suffering from a condition.",
+          "to": "Target ally is healed for 20...65 Health and an additional 20...50 Health if that ally is suffering from a condition."
+        },
+        "concise": {
+          "from": "Heals for 15...60. Heals for 15...45 more if target ally has a condition.",
+          "to": "Heals for 20...65. Heals for 20...50 more if target ally has a condition."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase unconditional healing from 15..60 to 20..65, conditional healing from 15..45 to 20..50."
+      ]
+    },
+    {
+      "id": 1404,
+      "name": "Flail",
+      "profession": "Warrior",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3464,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3464"
+      ]
+    },
+    {
+      "id": 1405,
+      "name": "Charging Strike",
+      "profession": "Warrior",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3465,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3465"
+      ]
+    },
+    {
+      "id": 1415,
+      "name": "Crippling Slash",
+      "profession": "Warrior",
+      "data": {
+        "adrenaline": {
+          "from": 6,
+          "to": 5,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] from 6 to 5",
+        "override: sword adrenaline 6 -> 5"
+      ]
+    },
+    {
+      "id": 1466,
+      "name": "Burning Arrow",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If this attack hits, you strike for +10...30 damage and cause Burning for 1...7 seconds.",
+          "to": "If this attack hits, you strike for +10...30 damage and cause Burning for 2...8 seconds."
+        },
+        "concise": {
+          "from": "Deals +10...30 damage. Inflicts Burning condition (1...7 seconds).",
+          "to": "Deals +10...30 damage. Inflicts Burning condition (2...8 seconds)."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase Burning duration from 1..7 to 2..8."
+      ]
+    },
+    {
+      "id": 1500,
+      "name": "Mirage Cloak",
+      "profession": "Dervish",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 15,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        },
+        "recharge": {
+          "from": 15,
+          "to": 24,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        },
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3469,
+          "wiki": "override"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 1...7 seconds, you have a 30...60% chance to block incoming attacks. When you cast this enchantment, all nearby foes are struck for 10...40 earth damage.",
+          "to": "For 20 seconds, you have a 40% chance to block and an additional 10% for each enchantment (max 80%). Each time an enchantment is removed from you, all nearby foes are struck for 10...40 earth damage."
+        },
+        "concise": {
+          "from": "(1...7 seconds.) You have 30...60% chance to block. Initial Effect: deals 10...40 earth damage to nearby foes.",
+          "to": "(20 seconds.) You have 40% chance to block and an additional 10% for each enchantment (max 80%). Deals 10...40 earth damage to nearby foes each time an enchantment is removed from you."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase energy cost from 10 to 15, increase duration from 1..7 to 20, increase recharge from 15 to 24, rework: \"For 20 seconds, you have a 40% chance to block and an additional 10% for each enchantment (max 80%). Each time an enchantment is removed from you, all nearby foes are struck for 10..40 earth damage.\"",
+        "override: split for PvP; PvP version is id 3469; reworked (text from the Aug 26 notes; Sep 1 changed the per-enchantment block to 4...10%)"
+      ]
+    },
+    {
+      "id": 1514,
+      "name": "Fleeting Stability",
+      "profession": "Dervish",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3470,
+          "wiki": "override"
+        },
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3470; recharge 15 -> 10 (BOTH)"
+      ]
+    },
+    {
+      "id": 1529,
+      "name": "Pious Restoration",
+      "profession": "Dervish",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3471,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3471"
+      ]
+    },
+    {
+      "id": 1532,
+      "name": "Mystic Sandstorm",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Create a sandstorm at your location that lasts 3 seconds. Each second, foes nearby this location take 10...20 earth damage. Attacking foes take an additional 10...20 damage. If you are enchanted when you cast this spell, it lasts twice as long.",
+          "to": "Create a sandstorm at your location that lasts 3 seconds. Each second, foes nearby this location take 10...40 earth damage. Attacking foes take an additional 10...20 damage. If you are enchanted when you cast this spell, it lasts twice as long."
+        },
+        "concise": {
+          "from": "(3 seconds.) Deals 10...20 earth damage each second. Deals an additional 10...20 damage to attacking foes. Hits foes nearby your initial location. Lasts twice as long if you are enchanted.",
+          "to": "(3 seconds.) Deals 10...40 earth damage each second. Deals an additional 10...20 damage to attacking foes. Hits foes nearby your initial location. Lasts twice as long if you are enchanted."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase unconditional damage per second from 10..20 to 10..40.",
+        "override: unconditional damage 10...20 -> 10...40"
+      ]
+    },
+    {
+      "id": 1544,
+      "name": "Whirling Charge",
+      "profession": "Dervish",
+      "data": {
+        "recharge": {
+          "from": 10,
+          "to": 8,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        },
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3472,
+          "wiki": "override"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 1...6 seconds, you move 33% faster than normal. The next time you strike a foe, all other nearby foes take 10...50 cold damage and this enchantment ends.",
+          "to": "For 1...6 seconds, you move 33% faster than normal. The next time you strike a foe, all other nearby foes take 10...60 cold damage and this enchantment ends."
+        },
+        "concise": {
+          "from": "(1...6 seconds.) You move 33% faster. Deal 10...50 cold damage to all other nearby foes the next time you hit a foe and this enchantment ends.",
+          "to": "(1...6 seconds.) You move 33% faster. Deal 10...60 cold damage to all other nearby foes the next time you hit a foe and this enchantment ends."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Decrease recharge from 10 to 8, increase damage from 10..50 to 10..60.",
+        "override: split for PvP; PvP version is id 3472"
+      ]
+    },
+    {
+      "id": 1545,
+      "name": "Test of Faith",
+      "profession": "Dervish",
+      "data": {
+        "activation": {
+          "from": 0.75,
+          "to": 0.5,
+          "noteFrom": 0.75,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Deals 15...75 cold damage and takes 1 enchantment from target foe. If that foe was not enchanted, that foe is Dazed for 1...4 seconds.",
+          "to": "Deals 15...75 cold damage and takes 1 enchantment from target foe. If that foe was not enchanted, that foe is Dazed for 2...6 seconds."
+        },
+        "concise": {
+          "from": "Touch Spell. Deals 15...75 cold damage and removes 1 enchantment. Target foe is Dazed for 1...4 seconds if that foe was not enchanted.",
+          "to": "Touch Spell. Deals 15...75 cold damage and removes 1 enchantment. Target foe is Dazed for 2...6 seconds if that foe was not enchanted."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation from 0.75 to 0.5, increase Daze duration from 1..4 to 2..6."
+      ]
+    },
+    {
+      "id": 1547,
+      "name": "Mighty Throw",
+      "profession": "Paragon",
+      "data": {
+        "adrenaline": {
+          "from": 2,
+          "to": 4,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Increase adrenaline cost from 2 to 4."
+      ]
+    },
+    {
+      "id": 1550,
+      "name": "Unblockable Throw",
+      "profession": "Paragon",
+      "data": {
+        "adrenaline": {
+          "from": 4,
+          "to": 6,
+          "noteFrom": 4,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Increase adrenaline cost from 4 to 6."
+      ]
+    },
+    {
+      "id": 1551,
+      "name": "Spear of Lightning",
+      "profession": "Paragon",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If this attack hits, it deals +8...20 lightning damage. This attack has 25% armor penetration.",
+          "to": "Strikes all foes between you and your target. If this attack hits, it deals +10...20 lightning damage. This attack has 25% armor penetration."
+        },
+        "concise": {
+          "from": "Deals +8...20 lightning damage. 25% armor penetration.",
+          "to": "Deals +10...20 lightning damage. 25% armor penetration. Strikes all foes between you and your target."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Rework: \"Strikes all foes between you and your target, deals +10..20 lightning damage, 25% armor penetration\".",
+        "override: reworked: hits all foes in line, damage +8...20 -> +10...20"
+      ]
+    },
+    {
+      "id": 1553,
+      "name": "Anthem of Fury",
+      "profession": "Paragon",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 10 seconds, all party members within earshot gain 1...4 strikes of adrenaline the next time they use an attack skill.",
+          "to": "For 10 seconds, all party members within earshot gain 2...5 strikes of adrenaline the next time they use an attack skill."
+        },
+        "concise": {
+          "from": "(10 seconds.) Party members in earshot gain 1...4 adrenaline with their next attack skill.",
+          "to": "(10 seconds.) Party members in earshot gain 2...5 adrenaline with their next attack skill."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase adrenaline gain from 1..4 to 2..5."
+      ]
+    },
+    {
+      "id": 1554,
+      "name": "Crippling Anthem",
+      "profession": "Paragon",
+      "data": {
+        "adrenaline": {
+          "from": 4,
+          "to": 3,
+          "noteFrom": 4,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce adrenaline cost from 4 to 3."
+      ]
+    },
+    {
+      "id": 1555,
+      "name": "Defensive Anthem",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 25,
+          "to": 15,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 25 to 15."
+      ]
+    },
+    {
+      "id": 1557,
+      "name": "Anthem of Flame",
+      "profession": "Paragon",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 10 seconds, the next attack skill used by each party member within earshot also causes Burning for 1...3 seconds.",
+          "to": "For 10 seconds, the next attack skill used by each party member within earshot also causes Burning for 1...5 seconds."
+        },
+        "concise": {
+          "from": "(10 seconds.) Party members in earshot inflict Burning condition (1...3 seconds) with their next attack skill.",
+          "to": "(10 seconds.) Party members in earshot inflict Burning condition (1...5 seconds) with their next attack skill."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase Burning duration from 1..3 to 1..5."
+      ]
+    },
+    {
+      "id": 1563,
+      "name": "Lyric of Zeal",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 5,
+          "to": 0,
+          "noteFrom": 5,
+          "wiki": "n/a"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 5 to 0."
+      ]
+    },
+    {
+      "id": 1636,
+      "name": "Black Spider Strike",
+      "profession": "Assassin",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10 to 5."
+      ]
+    },
+    {
+      "id": 1652,
+      "name": "Shadow Prison",
+      "profession": "Assassin",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10 to 5."
+      ]
+    },
+    {
+      "id": 1654,
+      "name": "Shadow Meld",
+      "profession": "Assassin",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 20 to 10."
+      ]
+    },
+    {
+      "id": 1685,
+      "name": "Holy Haste",
+      "profession": "Monk",
+      "data": {
+        "energy": {
+          "from": 10,
+          "to": 5,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10 to 5."
+      ]
+    },
+    {
+      "id": 1688,
+      "name": "Defender's Zeal",
+      "profession": "Monk",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 5...25 seconds, whenever target foe hits with an attack, you gain 2 Energy.",
+          "to": "For 10...30 seconds, whenever target foe hits with an attack, you gain 2 Energy."
+        },
+        "concise": {
+          "from": "(5...25 seconds.) You gain 2 Energy whenever target foe hits with an attack.",
+          "to": "(10...30 seconds.) You gain 2 Energy whenever target foe hits with an attack."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase effect duration from 5..25 to 10..30."
+      ]
+    },
+    {
+      "id": 1696,
+      "name": "Decapitate",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "You lose all adrenaline and all Energy. If this attack hits, you deal +5...80 damage and cause a Deep Wound for 5...20 seconds. This attack always results in a critical hit.",
+          "to": "You lose all adrenaline and all Energy. This attack is unblockable, you deal +5...80 damage and cause a Deep Wound for 5...20 seconds. This attack is always critical and if foe is killed, nearby foes are Weakened for 8 seconds."
+        },
+        "concise": {
+          "from": "Deals +5...80 damage. Inflicts Deep Wound condition (5...20 seconds). Automatic critical hit. <gray>You lose all adrenaline and Energy.</gray>",
+          "to": "Deals +5...80 damage. Unblockable. Inflicts Deep Wound condition (5...20 seconds). Automatic critical hit. If foe is killed, nearby foes are Weakened (8 seconds). <gray>You lose all adrenaline and Energy.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Add unblockable, add \"if target foe is killed by this attack, nearby enemies are Weakened for 8 seconds.\"",
+        "override: now unblockable; kill weakens nearby foes (wiki text)"
+      ]
+    },
+    {
+      "id": 1702,
+      "name": "Steelfang Slash",
+      "profession": "Warrior",
+      "data": {
+        "adrenaline": {
+          "from": 8,
+          "to": 7,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] from 8 to 7",
+        "override: sword adrenaline 8 -> 7"
+      ]
+    },
+    {
+      "id": 1730,
+      "name": "Infuriating Heat",
+      "profession": "Ranger",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3466,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3466"
+      ]
+    },
+    {
+      "id": 1733,
+      "name": "Wielder's Strike",
+      "profession": "Ritualist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Target foe is struck for 5...50 lightning damage. If you are under the effects of a weapon spell, you deal an additional 10...40 lightning damage.",
+          "to": "Target foe is struck for 10...60 lightning damage. If you are under the effects of a weapon spell, you deal an additional 10...50 lightning damage."
+        },
+        "concise": {
+          "from": "Deals 5...50 lightning damage. Deals 10...40 more lightning damage if you are under a weapon spell.",
+          "to": "Deals 10...60 lightning damage. Deals 10...50 more lightning damage if you are under a weapon spell."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase unconditional damage from 5..50 to 10..60, increase conditional weapon spell bonus damage from 10..40 to 10..50."
+      ]
+    },
+    {
+      "id": 1744,
+      "name": "Caretaker's Charge",
+      "profession": "Ritualist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Target foe is struck for 20...75 lightning damage. If you are holding an item, you gain 5 Energy and 5...50 Health.",
+          "to": "Target foe is struck for 20...85 lightning damage. If you are holding an item, you gain 7 Energy and 5...50 Health."
+        },
+        "concise": {
+          "from": "Deals 20...75 lightning damage. You gain 5 Energy and 5...50 Health if you are holding an item.",
+          "to": "Deals 20...85 lightning damage. You gain 7 Energy and 5...50 Health if you are holding an item."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase energy gain from 5 to 7, increase damage from 20..75 to 20..85.",
+        "override: energy gain 5 -> 7"
+      ]
+    },
+    {
+      "id": 1755,
+      "name": "Mystic Corruption",
+      "profession": "Dervish",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3467,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3467"
+      ]
+    },
+    {
+      "id": 1756,
+      "name": "Grenth's Grasp",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 20 seconds, if you are wielding a cold weapon, your attack skills also Cripple that <sic/> foe for 1...11 seconds and you transfer 1...3 conditions from yourself to that foe.",
+          "to": "For 20 seconds, your attack skills also Cripple that foe for 1...11 seconds and you transfer 1...3 conditions from yourself to that foe."
+        },
+        "concise": {
+          "from": "(20 seconds.) Inflicts Crippled condition (1...11 seconds) with your attack skills and transfer 1...3 conditions. <gray>No effect unless wielding a cold weapon.</gray>",
+          "to": "(20 seconds.) Inflicts Crippled condition (1...11 seconds) with your attack skills and transfer 1...3 conditions."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Remove the cold-weapon requirement.",
+        "override: cold-weapon requirement removed"
+      ]
+    },
+    {
+      "id": 1758,
+      "name": "Harrier's Grasp",
+      "profession": "Dervish",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3468,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3468"
+      ]
+    },
+    {
+      "id": 1769,
+      "name": "Focused Anger",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 60,
+          "to": 45,
+          "noteFrom": 60,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 60 to 45."
+      ]
+    },
+    {
+      "id": 1770,
+      "name": "Natural Temper",
+      "profession": "Paragon",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 4...10 seconds, you gain 33% more adrenaline while not under the effects of an Enchantment.",
+          "to": "For 4...15 seconds, you gain 33% more adrenaline while not under the effects of an Enchantment."
+        },
+        "concise": {
+          "from": "(4...10 seconds.) You gain 33% more adrenaline. <gray>No effect if you are enchanted.</gray>",
+          "to": "(4...15 seconds.) You gain 33% more adrenaline. <gray>No effect if you are enchanted.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase duration from 4..10 to 4..15."
+      ]
+    },
+    {
+      "id": 1778,
+      "name": "Signet of Return",
+      "profession": "Paragon",
+      "data": {
+        "activation": {
+          "from": 5,
+          "to": 4,
+          "noteFrom": 5,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Resurrect target party member with 5...15% Health and 1...4% Energy for each party member within earshot.",
+          "to": "Resurrect target party member with 5...20% Health and 1...4% Energy for each party member within earshot."
+        },
+        "concise": {
+          "from": "Resurrects target party member (5...15% Health and 1...4% Energy for each party member in earshot).",
+          "to": "Resurrects target party member (5...20% Health and 1...4% Energy for each party member in earshot)."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation from 5 to 4, increase Health per party member from 5..15% to 5..20%."
+      ]
+    },
+    {
+      "id": 1780,
+      "name": "\"Can't Touch This!\"",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 20 to 10."
+      ]
+    },
+    {
+      "id": 1996,
+      "name": "Sum of All Fears",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 1...10 seconds, target foe moves, attacks, and casts spells 33% slower.",
+          "to": "For 4...12 seconds, target foe moves, attacks, and casts spells 33% slower."
+        },
+        "concise": {
+          "from": "(1...10 seconds.) Target foe moves, attacks, and casts spells 33% slower.",
+          "to": "(4...12 seconds.) Target foe moves, attacks, and casts spells 33% slower."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase duration from 1..10 to 4..12."
+      ]
+    },
+    {
+      "id": 2006,
+      "name": "Castigation Signet",
+      "profession": "Monk",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 15,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Target foe takes 26...56 holy damage. If that foe was attacking, you gain 1...10 Energy.",
+          "to": "Target foe takes 26...56 holy damage. If that foe was attacking, you gain 4...14 Energy."
+        },
+        "concise": {
+          "from": "Deals 26...56 holy damage. You gain 1...10 Energy if target foe is attacking.",
+          "to": "Deals 26...56 holy damage. You gain 4...14 Energy if target foe is attacking."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 20 to 15, increase energy gain from 1..10 to 4..14."
+      ]
+    },
+    {
+      "id": 2057,
+      "name": "Foul Feast",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "All conditions are transferred from target other ally to yourself. For each condition acquired in this way, you gain 0...45 Health and 0...2 Energy. This skill recharges twice as fast if you remove Disease from your target.",
+          "to": "All conditions are transferred from target other ally to yourself. For each condition acquired in this way, you gain 0...45 Health and 2...4 Energy. This skill recharges twice as fast if you remove Disease from your target."
+        },
+        "concise": {
+          "from": "Transfers all conditions from target ally to yourself. You gain 0...45 Health and 0...2 Energy for each condition transferred. Half recharge if you remove Disease. <gray>Cannot self-target.</gray>",
+          "to": "Transfers all conditions from target ally to yourself. You gain 0...45 Health and 2...4 Energy for each condition transferred. Half recharge if you remove Disease. <gray>Cannot self-target.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase energy gain from 0..2 to 2..4."
+      ]
+    },
+    {
+      "id": 2058,
+      "name": "Putrid Bile",
+      "profession": "Necromancer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 5...20 seconds, target foe suffers -1...3 Health degeneration. If that foe dies while under the effects of this hex, all nearby foes take 25...85 damage.",
+          "to": "For 5...25 seconds, target foe suffers -1...3 Health degeneration. If that foe dies while under the effects of this hex, all nearby foes take 25...85 damage."
+        },
+        "concise": {
+          "from": "(5...20 seconds.) Causes -1...3 Health degeneration. Deals 25...85 damage to all nearby foes if target foe dies.",
+          "to": "(5...25 seconds.) Causes -1...3 Health degeneration. Deals 25...85 damage to all nearby foes if target foe dies."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase duration from 5..20 to 5..25."
+      ]
+    },
+    {
+      "id": 2070,
+      "name": "Aura Slicer",
+      "profession": "Dervish",
+      "data": {
+        "pvp_split": {
+          "from": false,
+          "to": true,
+          "wiki": "override"
+        },
+        "split_id": {
+          "from": 0,
+          "to": 3473,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "override: split for PvP; PvP version is id 3473"
+      ]
+    },
+    {
+      "id": 2075,
+      "name": "Hasty Refrain",
+      "profession": "Paragon",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 3...15 seconds, target ally moves 25% faster. This echo is reapplied every time a chant or shout ends on that ally.",
+          "to": "For 8...20 seconds, target ally moves 25% faster. This echo is reapplied every time a chant or shout ends on that ally."
+        },
+        "concise": {
+          "from": "(3...15 seconds.) Target ally moves 25% faster. Renewal: every time a chant or shout ends on this ally.",
+          "to": "(8...20 seconds.) Target ally moves 25% faster. Renewal: every time a chant or shout ends on this ally."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase duration from 3..15 to 8..20."
+      ]
+    },
+    {
+      "id": 2202,
+      "name": "Mending Grip",
+      "profession": "Ritualist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Target ally is healed for 20...80 Health. If that ally is under the effects of a weapon spell, that ally loses one condition.",
+          "to": "Target ally is healed for 30...90 Health. If that ally is under the effects of a weapon spell, that ally loses one condition."
+        },
+        "concise": {
+          "from": "Heals for 20...80. Removes one condition if target ally is under a Weapon <sic/> spell.",
+          "to": "Heals for 30...90. Removes one condition if target ally is under a Weapon <sic/> spell."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase healing from 20..80 to 30..90."
+      ]
+    },
+    {
+      "id": 2806,
+      "name": "Ward Against Harm (PvP)",
+      "profession": "Elementalist",
+      "data": {
+        "recharge": {
+          "from": 30,
+          "to": 20,
+          "noteFrom": 30,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 30 to 20."
+      ]
+    },
+    {
+      "id": 2807,
+      "name": "Ride the Lightning (PvP)",
+      "profession": "Elementalist",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 5,
+          "wiki": "override"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 10/15 (respectively) to 5.",
+        "override: energy 15 -> 5"
+      ]
+    },
+    {
+      "id": 2808,
+      "name": "Enraged Smash (PvP)",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If Enraged Smash hits, you gain 1...4 strikes of adrenaline. If you hit a moving foe, you strike for +10...40 damage, and target foe is knocked down.",
+          "to": "If Enraged Smash hits, you gain 1...3 strikes of adrenaline. If you hit a moving foe, you strike for +10...40 damage, and target foe is knocked down."
+        },
+        "concise": {
+          "from": "Gives you 1...4 strikes of adrenaline if you hit. Deals +10...40 damage and causes knockdown if target foe was moving.",
+          "to": "Gives you 1...3 strikes of adrenaline if you hit. Deals +10...40 damage and causes knockdown if target foe was moving."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce adrenaline gain from 1..4 to 1..3."
+      ]
+    },
+    {
+      "id": 2861,
+      "name": "Penetrating Attack (PvP)",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If Penetrating Attack hits, you strike for +3...10 damage and this attack has 10% armor penetration.",
+          "to": "If Penetrating Attack hits, you strike for +5...15 damage and this attack has 10% armor penetration."
+        },
+        "concise": {
+          "from": "Deals +3...10 damage. 10% armor penetration.",
+          "to": "Deals +5...15 damage. 10% armor penetration."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from +3..10 to +5..15.",
+        "override: damage +3...10 -> +5...15"
+      ]
+    },
+    {
+      "id": 2864,
+      "name": "Sundering Attack (PvP)",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If Sundering Attack hits, you strike for +3...10 damage and this attack has 10% armor penetration.",
+          "to": "If Sundering Attack hits, you strike for +5...15 damage and this attack has 10% armor penetration."
+        },
+        "concise": {
+          "from": "Deals +3...10 damage. 10% armor penetration.",
+          "to": "Deals +5...15 damage. 10% armor penetration."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from +3..10 to +5..15.",
+        "override: damage +3...10 -> +5...15"
+      ]
+    },
+    {
+      "id": 2866,
+      "name": "Flesh of My Flesh (PvP)",
+      "profession": "Ritualist",
+      "data": {
+        "recharge": {
+          "from": 10,
+          "to": 6,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 10 to 6."
+      ]
+    },
+    {
+      "id": 2867,
+      "name": "Ancestors' Rage (PvP)",
+      "profession": "Ritualist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 3 seconds all foes adjacent to target ally are struck for 1...41 lightning damage each second.",
+          "to": "For 3 seconds all foes adjacent to target ally are struck for 4...50 lightning damage each second."
+        },
+        "concise": {
+          "from": "(3 seconds.) Deals 1...41 lightning damage to foes adjacent to target ally each second.",
+          "to": "(3 seconds.) Deals 4...50 lightning damage to foes adjacent to target ally each second."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from 1..41 to 4..50."
+      ]
+    },
+    {
+      "id": 2868,
+      "name": "Splinter Weapon (PvP)",
+      "profession": "Ritualist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 20 seconds, target ally has a Splinter Weapon. Target ally's next 1...5 attacks deal 5...30 damage to up to 4 adjacent foes.",
+          "to": "For 20 seconds, target ally has a Splinter Weapon. Target ally's next 1...5 attacks deal 5...40 damage to up to 4 adjacent foes."
+        },
+        "concise": {
+          "from": "(20 seconds.) Attacks deal 5...30 damage to 3 <sic/> adjacent foes. <gray>Ends after 1...5 attacks.</gray>",
+          "to": "(20 seconds.) Attacks deal 5...40 damage to 3 <sic/> adjacent foes. <gray>Ends after 1...5 attacks.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from 5..30 to 5..40."
+      ]
+    },
+    {
+      "id": 2871,
+      "name": "Light of Deliverance (PvP)",
+      "profession": "Monk",
+      "data": {
+        "recharge": {
+          "from": 10,
+          "to": 8,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 10 to 8."
+      ]
+    },
+    {
+      "id": 2876,
+      "name": "Defensive Anthem (PvP)",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 25,
+          "to": 15,
+          "noteFrom": 25,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 25 to 15."
+      ]
+    },
+    {
+      "id": 2884,
+      "name": "Mystic Regeneration (PvP)",
+      "profession": "Dervish",
+      "data": {
+        "recharge": {
+          "from": 12,
+          "to": 15,
+          "noteFrom": 12,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Increase recharge from 12 to 15."
+      ]
+    },
+    {
+      "id": 2998,
+      "name": "Fragility (PvP)",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 8...20 seconds, target foe takes 5...20 damage each time that foe suffers or recovers from a new condition.",
+          "to": "For 8...20 seconds, target and adjacent foes take 5...20 damage each time they suffer or recover from a new condition."
+        },
+        "concise": {
+          "from": "(8...20 seconds.) Target foe takes 5...20 damage each time it gains or loses a condition.",
+          "to": "(8...20 seconds.) Also hexes foes adjacent to target. These foes take 5...20 damage each time they gain or lose a condition."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Give the PvE functionality of affecting adjacent foes.",
+        "override: now also hits adjacent foes, like PvE (wiki text)"
+      ]
+    },
+    {
+      "id": 3015,
+      "name": "Earthbind (PvP)",
+      "profession": "Ritualist",
+      "data": {
+        "recharge": {
+          "from": 60,
+          "to": 45,
+          "noteFrom": 60,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 5,
+          "to": 3,
+          "noteFrom": 5,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation from 5 to 3, reduce recharge from 60 to 45."
+      ]
+    },
+    {
+      "id": 3017,
+      "name": "Disenchantment (PvP)",
+      "profession": "Ritualist",
+      "data": {
+        "recharge": {
+          "from": 45,
+          "to": 30,
+          "noteFrom": 45,
+          "wiki": "confirmed"
+        },
+        "activation": {
+          "from": 5,
+          "to": 3,
+          "noteFrom": 5,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Create a level 1...8 spirit. This spirit deals 5...20 damage and anyone struck by its attack loses one enchantment. This spirit dies after 10...35 seconds.",
+          "to": "Create a level 1...8 spirit. This spirit deals 5...20 damage and anyone struck by its attack loses one enchantment. This spirit dies after 15...40 seconds."
+        },
+        "concise": {
+          "from": "Creates a level 1...8 spirit (10...35 second lifespan). Its attacks deal 5...20 damage and remove one enchantment.",
+          "to": "Creates a level 1...8 spirit (15...40 second lifespan). Its attacks deal 5...20 damage and remove one enchantment."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation from 5 to 3, increase duration from 10..35 to 15..40, reduce recharge from 45 to 30."
+      ]
+    },
+    {
+      "id": 3020,
+      "name": "Wanderlust (PvP)",
+      "profession": "Ritualist",
+      "data": {
+        "activation": {
+          "from": 5,
+          "to": 3,
+          "noteFrom": 5,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation time from 5 to 3."
+      ]
+    },
+    {
+      "id": 3028,
+      "name": "Blazing Finale (PvP)",
+      "profession": "Paragon",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 10...35 seconds, whenever a chant or shout ends on target non-spirit ally, all foes adjacent to that ally are set on Fire for 1...3 seconds.",
+          "to": "For 10...35 seconds, whenever a chant or shout ends on target non-spirit ally, all foes adjacent to that ally are set on Fire for 1...5 seconds."
+        },
+        "concise": {
+          "from": "(10...35 seconds.) Inflicts Burning condition (1...3 seconds) to adjacent foes whenever a chant or shout ends on target ally. Cannot target spirits.",
+          "to": "(10...35 seconds.) Inflicts Burning condition (1...5 seconds) to adjacent foes whenever a chant or shout ends on target ally. Cannot target spirits."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase Burning duration from 1..3 to 1..5."
+      ]
+    },
+    {
+      "id": 3030,
+      "name": "Signet of Return (PvP)",
+      "profession": "Paragon",
+      "data": {
+        "activation": {
+          "from": 5,
+          "to": 4,
+          "noteFrom": 5,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "Resurrect target party member with 5...15% Health and 1...4% Energy for each party member within earshot.",
+          "to": "Resurrect target party member with 5...20% Health and 1...4% Energy for each party member within earshot."
+        },
+        "concise": {
+          "from": "Resurrects target party member (5...15% Health and 1...4% Energy for each party member in earshot).",
+          "to": "Resurrects target party member (5...20% Health and 1...4% Energy for each party member in earshot)."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce activation from 5 to 4, increase Health per party member from 5..15% to 5..20%."
+      ]
+    },
+    {
+      "id": 3031,
+      "name": "\"Can't Touch This!\" (PvP)",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 20 to 10."
+      ]
+    },
+    {
+      "id": 3045,
+      "name": "Comfort Animal (PvP)",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "You heal your animal companion for 20...104 Health. If your companion is dead, it is resurrected with 10...58% Health.",
+          "to": "You heal your animal companion for 40...120 Health. If your companion is dead, it is resurrected with 10...58% Health. If you have Comfort Animal equipped, your animal companion will travel with you."
+        },
+        "concise": {
+          "from": "Your pet gains 20...104 Health. Resurrects your pet (10...58% Health.)",
+          "to": "Your pet gains 40...120 Health. Resurrects your pet (10...58% Health.) If you have Comfort Animal equipped, your animal companion will travel with you."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase health gain from 20..104 to 40..120. Add \"If you have Comfort Animal equipped, your animal companion will travel with you.\"",
+        "override: pet now travels with you (as PvE)"
+      ]
+    },
+    {
+      "id": 3051,
+      "name": "Enraged Lunge (PvP)",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "Your animal companion attempts an Enraged Lunge that deals +3...23 damage (maximum bonus 80) for each recharging Beast Mastery skill.",
+          "to": "Your animal companion attempts an Enraged Lunge that deals +3...23 damage (maximum bonus 60) for each recharging Beast Mastery skill."
+        },
+        "concise": {
+          "from": "Deals +3...23 damage (maximum 80) for each of your recharging Beast Mastery skills.",
+          "to": "Deals +3...23 damage (maximum 60) for each of your recharging Beast Mastery skills."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce maximum damage cap from 80 to 60.",
+        "override: damage cap 80 -> 60"
+      ]
+    },
+    {
+      "id": 3145,
+      "name": "Glass Arrows (PvP)",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "For 10...35 seconds, your arrows strike for +5...12 damage if they hit and cause Bleeding for 10...20 seconds if they are blocked.",
+          "to": "For 10...35 seconds, your arrows strike for +6...18 damage if they hit and cause Bleeding for 10...20 seconds if they are blocked."
+        },
+        "concise": {
+          "from": "(10...35 seconds.) Your arrows deal +5...12 damage. Inflicts Bleeding condition if blocked (10...20 seconds).",
+          "to": "(10...35 seconds.) Your arrows deal +6...18 damage. Inflicts Bleeding condition if blocked (10...20 seconds)."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase damage from +5..12 to +6..18. (PvE) Increase damage from 5..20 to 6..20.",
+        "override: damage +5...12 -> +6...18"
+      ]
+    },
+    {
+      "id": 3147,
+      "name": "Keen Arrow (PvP)",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "If this attack hits, you strike for +1...5 damage. If you land a critical hit, you deal an additional +5...30 damage.",
+          "to": "If this attack hits, you strike for +5...15 damage. If you land a critical hit, you deal an additional +5...30 damage."
+        },
+        "concise": {
+          "from": "Deals +1...5 damage. Deals +5...30 more damage if you land a critical hit.",
+          "to": "Deals +5...15 damage. Deals +5...30 more damage if you land a critical hit."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase unconditional damage from +1..5 to +5..15.",
+        "override: damage +1...5 -> +5...15"
+      ]
+    },
+    {
+      "id": 3181,
+      "name": "Illusionary Weaponry (PvP)",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {
+        "description": {
+          "from": "For 30 seconds, your melee attacks neither hit nor fail to hit. Instead, Illusionary Weaponry deals 16...50 damage to your targets for each melee attack.",
+          "to": "For 30 seconds, your melee attacks neither hit nor fail to hit. Instead, Illusionary Weaponry deals 20...60 damage to your targets for each melee attack."
+        },
+        "concise": {
+          "from": "(30 seconds.) Deals 16...50 damage to foes in place of other damage or effects from melee attacks. <gray>Your melee attacks neither hit nor fail to hit.</gray>",
+          "to": "(30 seconds.) Deals 20...60 damage to foes in place of other damage or effects from melee attacks. <gray>Your melee attacks neither hit nor fail to hit.</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 15 to 10, increase damage from 16..50 to 20..60."
+      ]
+    },
+    {
+      "id": 3194,
+      "name": "Mirror of Disenchantment (PvP)",
+      "profession": "Mesmer",
+      "data": {
+        "energy": {
+          "from": 15,
+          "to": 10,
+          "noteFrom": 15,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce energy cost from 15 to 10."
+      ]
+    },
+    {
+      "id": 3232,
+      "name": "Heal Party (PvP)",
+      "profession": "Monk",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 10,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 20 to 10."
+      ]
+    },
+    {
+      "id": 3273,
+      "name": "Signet of Pious Restraint (PvP)",
+      "profession": "Dervish",
+      "data": {
+        "recharge": {
+          "from": 10,
+          "to": 16,
+          "noteFrom": 10,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Increase recharge from 10 to 16."
+      ]
+    },
+    {
+      "id": 3289,
+      "name": "Fevered Dreams (PvP)",
+      "profession": "Mesmer",
+      "data": {
+        "recharge": {
+          "from": 20,
+          "to": 15,
+          "noteFrom": 20,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Reduce recharge from 20 to 15."
+      ]
+    },
+    {
+      "id": 3422,
+      "name": "Time Ward",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "You create a Time Ward at your location. For 3...15 seconds, non-spirit allies in this area cast spells 15...20% faster and recharge skills 15...20% faster.",
+          "to": "You create a Time Ward at your location. For 6...20 seconds, non-spirit allies in this area cast spells 15...20% faster and recharge skills 15...20% faster."
+        },
+        "concise": {
+          "from": "(3...15 seconds.) Allies in this ward cast spells 15...20% faster and recharge skills 15...20% faster. <gray>Allied spirits are not affected. PvE Skill</gray>",
+          "to": "(6...20 seconds.) Allies in this ward cast spells 15...20% faster and recharge skills 15...20% faster. <gray>Allied spirits are not affected. PvE Skill</gray>"
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Increase duration from 3..15 to 6..20."
+      ]
+    },
+    {
+      "id": 3424,
+      "name": "Over the Limit",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {
+        "description": {
+          "from": "While you maintain this enchantment, your spells cast 15...20% faster, and recharge 15...50% faster, but you continuously gain Overcast.",
+          "to": "While you maintain this enchantment, your spells cast 20...50% faster, and recharge 40...80% faster, but you continuously gain Overcast."
+        },
+        "concise": {
+          "from": "Spells cast 15...20% faster and recharge 15...50% faster. Continuously gain Overcast while active.",
+          "to": "Spells cast 20...50% faster and recharge 40...80% faster. Continuously gain Overcast while active."
+        }
+      },
+      "flags": [],
+      "notes": [
+        "[base] Cast time bonus increased from 15..20 to 20..50, recharge bonus increased from 15..50 to 40..80. Increased amount of Overcast generated from 1 to 3."
+      ]
+    },
+    {
+      "id": 3442,
+      "name": "Mighty Throw (PvP)",
+      "profession": "Paragon",
+      "data": {
+        "recharge": {
+          "from": 2,
+          "to": 1,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        },
+        "adrenaline": {
+          "from": 2,
+          "to": 4,
+          "noteFrom": 2,
+          "wiki": "confirmed"
+        }
+      },
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Increase adrenaline cost from 2 to 4. Reduce recharge from 2 to 1."
+      ]
+    },
+    {
+      "id": 3443,
+      "name": "Frenzy (PvP)",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Rework: \"For 8 seconds, you attack 33% faster but take 200..150% damage.\" Moved to Strength.",
+        "override: new PvP split (wiki id 3443): Strength, takes 200...150% damage"
+      ],
+      "create": {
+        "data": {
+          "id": 3443,
+          "campaign": 0,
+          "profession": 1,
+          "attribute": 17,
+          "type": 29,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0,
+          "recharge": 4,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3443,
+          "name": "Frenzy (PvP)",
+          "description": "For 8 seconds, you attack 33% faster but take 200...150% damage.",
+          "concise": "(8 seconds.) You attack 33% faster. <gray>You take 200...150% damage.</gray>"
+        }
+      }
+    },
+    {
+      "id": 3444,
+      "name": "Hundred Blades (PvP)",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Reduce damage from 10..35 to 10..30.",
+        "override: new PvP split (wiki id 3444): damage 10...35 -> 10...30"
+      ],
+      "create": {
+        "data": {
+          "id": 3444,
+          "campaign": 0,
+          "profession": 1,
+          "attribute": 20,
+          "type": 1,
+          "is_elite": true,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0,
+          "recharge": 20,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3444,
+          "name": "Hundred Blades (PvP)",
+          "description": "For 15 seconds, whenever you attack with a sword, all adjacent foes take 10...30 slashing damage.",
+          "concise": "(15 seconds.) Deals 10...30 slashing damage to all adjacent foes whenever you attack with a sword."
+        }
+      }
+    },
+    {
+      "id": 3445,
+      "name": "Nature's Renewal (PvP)",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Reduce enchantment/hex casting penalty from 200% to 50..75%.",
+        "override: new PvP split (wiki id 3445): cast penalty twice as long -> 50...75% longer (wiki text)"
+      ],
+      "create": {
+        "data": {
+          "id": 3445,
+          "campaign": 0,
+          "profession": 2,
+          "attribute": 24,
+          "type": 19,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 2,
+          "recharge": 60,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3445,
+          "name": "Nature's Renewal (PvP)",
+          "description": "Create a level 1...10 spirit. For 30...240 seconds, enchantments and hexes cast by non-spirit creatures in range take 50...75% longer to cast, and it costs twice as much Energy to maintain enchantments. This spirit dies after 30...240 seconds.",
+          "concise": "Creates a level 1...10 spirit (30...240 second lifespan). For creatures in range, enchantments and Hexes take 50...75% as long to cast and it costs twice as much Energy to maintain enchantments. Does not affect spirits."
+        }
+      }
+    },
+    {
+      "id": 3446,
+      "name": "Soul Ignition",
+      "profession": "Elementalist",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] (new skill, PvE only) - \"While you maintain this enchantment, reduce overcast at a rate of 1-2 per second. You and all adjacent foes are afflicted with burning while this enchantment is active.\" Recharge 30, cast time 0.5. Energy Storage. PvE only to start.",
+        "override: new PvE-only Energy Storage enchantment (wiki id 3446); costs and text from wiki infobox; type/campaign as Over the Limit"
+      ],
+      "create": {
+        "data": {
+          "id": 3446,
+          "campaign": 0,
+          "profession": 6,
+          "attribute": 12,
+          "type": 23,
+          "is_elite": false,
+          "is_rp": true,
+          "is_pvp": false,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": -1,
+          "energy": 10,
+          "activation": 0.5,
+          "recharge": 30,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3446,
+          "name": "Soul Ignition",
+          "description": "While you maintain this enchantment, reduce overcast at a rate of 1...2 per second. You and all adjacent foes are afflicted with burning while this enchantment is active.",
+          "concise": "Reduce overcast at a rate of 1...2 per second. You and all adjacent foes are afflicted with burning."
+        }
+      }
+    },
+    {
+      "id": 3447,
+      "name": "Wastrel's Worry (PvP)",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP.",
+        "override: new PvP split (wiki id 3447): keeps pre-patch recharge 4"
+      ],
+      "create": {
+        "data": {
+          "id": 3447,
+          "campaign": 1,
+          "profession": 5,
+          "attribute": 2,
+          "type": 24,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0.25,
+          "recharge": 4,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3447,
+          "name": "Wastrel's Worry (PvP)",
+          "description": "After 3 seconds, target foe takes 20...100 damage and all adjacent foes take 75% of that damage. If that foe successfully uses a skill, Wastrel's Worry ends prematurely and does no damage.",
+          "concise": "(3 seconds). End effect: causes 20...100 damage to target and 75% of that damage to adjacent foes. <gray>No effect and ends early if target foe uses a skill.</gray>"
+        }
+      }
+    },
+    {
+      "id": 3448,
+      "name": "Peace and Harmony (PvP)",
+      "profession": "Monk",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Increase recharge from 10 to 15, reduce hex and condition removal from 0..9 to 0..4.",
+        "override: new PvP split (wiki id 3448): recharge 10 -> 15, removal 0...9 -> 0...4"
+      ],
+      "create": {
+        "data": {
+          "id": 3448,
+          "campaign": 1,
+          "profession": 3,
+          "attribute": 16,
+          "type": 23,
+          "is_elite": true,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0.25,
+          "recharge": 15,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3448,
+          "name": "Peace and Harmony (PvP)",
+          "description": "Target ally loses 0...4 conditions and hexes. For 1...3 seconds, conditions and hexes expire 90% faster on that ally. All your Smiting Prayers are disabled for 20 seconds.",
+          "concise": "Target ally loses 0...4 conditions and hexes. Conditions and hexes expire 90% faster on that ally (1...3 seconds). <gray>Disables your Smiting Prayers (20 seconds).</gray>"
+        }
+      }
+    },
+    {
+      "id": 3449,
+      "name": "Protector's Strike (PvP)",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Increase recharge from 3 to 6.",
+        "override: new PvP split (wiki id 3449): recharge 3 -> 6"
+      ],
+      "create": {
+        "data": {
+          "id": 3449,
+          "campaign": 1,
+          "profession": 1,
+          "attribute": 17,
+          "type": 3,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0.5,
+          "recharge": 6,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3449,
+          "name": "Protector's Strike (PvP)",
+          "description": "If this attack strikes a moving foe, you strike for 10...40 more damage.",
+          "concise": "Deals +10...40 damage if target is moving."
+        }
+      }
+    },
+    {
+      "id": 3450,
+      "name": "Crippling Shot (PvP)",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Increase Cripple duration from 1..12 to 4..14.",
+        "override: new PvP split (wiki id 3450): Cripple 1...12 -> 4...14 (keeps energy 10)"
+      ],
+      "create": {
+        "data": {
+          "id": 3450,
+          "campaign": 1,
+          "profession": 2,
+          "attribute": 25,
+          "type": 2,
+          "is_elite": true,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 10,
+          "activation": 0,
+          "recharge": 2,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3450,
+          "name": "Crippling Shot (PvP)",
+          "description": "If Crippling Shot hits, your target becomes Crippled for 4...14 seconds. This attack cannot be blocked.",
+          "concise": "Unblockable. Inflicts Crippled condition (4...14 seconds)."
+        }
+      }
+    },
+    {
+      "id": 3451,
+      "name": "Otyugh's Cry (PvP)",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Reduce duration from 10..25 to 5..15.",
+        "override: new PvP split (wiki id 3451): duration 10...25 -> 5...15"
+      ],
+      "create": {
+        "data": {
+          "id": 3451,
+          "campaign": 1,
+          "profession": 2,
+          "attribute": 22,
+          "type": 20,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0,
+          "recharge": 30,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3451,
+          "name": "Otyugh's Cry (PvP)",
+          "description": "For 5...15 seconds, your animal companion gains +24 armor and cannot be blocked.",
+          "concise": "(5...15 seconds.) Your pet has +24 armor and is unblockable."
+        }
+      }
+    },
+    {
+      "id": 3452,
+      "name": "Shadow Shroud (PvP)",
+      "profession": "Assassin",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Reduce duration from 3..9 to 2..7.",
+        "override: new PvP split (wiki id 3452): duration 3...9 -> 2...7"
+      ],
+      "create": {
+        "data": {
+          "id": 3452,
+          "campaign": 2,
+          "profession": 7,
+          "attribute": 31,
+          "type": 24,
+          "is_elite": true,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0.25,
+          "recharge": 20,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3452,
+          "name": "Shadow Shroud (PvP)",
+          "description": "For 2...7 seconds, target foe cannot be the target of enchantments.",
+          "concise": "(2...7 seconds.) Target foe cannot be the target of enchantments."
+        }
+      }
+    },
+    {
+      "id": 3453,
+      "name": "Dash (PvP)",
+      "profession": "Assassin",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Moved to Shadow Arts. Recharge increased from 8 to 12. Rework: \"For 3 seconds, you run 50% faster. Every 2 points in Shadow Arts lowers recharge by 1 second (max 6 seconds).",
+        "override: new PvP split (wiki id 3453): Shadow Arts, recharge 8 -> 12, recharge lowered by Shadow Arts"
+      ],
+      "create": {
+        "data": {
+          "id": 3453,
+          "campaign": 2,
+          "profession": 7,
+          "attribute": 31,
+          "type": 29,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0,
+          "recharge": 12,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3453,
+          "name": "Dash (PvP)",
+          "description": "For 3 seconds, you run 50% faster. Every 2 points in Shadow Arts lowers recharge by 1 second (max 6 seconds).",
+          "concise": "(3 seconds.) You move 50% faster. Every 2 points in Shadow Arts lowers recharge by 1 second (max 6 seconds)."
+        }
+      }
+    },
+    {
+      "id": 3454,
+      "name": "Shield Guardian (PvP)",
+      "profession": "Monk",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Increase recharge from 20 to 25, reduce healing from 10..40 to 10..35.",
+        "override: new PvP split (wiki id 3454): recharge 20 -> 25, healing 10...40 -> 10...35; activation copied from base (1) - wiki says 1.5 for both, open question"
+      ],
+      "create": {
+        "data": {
+          "id": 3454,
+          "campaign": 2,
+          "profession": 3,
+          "attribute": 15,
+          "type": 23,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 1,
+          "recharge": 25,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3454,
+          "name": "Shield Guardian (PvP)",
+          "description": "For 1...4 seconds, all party members in earshot have a 75% chance to block incoming attacks. If an attack is blocked, all allies in earshot are healed for 10...35 and Shield Guardian ends.",
+          "concise": "(1...4 seconds). Party members in earshot have a 75% chance to block attacks. Block effect: Allies in earshot are healed for 10...35, and Shield Guardian ends."
+        }
+      }
+    },
+    {
+      "id": 3455,
+      "name": "Auspicious Blow (PvP)",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Reduce energy gain from 3..8 to 2..4.",
+        "override: new PvP split (wiki id 3455): Energy gain 3...8 -> 2...4"
+      ],
+      "create": {
+        "data": {
+          "id": 3455,
+          "campaign": 2,
+          "profession": 1,
+          "attribute": 19,
+          "type": 8,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 0,
+          "activation": 0,
+          "recharge": 0,
+          "adrenaline": 5,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3455,
+          "name": "Auspicious Blow (PvP)",
+          "description": "If Auspicious Blow hits, you strike for +5...20 damage and gain 2...4 Energy. If target foe is suffering from Weakness, this attack is unblockable.",
+          "concise": "Deals +5...20 damage and you gain 2...4 Energy. Unblockable if target foe is Weakened."
+        }
+      }
+    },
+    {
+      "id": 3456,
+      "name": "\"Coward!\" (PvP)",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Increase recharge from 2 to 4.",
+        "override: new PvP split (wiki id 3456): recharge 2 -> 4"
+      ],
+      "create": {
+        "data": {
+          "id": 3456,
+          "campaign": 2,
+          "profession": 1,
+          "attribute": 101,
+          "type": 20,
+          "is_elite": true,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 0,
+          "activation": 0,
+          "recharge": 4,
+          "adrenaline": 4,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3456,
+          "name": "\"Coward!\" (PvP)",
+          "description": "If target foe is moving, that foe is knocked down.",
+          "concise": "Causes knock-down if target foe is moving."
+        }
+      }
+    },
+    {
+      "id": 3457,
+      "name": "Protector's Defense (PvP)",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Reduce duration from 5..11 to 4..8.",
+        "override: new PvP split (wiki id 3457): duration 5...11 -> 4...8"
+      ],
+      "create": {
+        "data": {
+          "id": 3457,
+          "campaign": 2,
+          "profession": 1,
+          "attribute": 21,
+          "type": 1,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0,
+          "recharge": 30,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3457,
+          "name": "Protector's Defense (PvP)",
+          "description": "For 4...8 seconds, allies adjacent to you have a 75% chance to block incoming attacks. Protector's Defense ends if you move.",
+          "concise": "(4...8 seconds.) Allies adjacent to you have 75% chance to block. <gray>Ends if you move.</gray>"
+        }
+      }
+    },
+    {
+      "id": 3458,
+      "name": "Primal Rage (PvP)",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Rework: \"For 1..9 second[s], you attack 33% faster and move 33% faster, but you take 200..150% damage.\"",
+        "override: new PvP split (wiki id 3458): takes 200...150% damage"
+      ],
+      "create": {
+        "data": {
+          "id": 3458,
+          "campaign": 2,
+          "profession": 1,
+          "attribute": 17,
+          "type": 29,
+          "is_elite": true,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0,
+          "recharge": 4,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3458,
+          "name": "Primal Rage (PvP)",
+          "description": "For 1...9 seconds, you attack 33% faster and move 33% faster, but you take 200...150% damage.",
+          "concise": "(1...9 seconds.) You attack 33% faster and move 33% faster. <gray>You take 200...150% damage.</gray>"
+        }
+      }
+    },
+    {
+      "id": 3459,
+      "name": "Melandru's Shot (PvP)",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Increase recharge from 8 to 12.",
+        "override: new PvP split (wiki id 3459): recharge 8 -> 12"
+      ],
+      "create": {
+        "data": {
+          "id": 3459,
+          "campaign": 2,
+          "profession": 2,
+          "attribute": 25,
+          "type": 2,
+          "is_elite": true,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 1,
+          "recharge": 12,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3459,
+          "name": "Melandru's Shot (PvP)",
+          "description": "If Melandru's Shot hits, your target begins Bleeding for 5...25 seconds. If it hits a foe that is moving or knocked down, that foe takes +10...25 damage and is Crippled for 5...15 seconds.",
+          "concise": "Inflicts Bleeding (5...25 seconds). Deals +10...25 damage and inflicts Crippled (5...15 seconds) if target foe was moving or knocked down."
+        }
+      }
+    },
+    {
+      "id": 3460,
+      "name": "Tranquility (PvP)",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Reduce enchantment expiration speed increase from 20..50% to 10..30%.",
+        "override: new PvP split (wiki id 3460): enchantment expiry 20...50% -> 10...30%"
+      ],
+      "create": {
+        "data": {
+          "id": 3460,
+          "campaign": 2,
+          "profession": 2,
+          "attribute": 24,
+          "type": 19,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 15,
+          "activation": 2,
+          "recharge": 60,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3460,
+          "name": "Tranquility (PvP)",
+          "description": "Create a level 1...10 spirit. Enchantments cast by non-spirit creatures within its range expire 10...30% faster. This spirit dies after 15...120 seconds.",
+          "concise": "Creates a level 1...10 spirit (15...120 second lifespan). Enchantments expire 10...30% faster on creatures in range. Does not affect spirits."
+        }
+      }
+    },
+    {
+      "id": 3461,
+      "name": "Soul Twisting (PvP)",
+      "profession": "Ritualist",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Minimum threshold reduced from 10 to 5. Change \"…and recharge instantly\" to \"…and recharge 25..50% faster\".",
+        "override: new PvP split (wiki id 3461): floor 10 -> 5, \"recharge instantly\" -> \"recharge 25...50% faster\""
+      ],
+      "create": {
+        "data": {
+          "id": 3461,
+          "campaign": 2,
+          "profession": 8,
+          "attribute": 36,
+          "type": 1,
+          "is_elite": true,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0,
+          "recharge": 15,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3461,
+          "name": "Soul Twisting (PvP)",
+          "description": "For 5...45 seconds, your Binding Rituals cost 15 less Energy (minimum 5) and recharge 25...50% faster. Soul Twisting ends after 1...3 Binding Rituals.",
+          "concise": "(5...45 seconds.) Your Binding Rituals cost 15 less Energy (minimum 5) and recharge 25...50% faster. <gray>Ends after 1...3 Binding Rituals.</gray>"
+        }
+      }
+    },
+    {
+      "id": 3462,
+      "name": "Guided Weapon (PvP)",
+      "profession": "Ritualist",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Increase recharge from 5 to 12.",
+        "override: new PvP split (wiki id 3462): recharge 5 -> 12"
+      ],
+      "create": {
+        "data": {
+          "id": 3462,
+          "campaign": 2,
+          "profession": 8,
+          "attribute": 32,
+          "type": 27,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 2,
+          "recharge": 12,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3462,
+          "name": "Guided Weapon (PvP)",
+          "description": "For 4...10 seconds, target ally's attacks cannot be blocked.",
+          "concise": "(4...10 seconds.) Attacks are unblockable."
+        }
+      }
+    },
+    {
+      "id": 3463,
+      "name": "Tease (PvP)",
+      "profession": "Mesmer",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP.",
+        "override: new PvP split (wiki id 3463): keeps pre-patch recharge 20"
+      ],
+      "create": {
+        "data": {
+          "id": 3463,
+          "campaign": 3,
+          "profession": 5,
+          "attribute": 3,
+          "type": 22,
+          "is_elite": true,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0.25,
+          "recharge": 20,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3463,
+          "name": "Tease (PvP)",
+          "description": "If target foe is using a skill, that foe and other foes in the area are interrupted and you steal 0...5 Energy from all foes in the area.",
+          "concise": "Interrupts a skill. Interruption effect: also interrupts other foes in the area, and you steal 0...5 Energy from all foes in the area."
+        }
+      }
+    },
+    {
+      "id": 3464,
+      "name": "Flail (PvP)",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Add \"Flail ends if you use a ranged attack skill.\"",
+        "override: new PvP split (wiki id 3464): ends if you use a ranged attack skill"
+      ],
+      "create": {
+        "data": {
+          "id": 3464,
+          "campaign": 3,
+          "profession": 1,
+          "attribute": 17,
+          "type": 29,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 0,
+          "activation": 0,
+          "recharge": 0,
+          "adrenaline": 4,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3464,
+          "name": "Flail (PvP)",
+          "description": "For 1...15 seconds, you attack 33% faster but move 33% slower. Ends if you use a ranged attack skill.",
+          "concise": "(1...15 seconds.) You attack 33% faster. Ends if you use a ranged attack skill. <gray>You move 33% slower.</gray>"
+        }
+      }
+    },
+    {
+      "id": 3465,
+      "name": "Charging Strike (PvP)",
+      "profession": "Warrior",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Reduce damage from 10..90 to 10..80.",
+        "override: new PvP split (wiki id 3465): damage +10...90 -> +10...80"
+      ],
+      "create": {
+        "data": {
+          "id": 3465,
+          "campaign": 3,
+          "profession": 1,
+          "attribute": 17,
+          "type": 29,
+          "is_elite": true,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0,
+          "recharge": 5,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3465,
+          "name": "Charging Strike (PvP)",
+          "description": "For 1...10 seconds, you run 33% faster. Your next successful melee hit does +10...80 damage and this stance ends. This stance ends if you use a skill.",
+          "concise": "(1...10 seconds.) You move 33% faster and deal +10...80 damage with your next melee hit. <gray>Ends when you hit or if you use a skill.</gray>"
+        }
+      }
+    },
+    {
+      "id": 3466,
+      "name": "Infuriating Heat (PvP)",
+      "profession": "Ranger",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Increase recharge from 15 to 30, reduce adrenaline gain from double to an additional 33..66%.",
+        "override: new PvP split (wiki id 3466): recharge 15 -> 30, adrenaline gain double -> 33...66% (wiki text)"
+      ],
+      "create": {
+        "data": {
+          "id": 3466,
+          "campaign": 3,
+          "profession": 2,
+          "attribute": 23,
+          "type": 19,
+          "is_elite": true,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 2,
+          "recharge": 30,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3466,
+          "name": "Infuriating Heat (PvP)",
+          "description": "Create a level 1...10 spirit. Non-spirit creatures within its range gain adrenaline 33...66% as fast. This spirit dies after 30...120 seconds.",
+          "concise": "Creates a level 1...10 spirit (30...120 second lifespan). Adrenaline gain increases by 33...66% for creatures in range."
+        }
+      }
+    },
+    {
+      "id": 3467,
+      "name": "Mystic Corruption (PvP)",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Adjust Disease duration from 1..10 to 2..6.",
+        "override: new PvP split (wiki id 3467): Disease 1...10 -> 2...6"
+      ],
+      "create": {
+        "data": {
+          "id": 3467,
+          "campaign": 3,
+          "profession": 10,
+          "attribute": 44,
+          "type": 33,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0,
+          "recharge": 10,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3467,
+          "name": "Mystic Corruption (PvP)",
+          "description": "All adjacent foes suffer from Disease for 2...6 seconds. For 20 seconds, nothing happens. Disease duration is doubled if you are enchanted when you activate this skill. When this enchantment ends, all party members in earshot are cured of Disease.",
+          "concise": "(20 seconds.) Initial Effect: all adjacent foes are Diseased (2...6 seconds.) Double duration if you are already enchanted. End Effect: party members in earshot lose Disease."
+        }
+      }
+    },
+    {
+      "id": 3468,
+      "name": "Harrier's Grasp (PvP)",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Rework: \"(5..20 second[s].) Melee attacks on moving foes also Cripple them…\".",
+        "override: new PvP split (wiki id 3468): reworked to melee attacks only (wiki text)"
+      ],
+      "create": {
+        "data": {
+          "id": 3468,
+          "campaign": 3,
+          "profession": 10,
+          "attribute": 42,
+          "type": 33,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 10,
+          "activation": 0,
+          "recharge": 15,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3468,
+          "name": "Harrier's Grasp (PvP)",
+          "description": "For 5...20 seconds, melee attacks against moving foes also Cripple those foes for 2...9 seconds. When you cast this enchantment, you are relieved of Cripple and 1 other condition. This enchantment ends after you apply Cripple 1...3 times.",
+          "concise": "(5...20 seconds.) Melee attacks on moving foes also Cripple them. Initial Effect: you lose Cripple and 1 other condition. Ends after you apply Cripple 1...3 times."
+        }
+      }
+    },
+    {
+      "id": 3469,
+      "name": "Mirage Cloak (PvP)",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP.",
+        "override: new PvP split (wiki id 3469): keeps the pre-rework Mirage Cloak"
+      ],
+      "create": {
+        "data": {
+          "id": 3469,
+          "campaign": 3,
+          "profession": 10,
+          "attribute": 43,
+          "type": 33,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 10,
+          "activation": 0,
+          "recharge": 15,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3469,
+          "name": "Mirage Cloak (PvP)",
+          "description": "For 1...7 seconds, you have a 30...60% chance to block incoming attacks. When you cast this enchantment, all nearby foes are struck for 10...40 earth damage.",
+          "concise": "(1...7 seconds.) You have 30...60% chance to block. Initial Effect: deals 10...40 earth damage to nearby foes."
+        }
+      }
+    },
+    {
+      "id": 3470,
+      "name": "Fleeting Stability (PvP)",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Reduce duration from 4..10 to 2..8. (BOTH) Reduce recharge from 15 to 10.",
+        "override: new PvP split (wiki id 3470): duration 4...10 -> 2...8, recharge 15 -> 10"
+      ],
+      "create": {
+        "data": {
+          "id": 3470,
+          "campaign": 3,
+          "profession": 10,
+          "attribute": 43,
+          "type": 33,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0,
+          "recharge": 10,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3470,
+          "name": "Fleeting Stability (PvP)",
+          "description": "For 2...8 seconds, you cannot be knocked down and move 25% faster. This enchantment ends prematurely if it prevents a knockdown.",
+          "concise": "(2...8 seconds.) You cannot be knocked down and move 25% faster. Ends if knockdown prevented."
+        }
+      }
+    },
+    {
+      "id": 3471,
+      "name": "Pious Restoration (PvP)",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Increase recharge from 8 to 15, reduce hexes removed from 1..3 to 1.",
+        "override: new PvP split (wiki id 3471): recharge 8 -> 15, hexes removed 1...3 -> 1"
+      ],
+      "create": {
+        "data": {
+          "id": 3471,
+          "campaign": 3,
+          "profession": 10,
+          "attribute": 42,
+          "type": 22,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 1,
+          "recharge": 15,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3471,
+          "name": "Pious Restoration (PvP)",
+          "description": "You gain 80...150 Health and remove 1 Dervish enchantment. If an enchantment was removed in this way, you also lose 1 hex.",
+          "concise": "Gain 80...150 Health and remove 1 Dervish enchantment. Removal effect: lose 1 hex."
+        }
+      }
+    },
+    {
+      "id": 3472,
+      "name": "Whirling Charge (PvP)",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP.",
+        "override: new PvP split (wiki id 3472): keeps pre-patch recharge 10 and 10...50 damage"
+      ],
+      "create": {
+        "data": {
+          "id": 3472,
+          "campaign": 3,
+          "profession": 10,
+          "attribute": 42,
+          "type": 33,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 5,
+          "activation": 0,
+          "recharge": 10,
+          "adrenaline": 0,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3472,
+          "name": "Whirling Charge (PvP)",
+          "description": "For 1...6 seconds, you move 33% faster than normal. The next time you strike a foe, all other nearby foes take 10...50 cold damage and this enchantment ends.",
+          "concise": "(1...6 seconds.) You move 33% faster. Deal 10...50 cold damage to all other nearby foes the next time you hit a foe and this enchantment ends."
+        }
+      }
+    },
+    {
+      "id": 3473,
+      "name": "Aura Slicer (PvP)",
+      "profession": "Dervish",
+      "data": {},
+      "desc": {},
+      "flags": [],
+      "notes": [
+        "[base] Split for PvP. Increase adrenaline cost from 4 to 5.",
+        "override: new PvP split (wiki id 3473): adrenaline 4 -> 5"
+      ],
+      "create": {
+        "data": {
+          "id": 3473,
+          "campaign": 4,
+          "profession": 10,
+          "attribute": 44,
+          "type": 3,
+          "is_elite": false,
+          "is_rp": false,
+          "is_pvp": true,
+          "pvp_split": false,
+          "split_id": 0,
+          "upkeep": 0,
+          "energy": 0,
+          "activation": 0,
+          "recharge": 0,
+          "adrenaline": 5,
+          "sacrifice": 0,
+          "overcast": 0
+        },
+        "desc": {
+          "id": 3473,
+          "name": "Aura Slicer (PvP)",
+          "description": "If this attack hits, you inflict Bleeding for 5...15 seconds. If you are enchanted, you also inflict Cracked Armor for 1...10 seconds.",
+          "concise": "(5...15 seconds.)Inflicts <sic/> Bleeding condition. Also inflicts Cracked Armor (1...10 seconds) if you are enchanted."
+        }
+      }
+    }
+  ],
+  "acknowledged": [
+    {
+      "name": "Lightning Orb (PvP)",
+      "note": "removed from the game in 2012 (wiki notes); not in our data"
+    },
+    {
+      "line": "Skill can be obtained from [[Dakk]] (Ember Light Camp), [[Zenaida]] (Harvest Temple), or [[Zendeht]] (Gate of Torment).",
+      "note": "Soul Ignition trainer locations; not skill data"
+    },
+    {
+      "line": "'''[[Nature ritual|Nature Rituals]]''' - Reduce range of nature spirits from 3500 to 3000. Affected skills: Brambles, Conflagration, Edge of Extinction, Energizing Wind, Equinox, Famine, Favorable Winds, Fertile Season, Frozen Soil, Greater Conflagration, Infuriating Heat (BOTH), Lacerate, Muddy Terrain, Nature's Renewal (BOTH), Pestilence, Predatory Season, Primal Echoes, Quickening Zephyr, Quicksand, Roaring Winds, Symbiosis, Toxicity, Tranquility (BOTH), Winnowing, Winter.",
+      "note": "spirit range is not in our data or descriptions"
+    },
+    {
+      "line": "Sword [[adrenaline]] reductions:",
+      "note": "group label; each sub-line is handled per skill"
+    }
+  ]
+}

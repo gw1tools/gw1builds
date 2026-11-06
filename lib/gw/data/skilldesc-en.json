@@ -161,8 +161,8 @@
 		"29": {
 			"id": 29,
 			"name": "Blackout",
-			"description": "For 2...6 seconds, all of touched target foe's skills are disabled, and all of your skills are disabled for 5 seconds.",
-			"concise": "(2...6 seconds.) Disables skills. <gray>Your skills are disabled (5 seconds).</gray>"
+			"description": "For 2...8 seconds, all of touched target foe's skills are disabled, and all of your skills are disabled for 5 seconds.",
+			"concise": "(2...8 seconds.) Disables skills. <gray>Your skills are disabled (5 seconds).</gray>"
 		},
 		"30": {
 			"id": 30,
@@ -185,8 +185,8 @@
 		"33": {
 			"id": 33,
 			"name": "Illusionary Weaponry",
-			"description": "For 30 seconds, your melee attacks neither hit nor fail to hit. Instead, Illusionary Weaponry deals 16...50 damage to your targets for each melee attack. You have +5 armor for each equipped Illusion Magic skill.",
-			"concise": "(30 seconds.) Deals 16...50 damage to foes in place of other damage or effects from melee attacks. You have +5 armor for each equipped Illusion Magic skill. <gray>Your melee attacks neither hit nor fail to hit.</gray>"
+			"description": "For 30 seconds, your melee attacks neither hit nor fail to hit. Instead, Illusionary Weaponry deals 20...60 damage to your targets for each melee attack. You have +5 armor for each equipped Illusion Magic skill.",
+			"concise": "(30 seconds.) Deals 20...60 damage to foes in place of other damage or effects from melee attacks. You have +5 armor for each equipped Illusion Magic skill. <gray>Your melee attacks neither hit nor fail to hit.</gray>"
 		},
 		"34": {
 			"id": 34,
@@ -257,8 +257,8 @@
 		"45": {
 			"id": 45,
 			"name": "Ethereal Burden",
-			"description": "For 10 seconds, target foe moves 50% slower. When Ethereal Burden ends, you gain 10...18 Energy.",
-			"concise": "(10 seconds.) Target foe moves 50% slower. End effect: you gain 10...18 Energy."
+			"description": "For 6...12 seconds, target foe moves 50% slower. When Ethereal Burden ends, you gain 10...18 Energy.",
+			"concise": "(6...12 seconds.) Target foe moves 50% slower. End effect: you gain 10...18 Energy."
 		},
 		"46": {
 			"id": 46,
@@ -509,8 +509,8 @@
 		"91": {
 			"id": 91,
 			"name": "Well of Power",
-			"description": "Exploit nearest corpse or sacrifice 66% Health to create a Well of Power at that location. For 8...20 seconds, allies within the area of Well of Power gain +1...6 Health regeneration and +2 Energy regeneration.",
-			"concise": "(8...20 seconds.) Allies in this well have +1...6 Health regeneration and +2 Energy regeneration. <gray>Exploits a fresh corpse or sacrifices 66% Health.</gray>"
+			"description": "Exploit nearest corpse or sacrifice 66% Health to create a Well of Power at that location. For 10...30 seconds, allies within the area of Well of Power gain +1...6 Health regeneration and +2 Energy regeneration.",
+			"concise": "(10...30 seconds.) Allies in this well have +1...6 Health regeneration and +2 Energy regeneration. <gray>Exploits a fresh corpse or sacrifices 66% Health.</gray>"
 		},
 		"92": {
 			"id": 92,
@@ -545,8 +545,8 @@
 		"97": {
 			"id": 97,
 			"name": "Necrotic Traversal",
-			"description": "Exploit a random corpse. You teleport to that corpse's location and all nearby foes become Poisoned for 5...20 seconds.",
-			"concise": "Teleport to a corpse's location. Inflicts Poisoned condition (5...20 seconds). Affects all nearby foes. <gray>Exploits a fresh corpse.</gray>"
+			"description": "Exploit a random corpse or sacrifice 30...20% Health to teleport to target foe's location. You become Diseased for 6 seconds and all nearby foes become Poisoned for 5...20 seconds.",
+			"concise": "Exploit a random corpse or sacrifice 30...20% Health to teleport to target foe's location. You become Diseased for 6 seconds and all nearby foes become Poisoned for 5...20 seconds."
 		},
 		"98": {
 			"id": 98,
@@ -569,8 +569,8 @@
 		"101": {
 			"id": 101,
 			"name": "Barbs",
-			"description": "For 30 seconds, target foe takes 1...15 more damage when hit by physical damage.",
-			"concise": "(30 seconds.) Target foe takes 1...15 damage whenever it takes physical damage."
+			"description": "For 30 seconds, target foe takes 4...16 more damage when hit by physical damage.",
+			"concise": "(30 seconds.) Target foe takes 4...16 damage whenever it takes physical damage."
 		},
 		"102": {
 			"id": 102,
@@ -761,8 +761,8 @@
 		"133": {
 			"id": 133,
 			"name": "Dark Pact",
-			"description": "Deal 10...48 shadow damage to target foe.",
-			"concise": "Deals 10...48 damage."
+			"description": "Deal 20...60 shadow damage to target foe.",
+			"concise": "Deals 20...60 damage."
 		},
 		"134": {
 			"id": 134,
@@ -773,8 +773,8 @@
 		"135": {
 			"id": 135,
 			"name": "Faintheartedness",
-			"description": "For the next 3...16 seconds, target foe attacks 50% slower, and that foe suffers -0...3 Health degeneration.",
-			"concise": "(3...16 seconds.) Target foe attacks 50% slower and has -0...3 Health degeneration."
+			"description": "For the next 4...18 seconds, target foe attacks 50% slower, and that foe suffers -1...3 Health degeneration.",
+			"concise": "(4...18 seconds.) Target foe attacks 50% slower and has -1...3 Health degeneration."
 		},
 		"136": {
 			"id": 136,
@@ -941,8 +941,8 @@
 		"164": {
 			"id": 164,
 			"name": "Elemental Attunement",
-			"description": "For 25...60 seconds, you are attuned to Air, Fire, Water, and Earth and gain +1...2 to these attributes. You gain 50% of the base Energy cost of the skill each time you use magic associated with any of these elements.",
-			"concise": "(25...60 seconds.) Your elemental attributes are increased by +1...2. You gain 50% of the Energy cost of any Air, Earth, Fire, and Water Magic skills you use."
+			"description": "For 25...60 seconds, you are attuned to Air, Fire, Water, and Earth and gain +1...2 to these attributes. You gain 1 Energy plus 50% of the base Energy cost of the skill each time you use magic associated with any of these elements.",
+			"concise": "(25...60 seconds.) Your elemental attributes are increased by +1...2. You gain 1 plus 50% of the Energy cost of any Air, Earth, Fire, and Water Magic skills you use."
 		},
 		"165": {
 			"id": 165,
@@ -953,7 +953,7 @@
 		"166": {
 			"id": 166,
 			"name": "Kinetic Armor",
-			"description": "For 12 seconds, you gain +20...80 armor. Whenever you cast a spell, Kinetic Armor is renewed for 8 seconds.",
+			"description": "For 12 seconds, you gain +20...80 armor. Whenever you cast a spell, Kinetic Armor is renewed for 12 seconds.",
 			"concise": "(12 seconds.) You have +20...80 armor. Renewal bonus: cast a spell."
 		},
 		"167": {
@@ -1001,8 +1001,8 @@
 		"174": {
 			"id": 174,
 			"name": "Aftershock",
-			"description": "Nearby foes are struck for 26...100 earth damage. Knocked down foes are struck for 10...68 additional earth damage.",
-			"concise": "Deals 26...100 earth damage to nearby foes. Deals 10...68 more earth damage to knocked down foes."
+			"description": "Nearby foes are struck for 15...85 earth damage. Knocked down foes are struck for 15...85 additional earth damage.",
+			"concise": "Deals 15...85 earth damage to nearby foes. Deals 15...85 more earth damage to knocked down foes."
 		},
 		"175": {
 			"id": 175,
@@ -1181,8 +1181,8 @@
 		"204": {
 			"id": 204,
 			"name": "Rust",
-			"description": "Deals 10...70 cold damage to target and adjacent foes. For 5...20 seconds, target foe and all adjacent foes take twice as long to activate signets. If you are Overcast, foes struck with Rust have their signets interrupted and disabled for 1...10 seconds.",
-			"concise": "Deals 10...70 cold damage to target and adjacent foes. Hexes target and adjacent foes (5...20 seconds). Doubles signet activation time. Interrupts and disables signets for 1...10 seconds if you are Overcast."
+			"description": "Deals 10...85 cold damage to target and adjacent foes. For 5...20 seconds, target foe and all adjacent foes take twice as long to activate signets. If you are Overcast, foes struck with Rust have their signets interrupted and disabled for 1...10 seconds.",
+			"concise": "Deals 10...85 cold damage to target and adjacent foes. Hexes target and adjacent foes (5...20 seconds). Doubles signet activation time. Interrupts and disables signets for 1...10 seconds if you are Overcast."
 		},
 		"205": {
 			"id": 205,
@@ -1289,8 +1289,8 @@
 		"222": {
 			"id": 222,
 			"name": "Lightning Strike",
-			"description": "Strike target foe for 5...40 lightning damage. This spell has 25% armor penetration. If you are Overcast, that foe is hexed with Lightning Strike for 3 seconds. When this hex ends, that foe is struck again for 5...40 lightning damage.",
-			"concise": "Deals 5...40 lightning damage. 25% armor penetration. Hex for 3 seconds if Overcast. End effect: deals 5...40 lightning damage."
+			"description": "Strike target foe for 10...60 lightning damage. This spell has 25% armor penetration. If you are Overcast, that foe is hexed with Lightning Strike for 3 seconds. When this hex ends, that foe is struck again for 20...40 lightning damage.",
+			"concise": "Deals 10...60 lightning damage. 25% armor penetration. Hex for 3 seconds if Overcast. End effect: deals 20...40 lightning damage."
 		},
 		"223": {
 			"id": 223,
@@ -1469,8 +1469,8 @@
 		"252": {
 			"id": 252,
 			"name": "Banish",
-			"description": "Target foe takes 20...56 holy damage. This spell does double damage to summoned creatures.",
-			"concise": "Deals 20...56 holy damage. Deals double damage to summoned creatures."
+			"description": "Target foe takes 20...65 holy damage. This spell does double damage to summoned creatures.",
+			"concise": "Deals 20...65 holy damage. Deals double damage to summoned creatures."
 		},
 		"253": {
 			"id": 253,
@@ -1499,8 +1499,8 @@
 		"257": {
 			"id": 257,
 			"name": "Aegis",
-			"description": "For 5...11 seconds, all party members within earshot have a 50% chance to block attacks.",
-			"concise": "Enchants all party members within earshot (5...11 seconds). 50% chance to block."
+			"description": "For 6...15 seconds, all party members within earshot have a 50% chance to block attacks.",
+			"concise": "Enchants all party members within earshot (6...15 seconds). 50% chance to block."
 		},
 		"258": {
 			"id": 258,
@@ -1643,8 +1643,8 @@
 		"281": {
 			"id": 281,
 			"name": "Orison of Healing",
-			"description": "Heal target ally for 20...70 Health.",
-			"concise": "Heals for 20...70."
+			"description": "Heal target ally for 30...80 Health.",
+			"concise": "Heals for 30...80."
 		},
 		"282": {
 			"id": 282,
@@ -1655,8 +1655,8 @@
 		"283": {
 			"id": 283,
 			"name": "Dwayna's Kiss",
-			"description": "Heal target other ally for 15...60 Health and an additional 10...35 Health for each enchantment or hex on that ally.",
-			"concise": "Heals for 15...60. Heals for 10...35 more for each enchantment and hex on target ally. <gray>Cannot self-target.</gray>"
+			"description": "Heal target other ally for 20...65 Health and an additional 15...40 Health for each enchantment or hex on that ally.",
+			"concise": "Heals for 20...65. Heals for 15...40 more for each enchantment and hex on target ally. <gray>Cannot self-target.</gray>"
 		},
 		"284": {
 			"id": 284,
@@ -1715,8 +1715,8 @@
 		"293": {
 			"id": 293,
 			"name": "Signet of Devotion",
-			"description": "Heal target ally for 14...100 Health.",
-			"concise": "Heals for 14...100."
+			"description": "Heal target ally for 20...120 Health.",
+			"concise": "Heals for 20...120."
 		},
 		"294": {
 			"id": 294,
@@ -1733,8 +1733,8 @@
 		"296": {
 			"id": 296,
 			"name": "Bane Signet",
-			"description": "Target foe takes 26...56 holy damage. If target foe was attacking, that foe is knocked down.",
-			"concise": "Deals 26...56 holy damage. Causes knock-down if target foe is attacking."
+			"description": "Target foe takes 30...60 holy damage. If target foe was attacking, that foe is knocked down.",
+			"concise": "Deals 30...60 holy damage. Causes knock-down if target foe is attacking."
 		},
 		"297": {
 			"id": 297,
@@ -1835,8 +1835,8 @@
 		"313": {
 			"id": 313,
 			"name": "Healing Touch",
-			"description": "Heal target touched ally for 16...60 Health. Health gain from Divine Favor is doubled for this spell.",
-			"concise": "Touch Spell. Heals for 16...60. Double Health gain from Divine Favor for this spell."
+			"description": "Heal target touched ally for 20...80 Health. Health gain from Divine Favor is doubled for this spell.",
+			"concise": "Touch Spell. Heals for 20...80. Double Health gain from Divine Favor for this spell."
 		},
 		"314": {
 			"id": 314,
@@ -1961,8 +1961,8 @@
 		"334": {
 			"id": 334,
 			"name": "Axe Rake",
-			"description": "If this attack hits a foe suffering from a Deep Wound, you strike for +1...10 damage, and that foe becomes Crippled for 15 seconds.",
-			"concise": "Deals +1...10 damage and inflicts Crippled condition (15 seconds) if target foe has a Deep Wound."
+			"description": "If this attack hits a foe suffering from a Deep Wound, you strike for +4...16 damage, and that foe becomes Crippled for 15 seconds.",
+			"concise": "Deals +4...16 damage and inflicts Crippled condition (15 seconds) if target foe has a Deep Wound."
 		},
 		"335": {
 			"id": 335,
@@ -1973,8 +1973,8 @@
 		"336": {
 			"id": 336,
 			"name": "Executioner's Strike",
-			"description": "If this attack hits, you strike for +10...40 damage.",
-			"concise": "Deals +10...40 damage."
+			"description": "If this attack hits, you strike for +15...45 damage.",
+			"concise": "Deals +15...45 damage."
 		},
 		"337": {
 			"id": 337,
@@ -1991,8 +1991,8 @@
 		"339": {
 			"id": 339,
 			"name": "Penetrating Blow",
-			"description": "If this attack hits, you strike for +5...20 damage. This axe attack has 20% armor penetration.",
-			"concise": "Deals +5...20 damage. 20% armor penetration."
+			"description": "If this attack hits, you strike for +10...25 damage. This axe attack has 20% armor penetration.",
+			"concise": "Deals +10...25 damage. 20% armor penetration."
 		},
 		"340": {
 			"id": 340,
@@ -2009,8 +2009,8 @@
 		"342": {
 			"id": 342,
 			"name": "Axe Twist",
-			"description": "If this attack hits a foe suffering from a Deep Wound, you strike for 1...20 more damage and that foe suffers from Weakness for 20 seconds.",
-			"concise": "Deals +1...20 damage and inflicts Weakness condition (20 seconds) if target foe has a Deep Wound."
+			"description": "If this attack hits a foe suffering from a Deep Wound, you strike for 5...25 more damage and that foe suffers from Weakness for 20 seconds.",
+			"concise": "Deals +5...25 damage and inflicts Weakness condition (20 seconds) if target foe has a Deep Wound."
 		},
 		"343": {
 			"id": 343,
@@ -2033,8 +2033,8 @@
 		"346": {
 			"id": 346,
 			"name": "Frenzy",
-			"description": "For 8 seconds, you attack 33% faster but take double damage.",
-			"concise": "(8 seconds.) You attack 33% faster. <gray>You take double damage.</gray>"
+			"description": "For 8 seconds, you attack 33% faster but take 175...125% damage.",
+			"concise": "(8 seconds.) You attack 33% faster. <gray>You take 175...125% damage.</gray>"
 		},
 		"347": {
 			"id": 347,
@@ -2135,8 +2135,8 @@
 		"363": {
 			"id": 363,
 			"name": "Shield Bash",
-			"description": "For 5...11 seconds, while wielding a shield, the next attack skill used against you is blocked. If it was a melee skill, your attacker is knocked down and that skill is disabled for an additional 15 seconds.",
-			"concise": "(5...11 seconds.) You block the next attack skill. Causes knock-down and +15 second recharge if it was a melee skill. <gray>No effect unless you are wielding a shield.</gray>"
+			"description": "For 5...11 seconds, while wielding a shield, the next melee attack skill used against you is blocked, your attacker is knocked down and that skill is disabled for an additional 15 seconds.",
+			"concise": "(5...11 seconds.) You block the next melee attack skill. Causes knock-down and +15 second recharge. <gray>No effect unless you are wielding a shield.</gray>"
 		},
 		"364": {
 			"id": 364,
@@ -2261,8 +2261,8 @@
 		"385": {
 			"id": 385,
 			"name": "Final Thrust",
-			"description": "Lose all adrenaline. If Final Thrust hits, you deal 1...40 more damage. This damage is doubled if your target was below 50% Health.",
-			"concise": "Deals +1...40 damage. Deals +1...40 more damage if target foe is below 50% Health. <gray>Lose all adrenaline.</gray>"
+			"description": "Lose all adrenaline. If Final Thrust hits, you deal 5...40 more damage. This damage is doubled if your target was below 50% Health.",
+			"concise": "Deals +5...40 damage. Deals +5...40 more damage if target foe is below 50% Health. <gray>Lose all adrenaline.</gray>"
 		},
 		"386": {
 			"id": 386,
@@ -2309,8 +2309,8 @@
 		"393": {
 			"id": 393,
 			"name": "Crippling Shot",
-			"description": "If Crippling Shot hits, your target becomes Crippled for 1...12 seconds. This attack cannot be blocked.",
-			"concise": "Unblockable. Inflicts Crippled condition (1...12 seconds)."
+			"description": "If Crippling Shot hits, your target becomes Crippled for 4...14 seconds. This attack cannot be blocked.",
+			"concise": "Unblockable. Inflicts Crippled condition (4...14 seconds)."
 		},
 		"394": {
 			"id": 394,
@@ -2507,8 +2507,8 @@
 		"436": {
 			"id": 436,
 			"name": "Comfort Animal",
-			"description": "You heal your animal companion for 20...104 Health. If your companion is dead, it is resurrected with 10...58% Health. If you have Comfort Animal equipped, your animal companion will travel with you.",
-			"concise": "Your pet gains 20...104 Health. Resurrects your pet (10...58% Health.) If you have Comfort Animal equipped, your animal companion will travel with you."
+			"description": "You heal your animal companion for 40...120 Health. If your companion is dead, it is resurrected with 10...58% Health. If you have Comfort Animal equipped, your animal companion will travel with you.",
+			"concise": "Your pet gains 40...120 Health. Resurrects your pet (10...58% Health.) If you have Comfort Animal equipped, your animal companion will travel with you."
 		},
 		"437": {
 			"id": 437,
@@ -2999,8 +2999,8 @@
 		"809": {
 			"id": 809,
 			"name": "Shatterstone",
-			"description": "Target foe is struck for 25...100 cold damage and is hexed with Shatterstone for 3 seconds. When Shatterstone ends, that foe and all nearby foes are struck for 25...100 cold damage.",
-			"concise": "(3 seconds.) Initial effect: deals 25...100 cold damage. End effect: deals 25...100 cold damage to target and all nearby foes."
+			"description": "Target foe is struck for 25...100 cold damage, moves 66% slower, and is hexed with Shatterstone for 3 seconds. When Shatterstone ends, that foe and all nearby foes are struck for 25...100 cold damage.",
+			"concise": "(3 seconds.) Initial effect: deals 25...100 cold damage and target moves 66% slower. End effect: deals 25...100 cold damage to target and all nearby foes."
 		},
 		"810": {
 			"id": 810,
@@ -3125,14 +3125,14 @@
 		"831": {
 			"id": 831,
 			"name": "Primal Rage",
-			"description": "For 1...9 seconds, you attack 33% faster and move 33% faster, but you take double damage.",
-			"concise": "(1...9 seconds.) You attack 33% faster and move 33% faster. <gray>You take double damage.</gray>"
+			"description": "For 1...9 seconds, you attack 33% faster and move 33% faster, but you take 150...125% damage.",
+			"concise": "(1...9 seconds.) You attack 33% faster and move 33% faster. <gray>You take 150...125% damage.</gray>"
 		},
 		"832": {
 			"id": 832,
 			"name": "Animate Flesh Golem",
-			"description": "Exploit nearest corpse to animate a level 3...25 Flesh Golem. The Flesh Golem leaves an exploitable corpse. You can have only one Flesh Golem at a time.",
-			"concise": "Creates a level 3...25 flesh golem which leaves a fresh corpse when it dies. <gray>Exploits a fresh corpse. You can have only one flesh golem at a time.</gray>"
+			"description": "Exploit nearest corpse to animate a level 3...25 Flesh Golem. The Flesh Golem leaves 1...4 exploitable corpse(s). You can have only one Flesh Golem at a time.",
+			"concise": "Creates a level 3...25 flesh golem which leaves 1...4 fresh corpse(s) when it dies. <gray>Exploits a fresh corpse. You can have only one flesh golem at a time.</gray>"
 		},
 		"834": {
 			"id": 834,
@@ -3209,8 +3209,8 @@
 		"846": {
 			"id": 846,
 			"name": "Steam",
-			"description": "Target foe is struck for 20...60 cold damage. If target foe is on fire, Steam Blinds that foe for 5...10 seconds.",
-			"concise": "Deals 20...60 cold damage. Inflicts Blindness condition (5...10 seconds) if target foe is Burning."
+			"description": "Target foe is struck for 20...60 cold damage. If target foe is on fire, Steam Blinds that foe for 5...10 seconds and they take an additional 20...60 fire damage.",
+			"concise": "Deals 20...60 cold damage. Inflicts Blindness condition (5...10 seconds) and does 20...60 fire damage if target foe is Burning."
 		},
 		"847": {
 			"id": 847,
@@ -3311,8 +3311,8 @@
 		"867": {
 			"id": 867,
 			"name": "Healing Light",
-			"description": "Heal target ally for 40...100 Health. If your target has an enchantment, you gain 1...3 Energy.",
-			"concise": "Heals for 40...100. You gain 1...3 Energy if target ally is enchanted."
+			"description": "Heal target ally for 40...120 Health. If your target has an enchantment, you gain 1...3 Energy.",
+			"concise": "Heals for 40...120. You gain 1...3 Energy if target ally is enchanted."
 		},
 		"869": {
 			"id": 869,
@@ -3389,8 +3389,8 @@
 		"885": {
 			"id": 885,
 			"name": "Shield Guardian",
-			"description": "For 1...4 seconds, all party members in earshot have a 75% chance to block incoming attacks. If an attack is blocked, all allies in earshot are healed for 10...40 and Shield Guardian ends.",
-			"concise": "(1...4 seconds). Party members in earshot have a 75% chance to block attacks. Block effect: Allies in earshot are healed for 10...40, and Shield Guardian ends."
+			"description": "For 2...6 seconds, all party members in earshot have a 75% chance to block incoming attacks. If an attack is blocked, all allies in earshot are healed for 10...40 and Shield Guardian ends.",
+			"concise": "(2...6 seconds). Party members in earshot have a 75% chance to block attacks. Block effect: Allies in earshot are healed for 10...40, and Shield Guardian ends."
 		},
 		"886": {
 			"id": 886,
@@ -3503,8 +3503,8 @@
 		"909": {
 			"id": 909,
 			"name": "Focused Shot",
-			"description": "If Focused Shot hits, you strike for +10...25 damage but all of your other attack skills are disabled for 5...3 seconds.",
-			"concise": "Deals +10...25 damage. <gray>Your other attack skills are disabled (5...3 seconds) if this attack hits.</gray>"
+			"description": "This shot moves three times faster, cannot be blocked, and strikes for +10...40 damage but all of your other attack skills are disabled for 8...4 seconds.",
+			"concise": "Deals +10...40 damage. Unblockable. This shot moves three times faster. <gray>Your other attack skills are disabled (8...4 seconds).</gray>"
 		},
 		"910": {
 			"id": 910,
@@ -3581,8 +3581,8 @@
 		"925": {
 			"id": 925,
 			"name": "Recall",
-			"description": "While you maintain Recall, nothing happens. When Recall ends, you Shadow Step to the ally you targeted when you activated this skill and all of your skills are disabled for 10 seconds.",
-			"concise": "End effect: Shadow Step to target ally. <gray>Cannot self-target and disables all of your skills for 10 seconds when it ends.</gray>"
+			"description": "While you maintain Recall, nothing happens. When Recall ends, you Shadow Step to the ally you targeted when you activated this skill and all of your skills are disabled for 3 seconds.",
+			"concise": "End effect: Shadow Step to target ally. <gray>Cannot self-target and disables all of your skills for 3 seconds when it ends.</gray>"
 		},
 		"926": {
 			"id": 926,
@@ -3671,8 +3671,8 @@
 		"941": {
 			"id": 941,
 			"name": "Blessed Light",
-			"description": "Heal target ally for 10...140 Health and remove one condition and one hex.",
-			"concise": "Heals for 10...140. Removes one condition and one hex."
+			"description": "Heal target ally for 10...120 Health and remove one condition and one hex.",
+			"concise": "Heals for 10...120. Removes one condition and one hex."
 		},
 		"942": {
 			"id": 942,
@@ -3869,8 +3869,8 @@
 		"985": {
 			"id": 985,
 			"name": "Caltrops",
-			"description": "Target foe and all foes adjacent to your target are Crippled for 5...15 seconds. Caltrops has half the normal range.",
-			"concise": "Half Range Spell. Inflicts Crippled condition (5...15 seconds) on target and adjacent foes."
+			"description": "Target foe and all foes adjacent to your target are Crippled and Bleeding for 5...15 seconds. Caltrops has half the normal range.",
+			"concise": "Half Range Spell. Inflicts Crippled and Bleeding condition (5...15 seconds) on target and adjacent foes."
 		},
 		"986": {
 			"id": 986,
@@ -3899,8 +3899,8 @@
 		"990": {
 			"id": 990,
 			"name": "Expunge Enchantments",
-			"description": "Target foe loses 1 enchantment. All of your other non-attack skills are disabled for 10...5 seconds. For each skill disabled in this way, target touched foe loses 1 additional enchantment.",
-			"concise": "Removes one enchantment for each non-attack skill you have. <gray>All your non-attack skills are disabled (10...5 seconds).</gray>"
+			"description": "Target foe loses 1 enchantment. All of your other non-attack skills are disabled for 8...4 seconds. For each skill disabled in this way, target touched foe loses 1 additional enchantment.",
+			"concise": "Removes one enchantment for each non-attack skill you have. <gray>All your non-attack skills are disabled (8...4 seconds).</gray>"
 		},
 		"991": {
 			"id": 991,
@@ -4043,8 +4043,8 @@
 		"1034": {
 			"id": 1034,
 			"name": "Seeping Wound",
-			"description": "For 1...7 seconds, target foe moves 33% slower. That foe takes 5...25 damage each second while suffering from a condition. This spell has half the normal range.",
-			"concise": "Elite Half Range Hex Spell. (1...7 seconds.) Target foe moves 33% slower. This foe takes 5...25 damage each second while suffering from a condition."
+			"description": "For 1...7 seconds, target foe moves 33% slower. That foe takes 5...25 damage each second while suffering from a condition.",
+			"concise": "(1...7 seconds.) Target foe moves 33% slower. This foe takes 5...25 damage each second while suffering from a condition."
 		},
 		"1035": {
 			"id": 1035,
@@ -4145,8 +4145,8 @@
 		"1056": {
 			"id": 1056,
 			"name": "Kitah's Burden",
-			"description": "For 10 seconds, target foe moves 50% slower. When Kitah's Burden ends you gain 10...18 Energy.",
-			"concise": "(10 seconds.) Target foe moves 50% slower. End effect: you gain 10...18 Energy."
+			"description": "For 6...12 seconds, target foe moves 50% slower. When Kitah's Burden ends you gain 10...18 Energy.",
+			"concise": "(6...12 seconds.) Target foe moves 50% slower. End effect: you gain 10...18 Energy."
 		},
 		"1057": {
 			"id": 1057,
@@ -4439,8 +4439,8 @@
 		"1136": {
 			"id": 1136,
 			"name": "Penetrating Chop",
-			"description": "If this attack hits, you strike for +5...20 damage. This axe attack has 20% armor penetration.",
-			"concise": "Deals +5...20 damage. 20% armor penetration."
+			"description": "If this attack hits, you strike for +10...25 damage. This axe attack has 20% armor penetration.",
+			"concise": "Deals +10...25 damage. 20% armor penetration."
 		},
 		"1137": {
 			"id": 1137,
@@ -4469,8 +4469,8 @@
 		"1146": {
 			"id": 1146,
 			"name": "Shove",
-			"description": "Target touched foe is knocked down. If that foe was moving, that foe's stance ends and that foe takes 15...75 damage before being knocked down.",
-			"concise": "Causes knockdown. Initial effect: ends foe's stance and deals 15...75 damage if target foe is moving."
+			"description": "Target touched foe takes 15...75 damage, their stance ends, and they are knocked down.",
+			"concise": "Target touched foe takes 15...75 damage, their stance ends, and they are knocked down."
 		},
 		"1191": {
 			"id": 1191,
@@ -4517,8 +4517,8 @@
 		"1199": {
 			"id": 1199,
 			"name": "Glass Arrows",
-			"description": "For 10...35 seconds, your arrows strike for +5...20 damage if they hit and cause Bleeding for 10...20 seconds if they are blocked.",
-			"concise": "(10...35 seconds.) Your arrows deal +5...20 damage. Inflicts Bleeding condition if blocked (10...20 seconds)."
+			"description": "For 10...35 seconds, your arrows strike for +6...20 damage if they hit and cause Bleeding for 10...20 seconds if they are blocked.",
+			"concise": "(10...35 seconds.) Your arrows deal +6...20 damage. Inflicts Bleeding condition if blocked (10...20 seconds)."
 		},
 		"1200": {
 			"id": 1200,
@@ -4601,8 +4601,8 @@
 		"1219": {
 			"id": 1219,
 			"name": "Protective Was Kaolai",
-			"description": "Hold Kaolai's ashes for up to 15...60 seconds. While you hold his ashes, you gain 10 armor. When you drop his ashes, all party members are healed for 10...85 Health.",
-			"concise": "(15...60 seconds.) You have +10 armor. Drop effect: all party members are healed for 10...85."
+			"description": "Hold Kaolai's ashes for up to 15...60 seconds. While you hold his ashes, you gain 20 armor. When you drop his ashes, all party members are healed for 20...95 Health.",
+			"concise": "(15...60 seconds.) You have +20 armor. Drop effect: all party members are healed for 20...95."
 		},
 		"1220": {
 			"id": 1220,
@@ -4727,8 +4727,8 @@
 		"1240": {
 			"id": 1240,
 			"name": "Soul Twisting",
-			"description": "For 5...45 seconds, your Binding Rituals cost 15 less Energy (minimum 10) and recharge instantly. Soul Twisting ends after 1...3 Binding Rituals.",
-			"concise": "(5...45 seconds.) Your Binding Rituals cost 15 less Energy (minimum 10) and recharge instantly. <gray>Ends after 1...3 Binding Rituals.</gray>"
+			"description": "For 5...45 seconds, your Binding Rituals cost 15 less Energy (minimum 5) and recharge instantly. Soul Twisting ends after 1...3 Binding Rituals.",
+			"concise": "(5...45 seconds.) Your Binding Rituals cost 15 less Energy (minimum 5) and recharge instantly. <gray>Ends after 1...3 Binding Rituals.</gray>"
 		},
 		"1244": {
 			"id": 1244,
@@ -4907,8 +4907,8 @@
 		"1339": {
 			"id": 1339,
 			"name": "Symbols of Inspiration",
-			"description": "For 1...31 seconds, this skill becomes the Elite of target foe. Elite spells you cast use your Fast Casting attribute instead of their normal attributes.",
-			"concise": "(1...31 seconds.) This skill becomes the Elite of target foe. Elite spells you cast use your Fast Casting attribute instead of their normal attributes."
+			"description": "For 6...40 seconds, this skill becomes the Elite of target foe. Elite skills you cast use your Fast Casting attribute instead of their normal attributes.",
+			"concise": "(6...40 seconds.) This skill becomes the Elite of target foe. Elite skills you cast use your Fast Casting attribute instead of their normal attributes."
 		},
 		"1340": {
 			"id": 1340,
@@ -5015,8 +5015,8 @@
 		"1358": {
 			"id": 1358,
 			"name": "Ulcerous Lungs",
-			"description": "For 10...25 seconds, target foe and all nearby foes suffer from -4 Health degeneration when Bleeding, and whenever they use a shout or chant, they Bleed for 3...15 seconds.",
-			"concise": "Also hexes foes near your target (10...25 seconds). Causes -4 Health degeneration to any of these foes that are Bleeding. Inflicts Bleeding (3...15 seconds) whenever these foes use a shout or chant."
+			"description": "For 10...30 seconds, target foe and all nearby foes suffer from -4 Health degeneration when Bleeding, and whenever they use a shout or chant, they Bleed for 5...20 seconds.",
+			"concise": "Also hexes foes near your target (10...30 seconds). Causes -4 Health degeneration to any of these foes that are Bleeding. Inflicts Bleeding (5...20 seconds) whenever these foes use a shout or chant."
 		},
 		"1359": {
 			"id": 1359,
@@ -5129,8 +5129,8 @@
 		"1378": {
 			"id": 1378,
 			"name": "Master of Magic",
-			"description": "For 1...61 seconds, all of your elemental attributes are set to 8...14 and your elemental spells return 30% of their Energy cost.",
-			"concise": "(1...61 seconds). Your elemental attributes are set to 8...14 and elemental spells return 30% of their Energy cost."
+			"description": "For 1...61 seconds, all of your elemental attributes are set to 8...14 and your elemental spells return 1 Energy plus 30% of their Energy cost.",
+			"concise": "(1...61 seconds). Your elemental attributes are set to 8...14 and elemental spells return 1 Energy plus 30% of their Energy cost."
 		},
 		"1379": {
 			"id": 1379,
@@ -5195,8 +5195,8 @@
 		"1396": {
 			"id": 1396,
 			"name": "Words of Comfort",
-			"description": "Target ally is healed for 15...60 Health and an additional 15...45 Health if that ally is suffering from a condition.",
-			"concise": "Heals for 15...60. Heals for 15...45 more if target ally has a condition."
+			"description": "Target ally is healed for 20...65 Health and an additional 20...50 Health if that ally is suffering from a condition.",
+			"concise": "Heals for 20...65. Heals for 20...50 more if target ally has a condition."
 		},
 		"1397": {
 			"id": 1397,
@@ -5327,8 +5327,8 @@
 		"1466": {
 			"id": 1466,
 			"name": "Burning Arrow",
-			"description": "If this attack hits, you strike for +10...30 damage and cause Burning for 1...7 seconds.",
-			"concise": "Deals +10...30 damage. Inflicts Burning condition (1...7 seconds)."
+			"description": "If this attack hits, you strike for +10...30 damage and cause Burning for 2...8 seconds.",
+			"concise": "Deals +10...30 damage. Inflicts Burning condition (2...8 seconds)."
 		},
 		"1467": {
 			"id": 1467,
@@ -5513,8 +5513,8 @@
 		"1500": {
 			"id": 1500,
 			"name": "Mirage Cloak",
-			"description": "For 1...7 seconds, you have a 30...60% chance to block incoming attacks. When you cast this enchantment, all nearby foes are struck for 10...40 earth damage.",
-			"concise": "(1...7 seconds.) You have 30...60% chance to block. Initial Effect: deals 10...40 earth damage to nearby foes."
+			"description": "For 20 seconds, you have a 40% chance to block and an extra 4...10% for each additional enchantment (max 80%). All nearby foes are struck for 10...40 earth damage each time a Dervish enchantment is removed from you.",
+			"concise": "(20 seconds.) 40% chance to block and an extra 4...10% for each additional enchantment. 10...40 earth damage to nearby foes when you lose a Dervish enchantment."
 		},
 		"1502": {
 			"id": 1502,
@@ -5693,8 +5693,8 @@
 		"1532": {
 			"id": 1532,
 			"name": "Mystic Sandstorm",
-			"description": "Create a sandstorm at your location that lasts 3 seconds. Each second, foes nearby this location take 10...20 earth damage. Attacking foes take an additional 10...20 damage. If you are enchanted when you cast this spell, it lasts twice as long.",
-			"concise": "(3 seconds.) Deals 10...20 earth damage each second. Deals an additional 10...20 damage to attacking foes. Hits foes nearby your initial location. Lasts twice as long if you are enchanted."
+			"description": "Create a sandstorm at your location that lasts 3 seconds. Each second, foes nearby this location take 10...40 earth damage. Attacking foes take an additional 10...20 damage. If you are enchanted when you cast this spell, it lasts twice as long.",
+			"concise": "(3 seconds.) Deals 10...40 earth damage each second. Deals an additional 10...20 damage to attacking foes. Hits foes nearby your initial location. Lasts twice as long if you are enchanted."
 		},
 		"1533": {
 			"id": 1533,
@@ -5765,14 +5765,14 @@
 		"1544": {
 			"id": 1544,
 			"name": "Whirling Charge",
-			"description": "For 1...6 seconds, you move 33% faster than normal. The next time you strike a foe, all other nearby foes take 10...50 cold damage and this enchantment ends.",
-			"concise": "(1...6 seconds.) You move 33% faster. Deal 10...50 cold damage to all other nearby foes the next time you hit a foe and this enchantment ends."
+			"description": "For 1...6 seconds, you move 33% faster than normal. The next time you strike a foe, all other nearby foes take 10...60 cold damage and this enchantment ends.",
+			"concise": "(1...6 seconds.) You move 33% faster. Deal 10...60 cold damage to all other nearby foes the next time you hit a foe and this enchantment ends."
 		},
 		"1545": {
 			"id": 1545,
 			"name": "Test of Faith",
-			"description": "Deals 15...75 cold damage and takes 1 enchantment from target foe. If that foe was not enchanted, that foe is Dazed for 1...4 seconds.",
-			"concise": "Touch Spell. Deals 15...75 cold damage and removes 1 enchantment. Target foe is Dazed for 1...4 seconds if that foe was not enchanted."
+			"description": "Deals 15...75 cold damage and takes 1 enchantment from target foe. If that foe was not enchanted, that foe is Dazed for 2...6 seconds.",
+			"concise": "Touch Spell. Deals 15...75 cold damage and removes 1 enchantment. Target foe is Dazed for 2...6 seconds if that foe was not enchanted."
 		},
 		"1546": {
 			"id": 1546,
@@ -5807,8 +5807,8 @@
 		"1551": {
 			"id": 1551,
 			"name": "Spear of Lightning",
-			"description": "If this attack hits, it deals +8...20 lightning damage. This attack has 25% armor penetration.",
-			"concise": "Deals +8...20 lightning damage. 25% armor penetration."
+			"description": "Strikes all foes between you and your target. If this attack hits, it deals +10...20 lightning damage. This attack has 25% armor penetration.",
+			"concise": "Deals +10...20 lightning damage. 25% armor penetration. Strikes all foes between you and your target."
 		},
 		"1552": {
 			"id": 1552,
@@ -5819,8 +5819,8 @@
 		"1553": {
 			"id": 1553,
 			"name": "Anthem of Fury",
-			"description": "For 10 seconds, all party members within earshot gain 1...4 strikes of adrenaline the next time they use an attack skill.",
-			"concise": "(10 seconds.) Party members in earshot gain 1...4 adrenaline with their next attack skill."
+			"description": "For 10 seconds, all party members within earshot gain 2...5 strikes of adrenaline the next time they use an attack skill.",
+			"concise": "(10 seconds.) Party members in earshot gain 2...5 adrenaline with their next attack skill."
 		},
 		"1554": {
 			"id": 1554,
@@ -5843,8 +5843,8 @@
 		"1557": {
 			"id": 1557,
 			"name": "Anthem of Flame",
-			"description": "For 10 seconds, the next attack skill used by each party member within earshot also causes Burning for 1...3 seconds.",
-			"concise": "(10 seconds.) Party members in earshot inflict Burning condition (1...3 seconds) with their next attack skill."
+			"description": "For 10 seconds, the next attack skill used by each party member within earshot also causes Burning for 1...5 seconds.",
+			"concise": "(10 seconds.) Party members in earshot inflict Burning condition (1...5 seconds) with their next attack skill."
 		},
 		"1558": {
 			"id": 1558,
@@ -6353,8 +6353,8 @@
 		"1688": {
 			"id": 1688,
 			"name": "Defender's Zeal",
-			"description": "For 5...25 seconds, whenever target foe hits with an attack, you gain 2 Energy.",
-			"concise": "(5...25 seconds.) You gain 2 Energy whenever target foe hits with an attack."
+			"description": "For 10...30 seconds, whenever target foe hits with an attack, you gain 2 Energy.",
+			"concise": "(10...30 seconds.) You gain 2 Energy whenever target foe hits with an attack."
 		},
 		"1689": {
 			"id": 1689,
@@ -6401,8 +6401,8 @@
 		"1696": {
 			"id": 1696,
 			"name": "Decapitate",
-			"description": "You lose all adrenaline and all Energy. If this attack hits, you deal +5...80 damage and cause a Deep Wound for 5...20 seconds. This attack always results in a critical hit.",
-			"concise": "Deals +5...80 damage. Inflicts Deep Wound condition (5...20 seconds). Automatic critical hit. <gray>You lose all adrenaline and Energy.</gray>"
+			"description": "You lose all adrenaline and all Energy. This attack is unblockable, you deal +5...80 damage and cause a Deep Wound for 5...20 seconds. This attack is always critical and if foe is killed, nearby foes are Weakened for 8 seconds.",
+			"concise": "Deals +5...80 damage. Unblockable. Inflicts Deep Wound condition (5...20 seconds). Automatic critical hit. If foe is killed, nearby foes are Weakened (8 seconds). <gray>You lose all adrenaline and Energy.</gray>"
 		},
 		"1697": {
 			"id": 1697,
@@ -6527,8 +6527,8 @@
 		"1733": {
 			"id": 1733,
 			"name": "Wielder's Strike",
-			"description": "Target foe is struck for 5...50 lightning damage. If you are under the effects of a weapon spell, you deal an additional 10...40 lightning damage.",
-			"concise": "Deals 5...50 lightning damage. Deals 10...40 more lightning damage if you are under a weapon spell."
+			"description": "Target foe is struck for 10...60 lightning damage. If you are under the effects of a weapon spell, you deal an additional 10...50 lightning damage.",
+			"concise": "Deals 10...60 lightning damage. Deals 10...50 more lightning damage if you are under a weapon spell."
 		},
 		"1734": {
 			"id": 1734,
@@ -6587,8 +6587,8 @@
 		"1744": {
 			"id": 1744,
 			"name": "Caretaker's Charge",
-			"description": "Target foe is struck for 20...75 lightning damage. If you are holding an item, you gain 5 Energy and 5...50 Health.",
-			"concise": "Deals 20...75 lightning damage. You gain 5 Energy and 5...50 Health if you are holding an item."
+			"description": "Target foe is struck for 20...85 lightning damage. If you are holding an item, you gain 7 Energy and 5...50 Health.",
+			"concise": "Deals 20...85 lightning damage. You gain 7 Energy and 5...50 Health if you are holding an item."
 		},
 		"1745": {
 			"id": 1745,
@@ -6653,8 +6653,8 @@
 		"1756": {
 			"id": 1756,
 			"name": "Grenth's Grasp",
-			"description": "For 20 seconds, if you are wielding a cold weapon, your attack skills also Cripple that <sic/> foe for 1...11 seconds and you transfer 1...3 conditions from yourself to that foe.",
-			"concise": "(20 seconds.) Inflicts Crippled condition (1...11 seconds) with your attack skills and transfer 1...3 conditions. <gray>No effect unless wielding a cold weapon.</gray>"
+			"description": "For 20 seconds, your attack skills also Cripple that foe for 1...11 seconds and you transfer 1...3 conditions from yourself to that foe.",
+			"concise": "(20 seconds.) Inflicts Crippled condition (1...11 seconds) with your attack skills and transfer 1...3 conditions."
 		},
 		"1757": {
 			"id": 1757,
@@ -6737,8 +6737,8 @@
 		"1770": {
 			"id": 1770,
 			"name": "Natural Temper",
-			"description": "For 4...10 seconds, you gain 33% more adrenaline while not under the effects of an Enchantment.",
-			"concise": "(4...10 seconds.) You gain 33% more adrenaline. <gray>No effect if you are enchanted.</gray>"
+			"description": "For 4...15 seconds, you gain 33% more adrenaline while not under the effects of an Enchantment.",
+			"concise": "(4...15 seconds.) You gain 33% more adrenaline. <gray>No effect if you are enchanted.</gray>"
 		},
 		"1771": {
 			"id": 1771,
@@ -6785,8 +6785,8 @@
 		"1778": {
 			"id": 1778,
 			"name": "Signet of Return",
-			"description": "Resurrect target party member with 5...15% Health and 1...4% Energy for each party member within earshot.",
-			"concise": "Resurrects target party member (5...15% Health and 1...4% Energy for each party member in earshot)."
+			"description": "Resurrect target party member with 5...20% Health and 1...4% Energy for each party member within earshot.",
+			"concise": "Resurrects target party member (5...20% Health and 1...4% Energy for each party member in earshot)."
 		},
 		"1779": {
 			"id": 1779,
@@ -6953,8 +6953,8 @@
 		"1996": {
 			"id": 1996,
 			"name": "Sum of All Fears",
-			"description": "For 1...10 seconds, target foe moves, attacks, and casts spells 33% slower.",
-			"concise": "(1...10 seconds.) Target foe moves, attacks, and casts spells 33% slower."
+			"description": "For 4...12 seconds, target foe moves, attacks, and casts spells 33% slower.",
+			"concise": "(4...12 seconds.) Target foe moves, attacks, and casts spells 33% slower."
 		},
 		"1997": {
 			"id": 1997,
@@ -7013,8 +7013,8 @@
 		"2006": {
 			"id": 2006,
 			"name": "Castigation Signet",
-			"description": "Target foe takes 26...56 holy damage. If that foe was attacking, you gain 1...10 Energy.",
-			"concise": "Deals 26...56 holy damage. You gain 1...10 Energy if target foe is attacking."
+			"description": "Target foe takes 26...56 holy damage. If that foe was attacking, you gain 4...14 Energy.",
+			"concise": "Deals 26...56 holy damage. You gain 4...14 Energy if target foe is attacking."
 		},
 		"2007": {
 			"id": 2007,
@@ -7127,14 +7127,14 @@
 		"2057": {
 			"id": 2057,
 			"name": "Foul Feast",
-			"description": "All conditions are transferred from target other ally to yourself. For each condition acquired in this way, you gain 0...45 Health and 0...2 Energy. This skill recharges twice as fast if you remove Disease from your target.",
-			"concise": "Transfers all conditions from target ally to yourself. You gain 0...45 Health and 0...2 Energy for each condition transferred. Half recharge if you remove Disease. <gray>Cannot self-target.</gray>"
+			"description": "All conditions are transferred from target other ally to yourself. For each condition acquired in this way, you gain 0...45 Health and 2...4 Energy. This skill recharges twice as fast if you remove Disease from your target.",
+			"concise": "Transfers all conditions from target ally to yourself. You gain 0...45 Health and 2...4 Energy for each condition transferred. Half recharge if you remove Disease. <gray>Cannot self-target.</gray>"
 		},
 		"2058": {
 			"id": 2058,
 			"name": "Putrid Bile",
-			"description": "For 5...20 seconds, target foe suffers -1...3 Health degeneration. If that foe dies while under the effects of this hex, all nearby foes take 25...85 damage.",
-			"concise": "(5...20 seconds.) Causes -1...3 Health degeneration. Deals 25...85 damage to all nearby foes if target foe dies."
+			"description": "For 5...25 seconds, target foe suffers -1...3 Health degeneration. If that foe dies while under the effects of this hex, all nearby foes take 25...85 damage.",
+			"concise": "(5...25 seconds.) Causes -1...3 Health degeneration. Deals 25...85 damage to all nearby foes if target foe dies."
 		},
 		"2059": {
 			"id": 2059,
@@ -7235,8 +7235,8 @@
 		"2075": {
 			"id": 2075,
 			"name": "Hasty Refrain",
-			"description": "For 3...15 seconds, target ally moves 25% faster. This echo is reapplied every time a chant or shout ends on that ally.",
-			"concise": "(3...15 seconds.) Target ally moves 25% faster. Renewal: every time a chant or shout ends on this ally."
+			"description": "For 8...20 seconds, target ally moves 25% faster. This echo is reapplied every time a chant or shout ends on that ally.",
+			"concise": "(8...20 seconds.) Target ally moves 25% faster. Renewal: every time a chant or shout ends on this ally."
 		},
 		"2091": {
 			"id": 2091,
@@ -7559,8 +7559,8 @@
 		"2202": {
 			"id": 2202,
 			"name": "Mending Grip",
-			"description": "Target ally is healed for 20...80 Health. If that ally is under the effects of a weapon spell, that ally loses one condition.",
-			"concise": "Heals for 20...80. Removes one condition if target ally is under a Weapon <sic/> spell."
+			"description": "Target ally is healed for 30...90 Health. If that ally is under the effects of a weapon spell, that ally loses one condition.",
+			"concise": "Heals for 30...90. Removes one condition if target ally is under a Weapon <sic/> spell."
 		},
 		"2203": {
 			"id": 2203,
@@ -7967,8 +7967,8 @@
 		"2808": {
 			"id": 2808,
 			"name": "Enraged Smash (PvP)",
-			"description": "If Enraged Smash hits, you gain 1...4 strikes of adrenaline. If you hit a moving foe, you strike for +10...40 damage, and target foe is knocked down.",
-			"concise": "Gives you 1...4 strikes of adrenaline if you hit. Deals +10...40 damage and causes knockdown if target foe was moving."
+			"description": "If Enraged Smash hits, you gain 1...3 strikes of adrenaline. If you hit a moving foe, you strike for +10...40 damage, and target foe is knocked down.",
+			"concise": "Gives you 1...3 strikes of adrenaline if you hit. Deals +10...40 damage and causes knockdown if target foe was moving."
 		},
 		"2809": {
 			"id": 2809,
@@ -8003,8 +8003,8 @@
 		"2861": {
 			"id": 2861,
 			"name": "Penetrating Attack (PvP)",
-			"description": "If Penetrating Attack hits, you strike for +3...10 damage and this attack has 10% armor penetration.",
-			"concise": "Deals +3...10 damage. 10% armor penetration."
+			"description": "If Penetrating Attack hits, you strike for +5...15 damage and this attack has 10% armor penetration.",
+			"concise": "Deals +5...15 damage. 10% armor penetration."
 		},
 		"2862": {
 			"id": 2862,
@@ -8021,8 +8021,8 @@
 		"2864": {
 			"id": 2864,
 			"name": "Sundering Attack (PvP)",
-			"description": "If Sundering Attack hits, you strike for +3...10 damage and this attack has 10% armor penetration.",
-			"concise": "Deals +3...10 damage. 10% armor penetration."
+			"description": "If Sundering Attack hits, you strike for +5...15 damage and this attack has 10% armor penetration.",
+			"concise": "Deals +5...15 damage. 10% armor penetration."
 		},
 		"2866": {
 			"id": 2866,
@@ -8033,14 +8033,14 @@
 		"2867": {
 			"id": 2867,
 			"name": "Ancestors' Rage (PvP)",
-			"description": "For 3 seconds all foes adjacent to target ally are struck for 1...41 lightning damage each second.",
-			"concise": "(3 seconds.) Deals 1...41 lightning damage to foes adjacent to target ally each second."
+			"description": "For 3 seconds all foes adjacent to target ally are struck for 4...50 lightning damage each second.",
+			"concise": "(3 seconds.) Deals 4...50 lightning damage to foes adjacent to target ally each second."
 		},
 		"2868": {
 			"id": 2868,
 			"name": "Splinter Weapon (PvP)",
-			"description": "For 20 seconds, target ally has a Splinter Weapon. Target ally's next 1...5 attacks deal 5...30 damage to up to 4 adjacent foes.",
-			"concise": "(20 seconds.) Attacks deal 5...30 damage to 3 <sic/> adjacent foes. <gray>Ends after 1...5 attacks.</gray>"
+			"description": "For 20 seconds, target ally has a Splinter Weapon. Target ally's next 1...5 attacks deal 5...40 damage to up to 4 adjacent foes.",
+			"concise": "(20 seconds.) Attacks deal 5...40 damage to 3 <sic/> adjacent foes. <gray>Ends after 1...5 attacks.</gray>"
 		},
 		"2869": {
 			"id": 2869,
@@ -8177,8 +8177,8 @@
 		"2998": {
 			"id": 2998,
 			"name": "Fragility (PvP)",
-			"description": "For 8...20 seconds, target foe takes 5...20 damage each time that foe suffers or recovers from a new condition.",
-			"concise": "(8...20 seconds.) Target foe takes 5...20 damage each time it gains or loses a condition."
+			"description": "For 8...20 seconds, target and adjacent foes take 5...20 damage each time they suffer or recover from a new condition.",
+			"concise": "(8...20 seconds.) Also hexes foes adjacent to target. These foes take 5...20 damage each time they gain or lose a condition."
 		},
 		"2999": {
 			"id": 2999,
@@ -8273,8 +8273,8 @@
 		"3017": {
 			"id": 3017,
 			"name": "Disenchantment (PvP)",
-			"description": "Create a level 1...8 spirit. This spirit deals 5...20 damage and anyone struck by its attack loses one enchantment. This spirit dies after 10...35 seconds.",
-			"concise": "Creates a level 1...8 spirit (10...35 second lifespan). Its attacks deal 5...20 damage and remove one enchantment."
+			"description": "Create a level 1...8 spirit. This spirit deals 5...20 damage and anyone struck by its attack loses one enchantment. This spirit dies after 15...40 seconds.",
+			"concise": "Creates a level 1...8 spirit (15...40 second lifespan). Its attacks deal 5...20 damage and remove one enchantment."
 		},
 		"3018": {
 			"id": 3018,
@@ -8339,8 +8339,8 @@
 		"3028": {
 			"id": 3028,
 			"name": "Blazing Finale (PvP)",
-			"description": "For 10...35 seconds, whenever a chant or shout ends on target non-spirit ally, all foes adjacent to that ally are set on Fire for 1...3 seconds.",
-			"concise": "(10...35 seconds.) Inflicts Burning condition (1...3 seconds) to adjacent foes whenever a chant or shout ends on target ally. Cannot target spirits."
+			"description": "For 10...35 seconds, whenever a chant or shout ends on target non-spirit ally, all foes adjacent to that ally are set on Fire for 1...5 seconds.",
+			"concise": "(10...35 seconds.) Inflicts Burning condition (1...5 seconds) to adjacent foes whenever a chant or shout ends on target ally. Cannot target spirits."
 		},
 		"3029": {
 			"id": 3029,
@@ -8351,8 +8351,8 @@
 		"3030": {
 			"id": 3030,
 			"name": "Signet of Return (PvP)",
-			"description": "Resurrect target party member with 5...15% Health and 1...4% Energy for each party member within earshot.",
-			"concise": "Resurrects target party member (5...15% Health and 1...4% Energy for each party member in earshot)."
+			"description": "Resurrect target party member with 5...20% Health and 1...4% Energy for each party member within earshot.",
+			"concise": "Resurrects target party member (5...20% Health and 1...4% Energy for each party member in earshot)."
 		},
 		"3031": {
 			"id": 3031,
@@ -8417,8 +8417,8 @@
 		"3045": {
 			"id": 3045,
 			"name": "Comfort Animal (PvP)",
-			"description": "You heal your animal companion for 20...104 Health. If your companion is dead, it is resurrected with 10...58% Health.",
-			"concise": "Your pet gains 20...104 Health. Resurrects your pet (10...58% Health.)"
+			"description": "You heal your animal companion for 40...120 Health. If your companion is dead, it is resurrected with 10...58% Health. If you have Comfort Animal equipped, your animal companion will travel with you.",
+			"concise": "Your pet gains 40...120 Health. Resurrects your pet (10...58% Health.) If you have Comfort Animal equipped, your animal companion will travel with you."
 		},
 		"3047": {
 			"id": 3047,
@@ -8447,8 +8447,8 @@
 		"3051": {
 			"id": 3051,
 			"name": "Enraged Lunge (PvP)",
-			"description": "Your animal companion attempts an Enraged Lunge that deals +3...23 damage (maximum bonus 80) for each recharging Beast Mastery skill.",
-			"concise": "Deals +3...23 damage (maximum 80) for each of your recharging Beast Mastery skills."
+			"description": "Your animal companion attempts an Enraged Lunge that deals +3...23 damage (maximum bonus 60) for each recharging Beast Mastery skill.",
+			"concise": "Deals +3...23 damage (maximum 60) for each of your recharging Beast Mastery skills."
 		},
 		"3053": {
 			"id": 3053,
@@ -8519,14 +8519,14 @@
 		"3145": {
 			"id": 3145,
 			"name": "Glass Arrows (PvP)",
-			"description": "For 10...35 seconds, your arrows strike for +5...12 damage if they hit and cause Bleeding for 10...20 seconds if they are blocked.",
-			"concise": "(10...35 seconds.) Your arrows deal +5...12 damage. Inflicts Bleeding condition if blocked (10...20 seconds)."
+			"description": "For 10...35 seconds, your arrows strike for +6...18 damage if they hit and cause Bleeding for 10...20 seconds if they are blocked.",
+			"concise": "(10...35 seconds.) Your arrows deal +6...18 damage. Inflicts Bleeding condition if blocked (10...20 seconds)."
 		},
 		"3147": {
 			"id": 3147,
 			"name": "Keen Arrow (PvP)",
-			"description": "If this attack hits, you strike for +1...5 damage. If you land a critical hit, you deal an additional +5...30 damage.",
-			"concise": "Deals +1...5 damage. Deals +5...30 more damage if you land a critical hit."
+			"description": "If this attack hits, you strike for +5...15 damage. If you land a critical hit, you deal an additional +5...30 damage.",
+			"concise": "Deals +5...15 damage. Deals +5...30 more damage if you land a critical hit."
 		},
 		"3148": {
 			"id": 3148,
@@ -8579,8 +8579,8 @@
 		"3181": {
 			"id": 3181,
 			"name": "Illusionary Weaponry (PvP)",
-			"description": "For 30 seconds, your melee attacks neither hit nor fail to hit. Instead, Illusionary Weaponry deals 16...50 damage to your targets for each melee attack.",
-			"concise": "(30 seconds.) Deals 16...50 damage to foes in place of other damage or effects from melee attacks. <gray>Your melee attacks neither hit nor fail to hit.</gray>"
+			"description": "For 30 seconds, your melee attacks neither hit nor fail to hit. Instead, Illusionary Weaponry deals 20...60 damage to your targets for each melee attack.",
+			"concise": "(30 seconds.) Deals 20...60 damage to foes in place of other damage or effects from melee attacks. <gray>Your melee attacks neither hit nor fail to hit.</gray>"
 		},
 		"3183": {
 			"id": 3183,
@@ -8849,8 +8849,8 @@
 		"3422": {
 			"id": 3422,
 			"name": "Time Ward",
-			"description": "You create a Time Ward at your location. For 3...15 seconds, non-spirit allies in this area cast spells 15...20% faster and recharge skills 15...20% faster.",
-			"concise": "(3...15 seconds.) Allies in this ward cast spells 15...20% faster and recharge skills 15...20% faster. <gray>Allied spirits are not affected. PvE Skill</gray>"
+			"description": "You create a Time Ward at your location. For 6...20 seconds, non-spirit allies in this area cast spells 15...20% faster and recharge skills 15...20% faster.",
+			"concise": "(6...20 seconds.) Allies in this ward cast spells 15...20% faster and recharge skills 15...20% faster. <gray>Allied spirits are not affected. PvE Skill</gray>"
 		},
 		"3423": {
 			"id": 3423,
@@ -8861,8 +8861,8 @@
 		"3424": {
 			"id": 3424,
 			"name": "Over the Limit",
-			"description": "While you maintain this enchantment, your spells cast 15...20% faster, and recharge 15...50% faster, but you continuously gain Overcast.",
-			"concise": "Spells cast 15...20% faster and recharge 15...50% faster. Continuously gain Overcast while active."
+			"description": "While you maintain this enchantment, your spells cast 20...50% faster, and recharge 40...80% faster, but you continuously gain Overcast.",
+			"concise": "Spells cast 20...50% faster and recharge 40...80% faster. Continuously gain Overcast while active."
 		},
 		"3425": {
 			"id": 3425,
@@ -8911,6 +8911,198 @@
 			"name": "Farmer's Scythe (PvP)",
 			"description": "If this attack hits, you deal +5...35 damage. If you hit more than one foe, this attack recharges instantly.",
 			"concise": "Deals +5...35 damage. Instant recharge if you hit more than one foe."
+		},
+		"3442": {
+			"id": 3442,
+			"name": "Mighty Throw (PvP)",
+			"description": "Your spear moves three times faster. If it hits, you deal +10...40 damage.",
+			"concise": "Deals +10...40 damage. This spear moves three times faster."
+		},
+		"3443": {
+			"id": 3443,
+			"name": "Frenzy (PvP)",
+			"description": "For 8 seconds, you attack 33% faster but take 200...150% damage.",
+			"concise": "(8 seconds.) You attack 33% faster. <gray>You take 200...150% damage.</gray>"
+		},
+		"3444": {
+			"id": 3444,
+			"name": "Hundred Blades (PvP)",
+			"description": "For 15 seconds, whenever you attack with a sword, all adjacent foes take 10...30 slashing damage.",
+			"concise": "(15 seconds.) Deals 10...30 slashing damage to all adjacent foes whenever you attack with a sword."
+		},
+		"3445": {
+			"id": 3445,
+			"name": "Nature's Renewal (PvP)",
+			"description": "Create a level 1...10 spirit. For 30...240 seconds, enchantments and hexes cast by non-spirit creatures in range take 50...75% longer to cast, and it costs twice as much Energy to maintain enchantments. This spirit dies after 30...240 seconds.",
+			"concise": "Creates a level 1...10 spirit (30...240 second lifespan). For creatures in range, enchantments and Hexes take 50...75% as long to cast and it costs twice as much Energy to maintain enchantments. Does not affect spirits."
+		},
+		"3446": {
+			"id": 3446,
+			"name": "Soul Ignition",
+			"description": "While you maintain this enchantment, reduce overcast at a rate of 1...2 per second. You and all adjacent foes are afflicted with burning while this enchantment is active.",
+			"concise": "Reduce overcast at a rate of 1...2 per second. You and all adjacent foes are afflicted with burning."
+		},
+		"3447": {
+			"id": 3447,
+			"name": "Wastrel's Worry (PvP)",
+			"description": "After 3 seconds, target foe takes 20...100 damage and all adjacent foes take 75% of that damage. If that foe successfully uses a skill, Wastrel's Worry ends prematurely and does no damage.",
+			"concise": "(3 seconds). End effect: causes 20...100 damage to target and 75% of that damage to adjacent foes. <gray>No effect and ends early if target foe uses a skill.</gray>"
+		},
+		"3448": {
+			"id": 3448,
+			"name": "Peace and Harmony (PvP)",
+			"description": "Target ally loses 0...4 conditions and hexes. For 1...3 seconds, conditions and hexes expire 90% faster on that ally. All your Smiting Prayers are disabled for 20 seconds.",
+			"concise": "Target ally loses 0...4 conditions and hexes. Conditions and hexes expire 90% faster on that ally (1...3 seconds). <gray>Disables your Smiting Prayers (20 seconds).</gray>"
+		},
+		"3449": {
+			"id": 3449,
+			"name": "Protector's Strike (PvP)",
+			"description": "If this attack strikes a moving foe, you strike for 10...40 more damage.",
+			"concise": "Deals +10...40 damage if target is moving."
+		},
+		"3450": {
+			"id": 3450,
+			"name": "Crippling Shot (PvP)",
+			"description": "If Crippling Shot hits, your target becomes Crippled for 4...14 seconds. This attack cannot be blocked.",
+			"concise": "Unblockable. Inflicts Crippled condition (4...14 seconds)."
+		},
+		"3451": {
+			"id": 3451,
+			"name": "Otyugh's Cry (PvP)",
+			"description": "For 5...15 seconds, your animal companion gains +24 armor and cannot be blocked.",
+			"concise": "(5...15 seconds.) Your pet has +24 armor and is unblockable."
+		},
+		"3452": {
+			"id": 3452,
+			"name": "Shadow Shroud (PvP)",
+			"description": "For 2...7 seconds, target foe cannot be the target of enchantments.",
+			"concise": "(2...7 seconds.) Target foe cannot be the target of enchantments."
+		},
+		"3453": {
+			"id": 3453,
+			"name": "Dash (PvP)",
+			"description": "For 3 seconds, you run 50% faster. Every 2 points in Shadow Arts lowers recharge by 1 second (max 6 seconds).",
+			"concise": "(3 seconds.) You move 50% faster. Every 2 points in Shadow Arts lowers recharge by 1 second (max 6 seconds)."
+		},
+		"3454": {
+			"id": 3454,
+			"name": "Shield Guardian (PvP)",
+			"description": "For 1...4 seconds, all party members in earshot have a 75% chance to block incoming attacks. If an attack is blocked, all allies in earshot are healed for 10...35 and Shield Guardian ends.",
+			"concise": "(1...4 seconds). Party members in earshot have a 75% chance to block attacks. Block effect: Allies in earshot are healed for 10...35, and Shield Guardian ends."
+		},
+		"3455": {
+			"id": 3455,
+			"name": "Auspicious Blow (PvP)",
+			"description": "If Auspicious Blow hits, you strike for +5...20 damage and gain 2...4 Energy. If target foe is suffering from Weakness, this attack is unblockable.",
+			"concise": "Deals +5...20 damage and you gain 2...4 Energy. Unblockable if target foe is Weakened."
+		},
+		"3456": {
+			"id": 3456,
+			"name": "\"Coward!\" (PvP)",
+			"description": "If target foe is moving, that foe is knocked down.",
+			"concise": "Causes knock-down if target foe is moving."
+		},
+		"3457": {
+			"id": 3457,
+			"name": "Protector's Defense (PvP)",
+			"description": "For 4...8 seconds, allies adjacent to you have a 75% chance to block incoming attacks. Protector's Defense ends if you move.",
+			"concise": "(4...8 seconds.) Allies adjacent to you have 75% chance to block. <gray>Ends if you move.</gray>"
+		},
+		"3458": {
+			"id": 3458,
+			"name": "Primal Rage (PvP)",
+			"description": "For 1...9 seconds, you attack 33% faster and move 33% faster, but you take 200...150% damage.",
+			"concise": "(1...9 seconds.) You attack 33% faster and move 33% faster. <gray>You take 200...150% damage.</gray>"
+		},
+		"3459": {
+			"id": 3459,
+			"name": "Melandru's Shot (PvP)",
+			"description": "If Melandru's Shot hits, your target begins Bleeding for 5...25 seconds. If it hits a foe that is moving or knocked down, that foe takes +10...25 damage and is Crippled for 5...15 seconds.",
+			"concise": "Inflicts Bleeding (5...25 seconds). Deals +10...25 damage and inflicts Crippled (5...15 seconds) if target foe was moving or knocked down."
+		},
+		"3460": {
+			"id": 3460,
+			"name": "Tranquility (PvP)",
+			"description": "Create a level 1...10 spirit. Enchantments cast by non-spirit creatures within its range expire 10...30% faster. This spirit dies after 15...120 seconds.",
+			"concise": "Creates a level 1...10 spirit (15...120 second lifespan). Enchantments expire 10...30% faster on creatures in range. Does not affect spirits."
+		},
+		"3461": {
+			"id": 3461,
+			"name": "Soul Twisting (PvP)",
+			"description": "For 5...45 seconds, your Binding Rituals cost 15 less Energy (minimum 5) and recharge 25...50% faster. Soul Twisting ends after 1...3 Binding Rituals.",
+			"concise": "(5...45 seconds.) Your Binding Rituals cost 15 less Energy (minimum 5) and recharge 25...50% faster. <gray>Ends after 1...3 Binding Rituals.</gray>"
+		},
+		"3462": {
+			"id": 3462,
+			"name": "Guided Weapon (PvP)",
+			"description": "For 4...10 seconds, target ally's attacks cannot be blocked.",
+			"concise": "(4...10 seconds.) Attacks are unblockable."
+		},
+		"3463": {
+			"id": 3463,
+			"name": "Tease (PvP)",
+			"description": "If target foe is using a skill, that foe and other foes in the area are interrupted and you steal 0...5 Energy from all foes in the area.",
+			"concise": "Interrupts a skill. Interruption effect: also interrupts other foes in the area, and you steal 0...5 Energy from all foes in the area."
+		},
+		"3464": {
+			"id": 3464,
+			"name": "Flail (PvP)",
+			"description": "For 1...15 seconds, you attack 33% faster but move 33% slower. Ends if you use a ranged attack skill.",
+			"concise": "(1...15 seconds.) You attack 33% faster. Ends if you use a ranged attack skill. <gray>You move 33% slower.</gray>"
+		},
+		"3465": {
+			"id": 3465,
+			"name": "Charging Strike (PvP)",
+			"description": "For 1...10 seconds, you run 33% faster. Your next successful melee hit does +10...80 damage and this stance ends. This stance ends if you use a skill.",
+			"concise": "(1...10 seconds.) You move 33% faster and deal +10...80 damage with your next melee hit. <gray>Ends when you hit or if you use a skill.</gray>"
+		},
+		"3466": {
+			"id": 3466,
+			"name": "Infuriating Heat (PvP)",
+			"description": "Create a level 1...10 spirit. Non-spirit creatures within its range gain adrenaline 33...66% as fast. This spirit dies after 30...120 seconds.",
+			"concise": "Creates a level 1...10 spirit (30...120 second lifespan). Adrenaline gain increases by 33...66% for creatures in range."
+		},
+		"3467": {
+			"id": 3467,
+			"name": "Mystic Corruption (PvP)",
+			"description": "All adjacent foes suffer from Disease for 2...6 seconds. For 20 seconds, nothing happens. Disease duration is doubled if you are enchanted when you activate this skill. When this enchantment ends, all party members in earshot are cured of Disease.",
+			"concise": "(20 seconds.) Initial Effect: all adjacent foes are Diseased (2...6 seconds.) Double duration if you are already enchanted. End Effect: party members in earshot lose Disease."
+		},
+		"3468": {
+			"id": 3468,
+			"name": "Harrier's Grasp (PvP)",
+			"description": "For 5...20 seconds, melee attacks against moving foes also Cripple those foes for 2...9 seconds. When you cast this enchantment, you are relieved of Cripple and 1 other condition. This enchantment ends after you apply Cripple 1...3 times.",
+			"concise": "(5...20 seconds.) Melee attacks on moving foes also Cripple them. Initial Effect: you lose Cripple and 1 other condition. Ends after you apply Cripple 1...3 times."
+		},
+		"3469": {
+			"id": 3469,
+			"name": "Mirage Cloak (PvP)",
+			"description": "For 1...7 seconds, you have a 30...60% chance to block incoming attacks. When you cast this enchantment, all nearby foes are struck for 10...40 earth damage.",
+			"concise": "(1...7 seconds.) You have 30...60% chance to block. Initial Effect: deals 10...40 earth damage to nearby foes."
+		},
+		"3470": {
+			"id": 3470,
+			"name": "Fleeting Stability (PvP)",
+			"description": "For 2...8 seconds, you cannot be knocked down and move 25% faster. This enchantment ends prematurely if it prevents a knockdown.",
+			"concise": "(2...8 seconds.) You cannot be knocked down and move 25% faster. Ends if knockdown prevented."
+		},
+		"3471": {
+			"id": 3471,
+			"name": "Pious Restoration (PvP)",
+			"description": "You gain 80...150 Health and remove 1 Dervish enchantment. If an enchantment was removed in this way, you also lose 1 hex.",
+			"concise": "Gain 80...150 Health and remove 1 Dervish enchantment. Removal effect: lose 1 hex."
+		},
+		"3472": {
+			"id": 3472,
+			"name": "Whirling Charge (PvP)",
+			"description": "For 1...6 seconds, you move 33% faster than normal. The next time you strike a foe, all other nearby foes take 10...50 cold damage and this enchantment ends.",
+			"concise": "(1...6 seconds.) You move 33% faster. Deal 10...50 cold damage to all other nearby foes the next time you hit a foe and this enchantment ends."
+		},
+		"3473": {
+			"id": 3473,
+			"name": "Aura Slicer (PvP)",
+			"description": "If this attack hits, you inflict Bleeding for 5...15 seconds. If you are enchanted, you also inflict Cracked Armor for 1...10 seconds.",
+			"concise": "(5...15 seconds.)Inflicts <sic/> Bleeding condition. Also inflicts Cracked Armor (1...10 seconds) if you are enchanted."
 		}
 	}
 }

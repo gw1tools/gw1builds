@@ -43,8 +43,10 @@ const changeset = readJson(path.resolve(changesetPath))
 const failures = []
 let dataChanges = 0
 let descChanges = 0
+let created = 0
 
 const same = (a, b) => Object.is(a, b)
+const sameRecord = (a, b) => JSON.stringify(a) === JSON.stringify(b) // key order is canonical in both
 
 for (const entry of changeset.entries) {
   const id = entry.id
@@ -58,6 +60,22 @@ for (const entry of changeset.entries) {
   const d = skillData[key]
   const t = skillDesc[key]
   const label = `${id} ${entry.name}`
+
+  // New skill: insert only if the id is free; an identical existing record is
+  // an idempotent re-run. Anything else (half-present, different) refuses.
+  if (entry.create) {
+    const { data: cd, desc: ct } = entry.create
+    if (!d && !t && !auditOnly) {
+      skillData[key] = cd
+      skillDesc[key] = ct
+      created += 1
+    } else if (!(d && t && sameRecord(d, cd) && sameRecord(t, ct))) {
+      failures.push(
+        `[${label}] ${auditOnly ? 'audit: created record differs or missing' : 'create refused: id already exists with different data'}`
+      )
+    }
+    continue
+  }
 
   if (!d || !t) {
     failures.push(`[${label}] missing local skill entry`)
@@ -130,6 +148,6 @@ if (auditOnly) {
   )
 } else {
   console.log(
-    `applied changeset ${changeset.date}: ${dataChanges} numeric + ${descChanges} text changes written.`
+    `applied changeset ${changeset.date}: ${created} skills created, ${dataChanges} numeric + ${descChanges} text changes written.`
   )
 }

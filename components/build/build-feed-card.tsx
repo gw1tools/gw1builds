@@ -22,6 +22,7 @@ import { MAX_DISPLAYED_TAGS, TAG_LABELS } from '@/lib/constants'
 import type { BuildListItem } from '@/types/database'
 import type { ProfessionKey } from '@/types/gw1'
 import { isPvxBuildId } from '@/lib/pvx'
+import { isPvpOnlyBuild } from '@/lib/gw/skills'
 import { useCanHover } from '@/hooks'
 
 export interface BuildFeedCardProps {
@@ -171,7 +172,7 @@ function TeamCompositionTooltip({
  * Empty slots match the build detail page styling (dark with ghost icon)
  * Horizontally scrollable on small screens to fit all 8 icons
  */
-const SkillPreview = memo(function SkillPreview({ skills, size = 'default' }: { skills: number[]; size?: 'default' | 'lg' }) {
+const SkillPreview = memo(function SkillPreview({ skills, size = 'default', pvp = false }: { skills: number[]; size?: 'default' | 'lg'; pvp?: boolean }) {
   // Ensure 8 slots
   const normalizedSkills = [...skills]
   while (normalizedSkills.length < 8) {
@@ -187,6 +188,7 @@ const SkillPreview = memo(function SkillPreview({ skills, size = 'default' }: { 
           <SkillSlot
             key={`slot-${index}-${skillId}`}
             skillId={skillId}
+            pvp={pvp}
             size={iconSize}
             position={index + 1}
             emptyVariant="viewer"
@@ -377,7 +379,11 @@ export const BuildFeedCard = memo(function BuildFeedCard({
 
       {/* Skill Preview */}
       <div className={size === 'lg' ? 'mb-4' : 'mb-3'}>
-        <SkillPreview skills={firstBar?.skills || []} size={size} />
+        <SkillPreview
+          skills={firstBar?.skills || []}
+          size={size}
+          pvp={isPvpOnlyBuild(build.tags)}
+        />
       </div>
 
       {/* Footer: Tags (left) + Stats/Attribution (right) */}

@@ -92,9 +92,11 @@ export const renderWikiText = raw => {
     const neg = parts.includes('-')
     const nums = parts.filter(p => /^[+-]?\d/.test(p))
     if (nums.length === 0) return ''
+    // A "%" arg is the unit suffix, e.g. {{gr|175|125||%}} -> 175...125%
+    const unit = parts.includes('%') ? '%' : ''
     const range =
       nums.length === 1 ? nums[0] : `${nums[0]}...${nums[nums.length - 1]}`
-    return neg ? `-${range}` : range
+    return (neg ? `-${range}` : range) + unit
   })
   // bold/italic wiki markup
   t = t.replace(/'''''|'''|''/g, '')
@@ -174,6 +176,9 @@ export const parseSkillInfobox = wikitext => {
     if (v == null) return undefined
     const s = String(v).trim()
     if (s === '') return undefined
+    // generic fraction template, optionally after an integer: {{3/2}} = 1.5
+    const fr = s.match(/^(\d+)?\s*\{\{\s*(\d+)\s*\/\s*(\d+)\s*\}\}/)
+    if (fr) return (fr[1] ? Number(fr[1]) : 0) + Number(fr[2]) / Number(fr[3])
     // fraction templates {{1/4}} / glyphs ¼, optionally with a leading integer
     for (const [g, f] of Object.entries(FRAC)) {
       if (s.includes(g)) {
@@ -235,8 +240,17 @@ export const parseUpdatePage = async date => {
 }
 
 /**
+ * h3 headings that open the per-skill change section. ArenaNet's wording varies:
+ * "... Balance Update" (Feb/Jun 2026), "Skill adjustments" (Jul 8), "Skill update
+ * details" (Aug 26), "Skill updates" (Sep 1). "Skill AI Adjustments" must NOT
+ * match — AI behaviour changes don't touch skill data.
+ */
+const BALANCE_HEADING_RE =
+  /balance update|^skill (adjustments|updates?|update details)$/i
+
+/**
  * Parse the per-skill balance change lines from a Feedback:Game updates/<date>
- * page. Only the "Balance Update" section is read (AI/bug-fix sections are
+ * page. Only the balance section (see BALANCE_HEADING_RE) is read (AI/bug-fix sections are
  * skipped). Returns [{ profession, name, variant, text }] where variant is
  * 'PvE' | 'PvP' | 'BOTH' | null, name is the skill-icon name (may embed a
  * "(PvP)"/"(PvE)" suffix), and text is the raw change description.
@@ -253,15 +267,12 @@ export const parseBalanceChanges = async date => {
     if (h) {
       const level = h[1].length
       const title = h[2]
-      if (level === 3 && /balance update/i.test(title)) {
+      if (level === 3 && BALANCE_HEADING_RE.test(title)) {
         inBalance = true
         continue
       }
-      if (inBalance && level <= 3 && !/balance update/i.test(title)) {
-        if (level <= 2) inBalance = false
-        else if (level === 3) inBalance = false
-      }
-      if (inBalance && level === 4) profession = title
+      if (inBalance && level <= 3) inBalance = false
+      if (inBalance && level === 4) profession = title.replace(/\[\[|\]\]/g, '')
       continue
     }
     if (!inBalance) continue
@@ -297,7 +308,7 @@ export const parseBalanceOtherBullets = async date => {
     if (h) {
       const level = h[1].length
       const title = h[2]
-      if (level === 3 && /balance update/i.test(title)) inBalance = true
+      if (level === 3 && BALANCE_HEADING_RE.test(title)) inBalance = true
       else if (inBalance && level <= 3) inBalance = false
       continue
     }
