@@ -6,6 +6,7 @@
 
 - Skill data now matches the [July 8](https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260708), [August 26](https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260826) and [September 1, 2026](https://wiki.guildwars.com/wiki/Feedback:Game_updates/20260901) game updates — 182 skills, full breakdown below
 - 31 skills now have their own PvP version, including **Frenzy**, **Primal Rage**, **Hundred Blades**, **Dash**, **Mirage Cloak**, **Shield Guardian** and **Mighty Throw**
+- Builds tagged PvP now show the PvP version of each skill, like the game does in PvP. Template codes don't change
 - New PvE-only Elementalist skill: **Soul Ignition**, an Energy Storage enchantment that burns off Overcast and sets you and adjacent foes on fire
 - Reworks for **Frenzy** and **Primal Rage** (damage taken now scales down with Strength, Frenzy moves to Strength), **Mirage Cloak**, **Focused Shot**, **Shove**, **Necrotic Traversal** and **Spear of Lightning**. **Dash** moves to Shadow Arts
 - The whole Warrior sword line costs 1 less adrenaline, and Water and Air Magic got cheaper and faster

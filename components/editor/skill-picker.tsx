@@ -62,6 +62,7 @@ export const EMPTY_SKILL: Skill = {
   overcast: 0,
   isRoleplay: false,
   pvpSplit: false,
+  splitId: 0,
 }
 
 const PROFESSION_ALIASES: Record<string, string> = {

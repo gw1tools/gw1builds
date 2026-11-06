@@ -24,6 +24,7 @@ export {
   getSkillById,
   getSkillByName,
   getSkillsByIds,
+  isPvpOnlyBuild,
   searchSkills,
   getSkillsByProfession,
   getEliteSkills,
